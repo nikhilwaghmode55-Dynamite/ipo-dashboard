@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live IPO Decision Engine</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --success-bg: #dcfce7;
+      --success-text: #166534;
+      --warning-bg: #fef9c3;
+      --warning-text: #854d0e;
+      --danger-bg: #fee2e2;
+      --danger-text: #991b1b;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 24px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    header {
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+    }
+    h1 { margin: 0 0 4px 0; font-size: 24px; }
+    p { margin: 0; color: var(--muted); font-size: 14px; }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .ipo-name { font-size: 18px; font-weight: 700; margin: 0; }
+    .ipo-sector { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-open { background: var(--success-bg); color: var(--success-text); }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 8px;
+    }
+    .metric-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .metric-value { font-size: 15px; font-weight: 600; margin-top: 2px; }
+    .decision-box {
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+    .verdict-tag {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    .verdict-apply { background: var(--success-bg); color: var(--success-text); }
+    .verdict-caution { background: var(--warning-bg); color: var(--warning-text); }
+    .verdict-avoid { background: var(--danger-bg); color: var(--danger-text); }
+    .summary-text { font-size: 14px; font-weight: 500; margin-bottom: 10px; color: #334155; }
+    .check-item { font-size: 13px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+    .check-pass { color: var(--success-text); }
+    .check-fail { color: var(--danger-text); }
+    .check-warn { color: var(--warning-text); }
+    .historical-box {
+      font-size: 13px;
+      color: var(--primary);
+      background: #eff6ff;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Live IPO Decision Engine</h1>
+      <p>Pre-application analytical framework &amp; open listings tracker (<span id="last-updated">Loading...</span>)</p>
+    </header>
+
+    <div id="cards-container">
+      <p style="text-align:center; color: var(--muted);">Loading open IPOs...</p>
+    </div>
+  </div>
+
+  <script>
+    async function loadData() {
+      try {
+        const response = await fetch('data.json');
+        const data = await response.json();
+        
+        document.getElementById('last-updated').textContent = `Last updated: ${data.lastUpdated || 'Just now'}`;
+        
+        const container = document.getElementById('cards-container');
+        container.innerHTML = '';
+
+        const openIpos = data.upcoming || [];
+
+        if (openIpos.length === 0) {
+          container.innerHTML = `<div class="card" style="text-align: center; color: var(--muted);">No OPEN IPOs found for today. Check back when an issue opens!</div>`;
+          return;
+        }
+
+        openIpos.forEach(ipo => {
+          let checksHtml = '';
+          if (ipo.checks) {
+            ipo.checks.forEach(c => {
+              checksHtml += `<div class="check-item ${c.cls}"><span>${c.icon}</span> <span>${c.text}</span></div>`;
+            });
+          }
+
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <div class="card-header">
+              <div>
+                <div class="ipo-name">${ipo.name}</div>
+                <div class="ipo-sector">${ipo.sector}</div>
+              </div>
+              <span class="badge badge-open">${ipo.status}</span>
+            </div>
+
+            <div class="grid">
+              <div>
+                <div class="metric-label">Cut-off Price</div>
+                <div class="metric-value">${ipo.issuePrice ? '₹' + ipo.issuePrice : 'TBA'}</div>
+              </div>
+              <div>
+                <div class="metric-label">Lot Size</div>
+                <div class="metric-value">${ipo.lotSize ? ipo.lotSize + ' shares' : 'TBA'}</div>
+              </div>
+              <div>
+                <div class="metric-label">Investment Needed</div>
+                <div class="metric-value">${ipo.minAmount ? '₹' + ipo.minAmount.toLocaleString('en-IN') : 'TBA'}</div>
+              </div>
+              <div>
+                <div class="metric-label">Issue Size</div>
+                <div class="metric-value">${ipo.issueSize || 'TBA'}</div>
+              </div>
+              <div>
+                <div class="metric-label">Closes</div>
+                <div class="metric-value">${ipo.closeDate || 'TBA'}</div>
+              </div>
+              <div>
+                <div class="metric-label">Listing</div>
+                <div class="metric-value">${ipo.listingDate || 'TBA'}</div>
+              </div>
+            </div>
+
+            <div class="decision-box">
+              <div class="verdict-tag ${ipo.verdictCls}">${ipo.verdict}</div>
+              ${ipo.summary ? `<div class="summary-text">${ipo.summary}</div>` : ''}
+              <div style="margin-top: 8px;">${checksHtml}</div>
+              ${ipo.historicalGain ? `<div class="historical-box">📊 <strong>Sector Benchmark:</strong> ${ipo.historicalGain}</div>` : ''}
+            </div>
+          `;
+          container.appendChild(card);
+        });
+
+      } catch (err) {
+        document.getElementById('cards-container').innerHTML = `<div class="card" style="color: red;">Error loading data.json. Ensure workflow has generated output files.</div>`;
+      }
+    }
+
+    loadData();
+  </script>
+</body>
+</html>

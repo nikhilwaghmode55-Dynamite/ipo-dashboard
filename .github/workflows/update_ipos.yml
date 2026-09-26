@@ -1,0 +1,36 @@
+name: Auto-Fetch Latest IPOs
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Daily at midnight UTC
+  workflow_dispatch:
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4
+
+      - name: Run fetch script
+        run: |
+          python fetch_ipos.py
+
+      - name: Commit and push changes if data updated
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json ipo_cache.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Automated IPO decision engine refresh [skip ci]" && git push)
