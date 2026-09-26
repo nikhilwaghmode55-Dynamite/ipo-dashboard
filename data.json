@@ -7,10 +7,10 @@
       "status": "Open",
       "openDate": "25 September 2026",
       "closeDate": "29 September 2026",
-      "listingDate": "TBA",
-      "issuePrice": 420,
-      "lotSize": 30,
-      "minAmount": 12600,
+      "listingDate": "05 Oct 2026",
+      "issuePrice": 32,
+      "lotSize": 468,
+      "minAmount": 14976,
       "issueSize": "\u20b9420 Cr",
       "historicalGain": "16.5% avg listing gain in last 1 yr (3/5 positive)",
       "summary": "Strong fundamentals outperforming historical benchmarks in Consumer Discretionary. Favorable risk profile.",
@@ -39,33 +39,48 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:12 PM"
+      "lastFetched": "26 Sep 2026, 04:30 PM"
     },
     {
       "name": "German Green Steel",
       "symbol": "GERMA",
-      "sector": "Financials (Mainboard IPO)",
+      "sector": "Materials (Mainboard IPO)",
       "status": "Open",
       "openDate": "25 September 2026",
       "closeDate": "29 September 2026",
       "listingDate": "TBA",
-      "issuePrice": 304,
+      "issuePrice": 139,
       "lotSize": 100,
-      "minAmount": 30400,
+      "minAmount": 13900,
       "issueSize": "\u20b9304 Cr",
-      "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials historical trends.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "17.0% avg listing gain in last 1 yr (3/4 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Materials. Favorable risk profile.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending terminal entry"
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "High P/S valuation (4.0x vs sector avg 2.5x)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Robust growth (16.0% vs sector avg 13.0%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "High promoter confidence (60.0% holding)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Proceeds deployed for business expansion (capex)"
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:13 PM"
+      "lastFetched": "26 Sep 2026, 04:31 PM"
     },
     {
       "name": "Runwal Enterprises",
@@ -75,9 +90,9 @@
       "openDate": "25 September 2026",
       "closeDate": "29 September 2026",
       "listingDate": "TBA",
-      "issuePrice": 500,
-      "lotSize": 500,
-      "minAmount": 250000,
+      "issuePrice": 305,
+      "lotSize": 100,
+      "minAmount": 30500,
       "issueSize": "\u20b9500 Cr",
       "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
       "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials historical trends.",
@@ -91,7 +106,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:13 PM"
+      "lastFetched": "26 Sep 2026, 04:31 PM"
     },
     {
       "name": "Orient Cables",
@@ -101,9 +116,9 @@
       "openDate": "25 September 2026",
       "closeDate": "29 September 2026",
       "listingDate": "TBA",
-      "issuePrice": 552,
+      "issuePrice": 272,
       "lotSize": 100,
-      "minAmount": 55200,
+      "minAmount": 27200,
       "issueSize": "\u20b9552 Cr",
       "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
       "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials historical trends.",
@@ -117,7 +132,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:13 PM"
+      "lastFetched": "26 Sep 2026, 04:31 PM"
     },
     {
       "name": "Moneyview",
@@ -126,10 +141,10 @@
       "status": "Open",
       "openDate": "24 September 2026",
       "closeDate": "28 September 2026",
-      "listingDate": "TBA",
-      "issuePrice": 34,
-      "lotSize": 441,
-      "minAmount": 14994,
+      "listingDate": "01 Oct 2026",
+      "issuePrice": 1092,
+      "lotSize": 100,
+      "minAmount": 109200,
       "issueSize": "\u20b91,092 Cr",
       "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
       "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials historical trends.",
@@ -143,7 +158,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:13 PM"
+      "lastFetched": "26 Sep 2026, 04:31 PM"
     },
     {
       "name": "A-One Steels",
@@ -154,8 +169,8 @@
       "closeDate": "28 September 2026",
       "listingDate": "TBA",
       "issuePrice": 405,
-      "lotSize": 37,
-      "minAmount": 14985,
+      "lotSize": 100,
+      "minAmount": 40500,
       "issueSize": "\u20b9405 Cr",
       "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
       "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials historical trends.",
@@ -169,7 +184,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:13 PM"
+      "lastFetched": "26 Sep 2026, 04:31 PM"
     },
     {
       "name": "Dudani Retail",
@@ -195,7 +210,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:13 PM"
+      "lastFetched": "26 Sep 2026, 04:31 PM"
     },
     {
       "name": "Sai Urja",
@@ -221,7 +236,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:13 PM"
+      "lastFetched": "26 Sep 2026, 04:31 PM"
     },
     {
       "name": "Himalayan Solar",
@@ -232,8 +247,8 @@
       "closeDate": "29 September 2026",
       "listingDate": "TBA",
       "issuePrice": 103,
-      "lotSize": 68,
-      "minAmount": 14008,
+      "lotSize": 1000,
+      "minAmount": 206000,
       "issueSize": "\u20b968.03 Cr",
       "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
       "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials historical trends.",
@@ -247,7 +262,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:13 PM"
+      "lastFetched": "26 Sep 2026, 04:31 PM"
     },
     {
       "name": "Bench Mark Infotech",
@@ -273,7 +288,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:13 PM"
+      "lastFetched": "26 Sep 2026, 04:31 PM"
     },
     {
       "name": "Green Asia Impex",
@@ -299,7 +314,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:13 PM"
+      "lastFetched": "26 Sep 2026, 04:31 PM"
     },
     {
       "name": "Peshwa Wheat",
@@ -325,7 +340,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:13 PM"
+      "lastFetched": "26 Sep 2026, 04:31 PM"
     },
     {
       "name": "Roopa Screen",
@@ -351,7 +366,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:13 PM"
+      "lastFetched": "26 Sep 2026, 04:31 PM"
     },
     {
       "name": "NSE",
@@ -361,9 +376,9 @@
       "openDate": "September 17, 2026",
       "closeDate": "TBA",
       "listingDate": "TBA",
-      "issuePrice": 22562,
+      "issuePrice": 1785,
       "lotSize": 100,
-      "minAmount": 2256200,
+      "minAmount": 178500,
       "issueSize": "\u20b922,562 Cr",
       "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
       "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials historical trends.",
@@ -377,8 +392,8 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:13 PM"
+      "lastFetched": "26 Sep 2026, 04:31 PM"
     }
   ],
-  "lastUpdated": "26 Sep 2026, 04:13 PM"
+  "lastUpdated": "26 Sep 2026, 04:31 PM"
 }

@@ -5,5 +5,12 @@
     "cagr3Yr": 15.9,
     "proceedsUse": "Capex",
     "promoterPct": 55.0
+  },
+  "german-green-steel": {
+    "sector": "Materials",
+    "psRatio": 4.0,
+    "cagr3Yr": 16.0,
+    "proceedsUse": "Capex",
+    "promoterPct": 60.0
   }
 }
