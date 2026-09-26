@@ -96,10 +96,17 @@ def is_currently_open(open_str, close_str):
     open_dt = parse_date_string(open_str)
     close_dt = parse_date_string(close_str)
     
+    # Explicitly exclude known closed or old listings
+    if "nse" in str(open_str).lower() or "nse" in str(close_str).lower():
+        return False
+
     if open_dt and close_dt:
         return open_dt.date() <= today <= close_dt.date()
     elif open_dt:
-        return open_dt.date() <= today
+        # If close date is TBA, only consider it open if it started within the last 7 days
+        days_since_open = (today - open_dt.date()).days
+        return 0 <= days_since_open <= 7
+        
     return False
 
 def classify_ipo_type(name, table_heading):

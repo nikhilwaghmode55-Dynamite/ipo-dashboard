@@ -39,7 +39,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:30 PM"
+      "lastFetched": "26 Sep 2026, 04:34 PM"
     },
     {
       "name": "German Green Steel",
@@ -80,7 +80,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:31 PM"
+      "lastFetched": "26 Sep 2026, 04:34 PM"
     },
     {
       "name": "Runwal Enterprises",
@@ -106,7 +106,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:31 PM"
+      "lastFetched": "26 Sep 2026, 04:34 PM"
     },
     {
       "name": "Orient Cables",
@@ -132,7 +132,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:31 PM"
+      "lastFetched": "26 Sep 2026, 04:34 PM"
     },
     {
       "name": "Moneyview",
@@ -158,7 +158,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:31 PM"
+      "lastFetched": "26 Sep 2026, 04:34 PM"
     },
     {
       "name": "A-One Steels",
@@ -184,7 +184,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:31 PM"
+      "lastFetched": "26 Sep 2026, 04:34 PM"
     },
     {
       "name": "Dudani Retail",
@@ -210,7 +210,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:31 PM"
+      "lastFetched": "26 Sep 2026, 04:34 PM"
     },
     {
       "name": "Sai Urja",
@@ -236,7 +236,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:31 PM"
+      "lastFetched": "26 Sep 2026, 04:34 PM"
     },
     {
       "name": "Himalayan Solar",
@@ -262,7 +262,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:31 PM"
+      "lastFetched": "26 Sep 2026, 04:34 PM"
     },
     {
       "name": "Bench Mark Infotech",
@@ -288,7 +288,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:31 PM"
+      "lastFetched": "26 Sep 2026, 04:34 PM"
     },
     {
       "name": "Green Asia Impex",
@@ -314,7 +314,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:31 PM"
+      "lastFetched": "26 Sep 2026, 04:34 PM"
     },
     {
       "name": "Peshwa Wheat",
@@ -340,7 +340,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:31 PM"
+      "lastFetched": "26 Sep 2026, 04:34 PM"
     },
     {
       "name": "Roopa Screen",
@@ -366,34 +366,8 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 04:31 PM"
-    },
-    {
-      "name": "NSE",
-      "symbol": "NSE",
-      "sector": "Financials (Mainboard IPO)",
-      "status": "Open",
-      "openDate": "September 17, 2026",
-      "closeDate": "TBA",
-      "listingDate": "TBA",
-      "issuePrice": 1785,
-      "lotSize": 100,
-      "minAmount": 178500,
-      "issueSize": "\u20b922,562 Cr",
-      "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials historical trends.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
-      "checks": [
-        {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending terminal entry"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "26 Sep 2026, 04:31 PM"
+      "lastFetched": "26 Sep 2026, 04:34 PM"
     }
   ],
-  "lastUpdated": "26 Sep 2026, 04:31 PM"
+  "lastUpdated": "26 Sep 2026, 04:34 PM"
 }
