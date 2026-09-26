@@ -116,7 +116,8 @@
   <script>
     async function loadData() {
       try {
-        const response = await fetch('data.json');
+        // Appending a timestamp (?v=...) prevents browser caching issues on GitHub Pages
+        const response = await fetch('data.json?v=' + new Date().getTime());
         const data = await response.json();
         
         document.getElementById('last-updated').textContent = `Last updated: ${data.lastUpdated || 'Just now'}`;
