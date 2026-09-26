@@ -14,18 +14,33 @@
       "minAmount": 15000,
       "issueSize": "\u20b9420 Cr",
       "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "summary": "Subpar valuation or growth metrics compared to peers in Financials.",
+      "verdict": "Avoid",
+      "verdictCls": "verdict-avoid",
       "checks": [
         {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (1.0x vs sector avg 3.8x)"
+        },
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "Slow revenue growth (1.0%)"
+        },
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "Low promoter holding (1.0%)"
+        },
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "Proceeds for debt repayment / OFS (1)"
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 07:54 PM"
+      "lastFetched": "26 Sep 2026, 08:01 PM"
     },
     {
       "slug": "german-green-steel",
@@ -41,18 +56,33 @@
       "minAmount": 66000,
       "issueSize": "\u20b9304 Cr",
       "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "summary": "Subpar valuation or growth metrics compared to peers in Financials.",
+      "verdict": "Avoid",
+      "verdictCls": "verdict-avoid",
       "checks": [
         {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "High P/S valuation (5.0x vs sector avg 3.8x)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Robust growth (20.0% vs sector avg 18.0%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "High promoter confidence (74.0% holding)"
+        },
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "Proceeds for debt repayment / OFS (ofs)"
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 07:54 PM"
+      "lastFetched": "26 Sep 2026, 08:01 PM"
     },
     {
       "slug": "runwal-enterprises",
@@ -79,7 +109,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 07:54 PM"
+      "lastFetched": "26 Sep 2026, 08:01 PM"
     },
     {
       "slug": "orient-cables",
@@ -106,7 +136,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 07:54 PM"
+      "lastFetched": "26 Sep 2026, 08:01 PM"
     },
     {
       "slug": "moneyview",
@@ -133,7 +163,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 07:54 PM"
+      "lastFetched": "26 Sep 2026, 08:01 PM"
     },
     {
       "slug": "a-one-steels",
@@ -160,7 +190,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 07:54 PM"
+      "lastFetched": "26 Sep 2026, 08:01 PM"
     },
     {
       "slug": "dudani-retail",
@@ -187,7 +217,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 07:54 PM"
+      "lastFetched": "26 Sep 2026, 08:01 PM"
     },
     {
       "slug": "sai-urja",
@@ -214,7 +244,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 07:54 PM"
+      "lastFetched": "26 Sep 2026, 08:01 PM"
     },
     {
       "slug": "himalayan-solar",
@@ -241,7 +271,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 07:54 PM"
+      "lastFetched": "26 Sep 2026, 08:01 PM"
     },
     {
       "slug": "bench-mark-infotech",
@@ -268,7 +298,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 07:54 PM"
+      "lastFetched": "26 Sep 2026, 08:01 PM"
     },
     {
       "slug": "green-asia-impex",
@@ -295,7 +325,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 07:54 PM"
+      "lastFetched": "26 Sep 2026, 08:01 PM"
     },
     {
       "slug": "peshwa-wheat",
@@ -322,7 +352,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 07:54 PM"
+      "lastFetched": "26 Sep 2026, 08:01 PM"
     },
     {
       "slug": "roopa-screen",
@@ -349,8 +379,8 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Sep 2026, 07:54 PM"
+      "lastFetched": "26 Sep 2026, 08:01 PM"
     }
   ],
-  "lastUpdated": "26 Sep 2026, 07:54 PM"
+  "lastUpdated": "26 Sep 2026, 08:01 PM"
 }

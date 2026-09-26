@@ -1,0 +1,18 @@
+{
+  "acevector": {
+    "sector": "Information Technology",
+    "psRatio": 1.0,
+    "cagr3Yr": 1.0,
+    "proceedsUse": "1",
+    "promoterPct": 1.0,
+    "lotSize": 1
+  },
+  "german-green-steel": {
+    "sector": "Financials",
+    "psRatio": 5.0,
+    "cagr3Yr": 20.0,
+    "proceedsUse": "OFS",
+    "promoterPct": 74.0,
+    "lotSize": 30
+  }
+}
