@@ -40,11 +40,19 @@ def save_cache(cache):
         json.dump(cache, f, indent=2)
 
 def load_existing_data():
+    """Safely loads existing data, handling any missing slugs gracefully."""
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             try:
                 data = json.load(f)
-                return {item["slug"]: item for item in data.get("upcoming", [])}
+                result = {}
+                for item in data.get("upcoming", []):
+                    slug = item.get("slug")
+                    if not slug and item.get("name"):
+                        slug = item["name"].lower().replace(" ", "-")
+                    if slug:
+                        result[slug] = item
+                return result
             except json.JSONDecodeError:
                 return {}
     return {}
@@ -104,12 +112,12 @@ def is_currently_open(open_str, close_str):
     if not open_dt or not close_dt:
         return False
         
-    # Strict active window: today must be >= open date and <= close date
     return open_dt.date() <= today <= close_dt.date()
 
 def parse_table_columns(cols, row_text):
-    price, lot_size, issue_size = None, None, "TBA"
-    for col in cols:
+    price, lot_size, issue_size, listing_date = None, None, "TBA", "TBA"
+    
+    for idx, col in enumerate(cols):
         text = col.text.strip()
         if "cr" in text.lower():
             cr_match = re.search(r'₹?\s*([\d,.]+)', text)
@@ -119,9 +127,16 @@ def parse_table_columns(cols, row_text):
             if p_match:
                 val = int(p_match.group(1).replace(',', ''))
                 if val < 25000: price = val
-        elif text.isdigit():
-            val = int(text)
-            if 25 <= val <= 10000 and val not in [2025, 2026]: lot_size = val
+        else:
+            clean_num = text.replace(',', '')
+            if clean_num.isdigit():
+                val = int(clean_num)
+                if 1 <= val <= 25000 and val not in [2025, 2026]:
+                    if val > 10: lot_size = val
+            elif idx >= 4 and len(text) > 5:
+                parsed_dt = parse_date_string(text)
+                if parsed_dt:
+                    listing_date = text
 
     if not price:
         clean_row = re.sub(r'₹?\s*[\d,.]+\s*(?:Cr|crore)', '', row_text, flags=re.IGNORECASE)
@@ -131,10 +146,11 @@ def parse_table_columns(cols, row_text):
             if clean_p: price = max(clean_p)
 
     if not lot_size:
-        lot_match = re.search(r'(\d+)\s*(?:shares|lot)', row_text, re.IGNORECASE)
-        if lot_match: lot_size = int(lot_match.group(1))
+        lot_match = re.search(r'(\d{1,3}(?:,\d{3})*)\s*(?:shares|lot)', row_text, re.IGNORECASE)
+        if lot_match: 
+            lot_size = int(lot_match.group(1).replace(',', ''))
 
-    return price, lot_size, issue_size
+    return price, lot_size, issue_size, listing_date
 
 def prompt_user_fundamentals(name):
     print(f"\n[CLI Input] Configure fundamentals for active IPO: {name}")
@@ -219,7 +235,6 @@ def fetch_open_ipos():
             prev_elem = table.find_previous(['h2', 'h3', 'h4', 'strong', 'caption'])
             if prev_elem: table_heading = prev_elem.text.lower()
                 
-            # Skip closed or archive tables entirely
             if any(kw in table_heading for kw in ["closed", "archive", "past", "completed", "listing"]):
                 continue
                 
@@ -236,14 +251,13 @@ def fetch_open_ipos():
                         
                     open_date, close_date = parse_date_range(dates_raw)
 
-                    # STRICT OPEN WINDOW VALIDATION
                     if not is_currently_open(open_date, close_date):
                         continue
 
                     name = name_text.split("(")[0].strip()
                     if len(name) < 3: continue
 
-                    price, lot_size, issue_size = parse_table_columns(cols, row_text)
+                    price, lot_size, issue_size, listing_dt = parse_table_columns(cols, row_text)
 
                     open_ipos.append({
                         "slug": name.lower().replace(" ", "-"),
@@ -253,7 +267,8 @@ def fetch_open_ipos():
                         "closeDate": close_date,
                         "autoPrice": price,
                         "autoLot": lot_size,
-                        "autoIssue": issue_size
+                        "autoIssue": issue_size,
+                        "autoListing": listing_dt
                     })
     except Exception as err:
         print(f"  Error fetching calendar: {err}")
@@ -289,7 +304,7 @@ def main():
 
         price = ipo["autoPrice"]
         lot = ipo["autoLot"]
-        listing = "TBA"
+        listing = ipo.get("autoListing", "TBA")
         issue_sz = ipo["autoIssue"]
         sector_name = enrichment.get("sector", "Financials") if enrichment else "Financials"
 
@@ -297,7 +312,8 @@ def main():
             cached_item = existing_data[slug]
             if cached_item.get("issuePrice"): price = cached_item["issuePrice"]
             if cached_item.get("lotSize"): lot = cached_item["lotSize"]
-            if cached_item.get("listingDate"): listing = cached_item["listingDate"]
+            if cached_item.get("listingDate") and cached_item["listingDate"] != "TBA": 
+                listing = cached_item["listingDate"]
             if cached_item.get("issueSize"): issue_sz = cached_item["issueSize"]
             if cached_item.get("sector"):
                 sector_str = cached_item["sector"]
@@ -309,6 +325,7 @@ def main():
         bench = SECTOR_BENCHMARKS.get(sector_name, {"avgListingGain": 20.0, "winRate": "3/4 positive"})
 
         upcoming.append({
+            "slug": slug,
             "name": name,
             "symbol": name[:5].upper(),
             "sector": f"{sector_name} ({ipo_cat})",
