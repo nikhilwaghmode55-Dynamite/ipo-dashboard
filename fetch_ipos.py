@@ -1,6 +1,6 @@
 """
-fetch_ipos.py — Live IPO Intelligence Dashboard Engine
-Strictly filters for currently OPEN IPOs only, discarding archives and closed issues.
+fetch_ipos.py — Live IPO Intelligence Dashboard Engine (Deep Detail Scraper)
+Strictly filters for currently OPEN IPOs and fetches exact lot sizes from detail pages.
 """
 
 import requests
@@ -113,10 +113,59 @@ def is_currently_open(open_str, close_str):
         
     return open_dt.date() <= today <= close_dt.date()
 
-def parse_table_columns(cols, row_text):
-    price, lot_size, issue_size, listing_date = None, None, "TBA", "TBA"
+def fetch_detailed_ipo_info(detail_url):
+    """Visits the official IPO detail page to extract exact Lot Size and Listing Date."""
+    if not detail_url:
+        return None, "TBA"
     
-    for idx, col in enumerate(cols):
+    lot_size = None
+    listing_date = "TBA"
+    
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        resp = requests.get(detail_url, headers=headers, timeout=10)
+        if resp.status_code != 200:
+            return None, "TBA"
+            
+        soup = BeautifulSoup(resp.text, 'html.parser')
+        text_content = soup.get_text()
+        
+        # Search for Lot Size patterns in the text
+        lot_match = re.search(r'(?:lot size|market lot|minimum order quantity)[:\s]*([\d,]+)\s*(?:shares)?', text_content, re.IGNORECASE)
+        if lot_match:
+            val_str = lot_match.group(1).replace(',', '')
+            if val_str.isdigit():
+                val = int(val_str)
+                if 1 <= val <= 25000:
+                    lot_size = val
+                    
+        # If specific label not found, look for numbers followed by 'shares' in tables/rows
+        if not lot_size:
+            table_cells = soup.find_all(['td', 'th', 'p', 'li'])
+            for cell in table_cells:
+                cell_text = cell.text.strip()
+                if "shares" in cell_text.lower() and any(c.isdigit() for c in cell_text):
+                    m = re.search(r'([\d,]+)\s*shares', cell_text, re.IGNORECASE)
+                    if m:
+                        val = int(m.group(1).replace(',', ''))
+                        if 1 <= val <= 25000:
+                            lot_size = val
+                            break
+
+        # Search for Listing Date patterns
+        listing_match = re.search(r'(?:listing date|shares listed on|date of listing)[:\s]*([0-9]{1,2}(?:st|nd|rd|th)?\s+[A-Za-z]+\s+20\d{2})', text_content, re.IGNORECASE)
+        if listing_match:
+            listing_date = listing_match.group(1)
+
+    except Exception:
+        pass
+        
+    return lot_size, listing_date
+
+def parse_table_columns(cols, row_text):
+    price, issue_size = None, "TBA"
+    
+    for col in cols:
         text = col.text.strip()
         if "cr" in text.lower():
             cr_match = re.search(r'₹?\s*([\d,.]+)', text)
@@ -126,16 +175,6 @@ def parse_table_columns(cols, row_text):
             if p_match:
                 val = int(p_match.group(1).replace(',', ''))
                 if val < 25000: price = val
-        else:
-            clean_num = text.replace(',', '')
-            if clean_num.isdigit():
-                val = int(clean_num)
-                if 1 <= val <= 25000 and val not in [2025, 2026]:
-                    if val > 10: lot_size = val
-            elif idx >= 4 and len(text) > 5:
-                parsed_dt = parse_date_string(text)
-                if parsed_dt:
-                    listing_date = text
 
     if not price:
         clean_row = re.sub(r'₹?\s*[\d,.]+\s*(?:Cr|crore)', '', row_text, flags=re.IGNORECASE)
@@ -144,12 +183,7 @@ def parse_table_columns(cols, row_text):
             clean_p = [int(p.replace(',', '')) for p in prices if int(p.replace(',', '')) < 25000]
             if clean_p: price = max(clean_p)
 
-    if not lot_size:
-        lot_match = re.search(r'(\d{1,3}(?:,\d{3})*)\s*(?:shares|lot)', row_text, re.IGNORECASE)
-        if lot_match: 
-            lot_size = int(lot_match.group(1).replace(',', ''))
-
-    return price, lot_size, issue_size, listing_date
+    return price, issue_size
 
 def prompt_user_fundamentals(name):
     print(f"\n[CLI Input] Configure fundamentals for active IPO: {name}")
@@ -219,7 +253,7 @@ def evaluate_decision(enrichment, sector_name):
         return {"verdict": "Avoid", "verdictCls": "verdict-avoid", "summary": f"Subpar valuation or growth metrics compared to peers in {sector_name}.", "checks": checks}
 
 def fetch_open_ipos():
-    print("\n[Scraper] Fetching strictly OPEN IPOs...")
+    print("\n[Scraper] Fetching strictly OPEN IPOs & deep-diving into detail pages...")
     url = "https://ipowatch.in/upcoming-ipo-calendar-ipo-list/"
     headers = {'User-Agent': 'Mozilla/5.0'}
     open_ipos = []
@@ -256,7 +290,14 @@ def fetch_open_ipos():
                     name = name_text.split("(")[0].strip()
                     if len(name) < 3: continue
 
-                    price, lot_size, issue_size, listing_dt = parse_table_columns(cols, row_text)
+                    # Extract detail page link if available
+                    link_elem = cols[0].find('a')
+                    detail_url = link_elem['href'] if link_elem and link_elem.has_attr('href') else None
+
+                    price, issue_size = parse_table_columns(cols, row_text)
+                    
+                    # Deep scrape the individual IPO page for exact lot size & listing date
+                    lot_size, listing_dt = fetch_detailed_ipo_info(detail_url)
 
                     open_ipos.append({
                         "slug": name.lower().replace(" ", "-"),
@@ -275,7 +316,7 @@ def fetch_open_ipos():
 
 def main():
     print("\n" + "="*50)
-    print("  IPO Intelligence Dashboard — Strictly Filtered Engine")
+    print("  IPO Intelligence Dashboard — Deep Scraper Engine")
     print("="*50)
 
     cache = load_cache()
@@ -302,16 +343,12 @@ def main():
                 save_cache(cache)
 
         price = ipo["autoPrice"]
-        
-        # SMART FALLBACK: If lot size isn't in the table, default to 500 (Mainboard) or 1000 (SME) so math works
-        default_lot = 1000 if ipo_cat == "SME IPO" else 500
-        lot = ipo["autoLot"] or default_lot
-
+        lot = ipo["autoLot"]
         listing = ipo.get("autoListing", "TBA")
         issue_sz = ipo["autoIssue"]
         sector_name = enrichment.get("sector", "Financials") if enrichment else "Financials"
 
-        # Check existing data (keeps your overrides/custom inputs safe!)
+        # Check existing data (keeps your verified overrides safe)
         if slug in existing_data:
             cached_item = existing_data[slug]
             if cached_item.get("issuePrice"): price = cached_item["issuePrice"]
@@ -355,7 +392,7 @@ def main():
         "lastUpdated": datetime.now().strftime("%d %b %Y, %I:%M %p")
     }
     save_data(data)
-    print(f"\nDone! Processed exactly {len(upcoming)} active OPEN IPO(s).\n")
+    print(f"\nDone! Processed exactly {len(upcoming)} active OPEN IPO(s) with deep details.\n")
 
 if __name__ == "__main__":
     main()
