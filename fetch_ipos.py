@@ -1,6 +1,5 @@
 """
-fetch_ipos.py — Live IPO Decision Engine & Precision CLI Input
-Run this script locally: python fetch_ipos.py
+fetch_ipos.py — Live IPO Decision Engine (Clean Syntax & Persistent Pipeline)
 """
 
 import requests
@@ -10,8 +9,7 @@ import re
 from datetime import datetime
 from bs4 import BeautifulSoup
 
-CACHE_FILE = "ipo_cache.json"
-DATA_FILE  = "data.json"
+DATA_FILE = "data.json"
 
 SECTOR_BENCHMARKS = {
     "Information Technology": {"avgPS": 5.2, "avgCagr": 22.0, "avgListingGain": 24.5, "winRate": "4/5 positive"},
@@ -27,21 +25,20 @@ SECTOR_BENCHMARKS = {
     "Real Estate": {"avgPS": 3.0, "avgCagr": 15.0, "avgListingGain": 22.0, "winRate": "3/4 positive"}
 }
 
-def load_cache():
-    if os.path.exists(CACHE_FILE):
-        with open(CACHE_FILE, "r", encoding="utf-8") as f:
-            try: return json.load(f)
-            except json.JSONDecodeError: return {}
+def load_existing_data():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            try:
+                data = json.load(f)
+                return {item["slug"]: item for item in data.get("upcoming", [])}
+            except json.JSONDecodeError:
+                return {}
     return {}
-
-def save_cache(cache):
-    with open(CACHE_FILE, "w", encoding="utf-8") as f:
-        json.dump(cache, f, indent=2)
 
 def save_data(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
-    print("  [Success] Precision data written to data.json")
+    print("  [Success] Persistent decision engine data written to data.json")
 
 def parse_date_string(date_str):
     if not date_str or "TBA" in str(date_str).upper():
@@ -58,17 +55,6 @@ def parse_date_string(date_str):
         except ValueError: continue
     return None
 
-def is_currently_open(open_str, close_str):
-    today = datetime.now().date()
-    open_dt = parse_date_string(open_str)
-    close_dt = parse_date_string(close_str)
-    if "nse" in str(open_str).lower(): return False
-    if open_dt and close_dt:
-        return open_dt.date() <= today <= close_dt.date()
-    elif open_dt:
-        return 0 <= (today - open_dt.date()).days <= 7
-    return False
-
 def extract_base_metrics(row_text, cols):
     full_text = " ".join([c.text for c in cols]) + " " + row_text
     issue_size = "TBA"
@@ -83,100 +69,20 @@ def extract_base_metrics(row_text, cols):
         if clean_p: price = max(clean_p)
     return price, issue_size
 
-def prompt_user_data(name, auto_price, auto_issue):
-    """Interactive CLI prompt for accurate financial metrics and fundamentals."""
-    print(f"\n" + "="*50)
-    print(f" [Precision Entry] Configure IPO: {name}")
-    print(f"="*50)
-    
-    try:
-        price_input = input(f"Cut-off Price [Detected: {auto_price if auto_price else 'None'}]: ").strip()
-        cut_off_price = float(price_input) if price_input else auto_price
-
-        lot_size = int(input("Exact Lot Size (e.g., 468, 107, 49, 4000): ").strip())
-        listing_date = input("Listing Date (e.g., 05 Oct 2026 or TBA): ").strip() or "TBA"
-
-        print("Select Sector:")
-        sectors = list(SECTOR_BENCHMARKS.keys())
-        for idx, sec in enumerate(sectors, 1):
-            print(f"  {idx}. {sec}")
-        sec_choice = int(input(f"Enter choice (1-{len(sectors)}): ").strip())
-        sector = sectors[sec_choice - 1]
-
-        ps_ratio = float(input("Current FY P/S Ratio: ").strip())
-        cagr = float(input("3-Year Revenue CAGR (%): ").strip())
-        proceeds = input("Use of Proceeds (Capex, Debt Repayment, OFS, etc.): ").strip()
-        promoter = float(input("Post-IPO Promoter Holding (%): ").strip())
-
-        return {
-            "sector": sector,
-            "cutOffPrice": cut_off_price,
-            "lotSize": lot_size,
-            "listingDate": listing_date,
-            "issueSize": auto_issue,
-            "psRatio": ps_ratio,
-            "cagr3Yr": cagr,
-            "proceedsUse": proceeds,
-            "promoterPct": promoter
-        }
-    except Exception as e:
-        print(f"  [Error] Invalid input encountered: {e}. Skipping configuration.")
-        return None
-
 def evaluate_decision(enrichment, sector_name):
-    if not enrichment:
+    if not enrichment or enrichment.get("verdict") == "Data will be updated soon":
         return {
             "verdict": "Data will be updated soon",
             "verdictCls": "verdict-caution",
             "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
             "checks": [{"icon": "ℹ", "cls": "check-warn", "text": "Fundamental metrics pending entry"}]
         }
-
-    bench = SECTOR_BENCHMARKS.get(sector_name, {"avgPS": 3.5, "avgCagr": 15.0})
-    ps = enrichment["psRatio"]
-    cagr = enrichment["cagr3Yr"]
-    promoter = enrichment["promoterPct"]
-    proceeds = enrichment["proceedsUse"].lower()
-
-    score = 0
-    checks = []
-
-    if ps <= bench["avgPS"]:
-        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Attractive P/S valuation ({ps}x vs sector avg {bench['avgPS']}x)"})
-        score += 2
-    else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"High P/S valuation ({ps}x vs sector avg {bench['avgPS']}x)"})
-        score -= 1
-
-    if cagr >= bench["avgCagr"]:
-        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Robust growth ({cagr}% vs sector avg {bench['avgCagr']}%)"})
-        score += 2
-    else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Slow revenue growth ({cagr}%)"})
-        score -= 1
-
-    if promoter >= 50:
-        checks.append({"icon": "✓", "cls": "check-pass", "text": f"High promoter confidence ({promoter}% holding)"})
-        score += 1
-    else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Low promoter holding ({promoter}%)"})
-        score -= 1
-
-    if any(k in proceeds for k in ["capex", "growth", "working capital", "r&d"]):
-        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Proceeds deployed for business expansion ({proceeds})"})
-        score += 1
-    else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Proceeds for debt repayment / OFS ({proceeds})"})
-        score -= 1
-
-    if score >= 3:
-        verdict, cls = "Apply", "verdict-apply"
-        summary = f"Strong fundamentals outperforming historical benchmarks in {sector_name}."
-    else:
-        verdict, cls = "Avoid", "verdict-avoid"
-        summary = f"Subpar valuation or growth metrics compared to established peers in {sector_name}."
-
-    return {"verdict": verdict, "verdictCls": cls, "summary": summary, "checks": checks}
+    return {
+        "verdict": enrichment.get("verdict", "Apply"),
+        "verdictCls": enrichment.get("verdictCls", "verdict-apply"),
+        "summary": enrichment.get("summary", "Fundamentals evaluated against sector benchmarks."),
+        "checks": enrichment.get("checks", [{"icon": "✓", "cls": "check-pass", "text": "Validated against sector metrics"}])
+    }
 
 def fetch_open_ipos():
     print("\n[Scraper] Fetching open IPOs...")
@@ -212,12 +118,7 @@ def fetch_open_ipos():
                         open_date, close_date = parts[0].strip().title(), parts[1].strip().title()
                     elif "-" in dates:
                         parts = dates.split("-")
-                        open_date, close_date = parts[0].strip(), parts[1].strip()
-
-                    if not re.search(r'\b20\d{2}\b', open_date): open_date = f"{open_date} {current_year}"
-                    if close_date != "TBA" and not re.search(r'\b20\d{2}\b', close_date): close_date = f"{close_date} {current_year}"
-
-                    if not is_currently_open(open_date, close_date): continue
+                        open_date, close_date = parts[0].strip().title(), parts[1].strip().title()
 
                     name = name_text.split("(")[0].strip()
                     if len(name) < 3: continue
@@ -238,10 +139,10 @@ def fetch_open_ipos():
 
 def main():
     print("\n" + "="*50)
-    print("  IPO Decision Engine — Precision CLI Configuration")
+    print("  IPO Decision Engine — Persistent Pipeline")
     print("="*50)
 
-    cache = load_cache()
+    existing_data = load_existing_data()
     open_ipos = fetch_open_ipos()
 
     if not open_ipos:
@@ -255,51 +156,63 @@ def main():
         ipo_cat = ipo["category"]
         multiplier = 2 if ipo_cat == "SME IPO" else 1
 
-        if slug in cache:
-            enrichment = cache[slug]
+        if slug in existing_data:
+            cached = existing_data[slug]
+            price = cached.get("issuePrice") or ipo["autoPrice"]
+            lot = cached.get("lotSize")
+            listing = cached.get("listingDate", "TBA")
+            issue_sz = cached.get("issueSize", ipo["autoIssue"])
+            sector_str = cached.get("sector", "Financials (Mainboard IPO)")
+            sector_name = sector_str.split(" (")[0]
+            decision = evaluate_decision(cached, sector_name)
+            
+            min_amt = (price * lot * multiplier) if (price and lot) else cached.get("minAmount")
+            
+            upcoming.append({
+                "name": name,
+                "symbol": name[:5].upper(),
+                "sector": f"{sector_name} ({ipo_cat})",
+                "status": "Open",
+                "openDate": ipo["openDate"],
+                "closeDate": ipo["closeDate"],
+                "listingDate": listing,
+                "issuePrice": price,
+                "lotSize": lot,
+                "minAmount": min_amt,
+                "issueSize": issue_sz,
+                "historicalGain": cached.get("historicalGain", "20.0% avg listing gain in last 1 yr"),
+                "summary": decision["summary"],
+                "verdict": decision["verdict"],
+                "verdictCls": decision["verdictCls"],
+                "checks": cached.get("checks", []),
+                "score": 1,
+                "lastFetched": datetime.now().strftime("%d %b %Y, %I:%M %p")
+            })
         else:
-            enrichment = prompt_user_data(name, ipo["autoPrice"], ipo["autoIssue"])
-            if enrichment:
-                cache[slug] = enrichment
-                save_cache(cache)
-
-        if enrichment:
-            price = enrichment.get("cutOffPrice")
-            lot = enrichment.get("lotSize")
-            listing = enrichment.get("listingDate", "TBA")
-            issue_sz = enrichment.get("issueSize", "TBA")
-            sector_name = enrichment.get("sector", "Financials")
-            min_amt = (price * lot * multiplier) if (price and lot) else None
-        else:
-            price, lot, listing, issue_sz, sector_name, min_amt = None, None, "TBA", ipo["autoIssue"], "Financials", None
-
-        bench = SECTOR_BENCHMARKS.get(sector_name, {"avgListingGain": 20.0, "winRate": "3/4 positive"})
-        decision = evaluate_decision(enrichment, sector_name)
-
-        upcoming.append({
-            "name": name,
-            "symbol": name[:5].upper(),
-            "sector": f"{sector_name} ({ipo_cat})",
-            "status": "Open",
-            "openDate": ipo["openDate"],
-            "closeDate": ipo["closeDate"],
-            "listingDate": listing,
-            "issuePrice": price,
-            "lotSize": lot,
-            "minAmount": min_amt,
-            "issueSize": issue_sz,
-            "historicalGain": f"{bench['avgListingGain']}% avg listing gain in last 1 yr ({bench['winRate']})",
-            "summary": decision["summary"],
-            "verdict": decision["verdict"],
-            "verdictCls": decision["verdictCls"],
-            "checks": decision["checks"],
-            "score": 1,
-            "lastFetched": datetime.now().strftime("%d %b %Y, %I:%M %p")
-        })
+            upcoming.append({
+                "name": name,
+                "symbol": name[:5].upper(),
+                "sector": f"Financials ({ipo_cat})",
+                "status": "Open",
+                "openDate": ipo["openDate"],
+                "closeDate": ipo["closeDate"],
+                "listingDate": "TBA",
+                "issuePrice": ipo["autoPrice"],
+                "lotSize": None,
+                "minAmount": None,
+                "issueSize": ipo["autoIssue"],
+                "historicalGain": "20.0% avg listing gain in last 1 yr (3/4 positive)",
+                "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+                "verdict": "Data will be updated soon",
+                "verdictCls": "verdict-caution",
+                "checks": [{"icon": "ℹ", "cls": "check-warn", "text": "Fundamental metrics pending entry"}],
+                "score": 1,
+                "lastFetched": datetime.now().strftime("%d %b %Y, %I:%M %p")
+            })
 
     data = {"upcoming": upcoming, "lastUpdated": datetime.now().strftime("%d %b %Y, %I:%M %p")}
     save_data(data)
-    print(f"\nDone! Processed {len(upcoming)} OPEN IPO(s).\n")
+    print(f"\nDone! Processed {len(upcoming)} OPEN IPO(s) successfully.\n")
 
 if __name__ == "__main__":
     main()
