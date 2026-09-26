@@ -23,5 +23,13 @@
     "promoterPct": 70.0,
     "lotSize": 30,
     "listingDate": "28 Sep"
+  },
+  "orient-cables": {
+    "sector": "Information Technology",
+    "psRatio": 5.0,
+    "cagr3Yr": 30.0,
+    "proceedsUse": "Capex",
+    "promoterPct": 70.0,
+    "lotSize": 300
   }
 }

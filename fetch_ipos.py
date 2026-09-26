@@ -1,6 +1,6 @@
 """
 fetch_ipos.py — Live IPO Intelligence Dashboard Engine
-Interactive CLI configuration with persistent caching for 100% accurate lot sizes and listing dates.
+Zero manual listing entry. Automatically sets TBA for listing dates while keeping verified lot sizes.
 """
 
 import requests
@@ -153,7 +153,6 @@ def prompt_user_fundamentals(name):
         proceeds = input("Use of Proceeds (e.g., Capex, Debt Repayment): ").strip()
         promoter = float(input("Post-IPO Promoter Holding % (e.g., 65): ").strip())
         lot_size = int(input("Exact Broker Lot Size (e.g., 50, 500, 1000): ").strip())
-        listing_date = input("Exact Listing Date (e.g., 03 Oct 2026 or TBA): ").strip()
         
         return {
             "sector": sector, 
@@ -161,8 +160,7 @@ def prompt_user_fundamentals(name):
             "cagr3Yr": cagr, 
             "proceedsUse": proceeds, 
             "promoterPct": promoter,
-            "lotSize": lot_size,
-            "listingDate": listing_date if listing_date else "TBA"
+            "lotSize": lot_size
         }
     except Exception:
         print("  [Notice] Invalid or skipped input. Setting defaults.")
@@ -297,7 +295,7 @@ def main():
 
         price = ipo["autoPrice"]
         lot = enrichment.get("lotSize") if enrichment else None
-        listing = enrichment.get("listingDate", "TBA") if enrichment else "TBA"
+        listing = "TBA"  # Automatically handled as TBA
         issue_sz = ipo["autoIssue"]
         
         sector_name = enrichment.get("sector", "Financials") if enrichment else "Financials"
