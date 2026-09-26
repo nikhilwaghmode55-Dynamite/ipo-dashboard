@@ -1,6 +1,6 @@
 """
 fetch_ipos.py — Live IPO Intelligence Dashboard Engine
-Strictly automated, column-aware, SEBI-compliant lot size & investment calculator.
+Strictly filters for currently OPEN IPOs only, discarding archives and closed issues.
 """
 
 import requests
@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 CACHE_FILE = "ipo_cache.json"
 DATA_FILE  = "data.json"
 
-# 11 Sector Benchmarks for Analytical Decision Engine (Macro Baselines)
+# 11 Sector Benchmarks for Analytical Decision Engine
 SECTOR_BENCHMARKS = {
     "Information Technology": {"avgPS": 5.2, "avgCagr": 22.0, "avgListingGain": 24.5, "winRate": "4/5 positive"},
     "Financials": {"avgPS": 3.8, "avgCagr": 18.0, "avgListingGain": 29.4, "winRate": "4/6 positive"},
@@ -40,7 +40,6 @@ def save_cache(cache):
         json.dump(cache, f, indent=2)
 
 def load_existing_data():
-    """Loads existing data.json to preserve user-entered overrides across pipeline runs."""
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             try:
@@ -53,7 +52,7 @@ def load_existing_data():
 def save_data(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
-    print("  [Success] Dashboard data securely compiled to data.json")
+    print(f"  [Success] Cleaned dashboard data ({len(data.get('upcoming', []))} open IPOs) written to data.json")
 
 def parse_date_string(date_str):
     if not date_str or "TBA" in str(date_str).upper():
@@ -71,7 +70,6 @@ def parse_date_string(date_str):
     return None
 
 def parse_date_range(dates_str):
-    """Smart parser handling date ranges like '25-29 September' by sharing month context."""
     dates_str = dates_str.strip()
     months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", 
               "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
@@ -98,24 +96,19 @@ def parse_date_range(dates_str):
     return open_str, close_str
 
 def is_currently_open(open_str, close_str):
-    """Strict date window validation. Discards past closed issues like NSE."""
+    """Strictly checks if today falls between open and close dates. Drops closed or future listings."""
     today = datetime.now().date()
     open_dt = parse_date_string(open_str)
     close_dt = parse_date_string(close_str)
     
-    if "nse" in str(open_str).lower() or "nse" in str(close_str).lower():
+    if not open_dt or not close_dt:
         return False
-
-    if open_dt and close_dt:
-        return open_dt.date() <= today <= close_dt.date()
-    elif open_dt:
-        return 0 <= (today - open_dt.date()).days <= 7
-    return False
+        
+    # Strict active window: today must be >= open date and <= close date
+    return open_dt.date() <= today <= close_dt.date()
 
 def parse_table_columns(cols, row_text):
-    """Column-aware extraction avoiding issue size and price confusion."""
     price, lot_size, issue_size = None, None, "TBA"
-    
     for col in cols:
         text = col.text.strip()
         if "cr" in text.lower():
@@ -144,7 +137,6 @@ def parse_table_columns(cols, row_text):
     return price, lot_size, issue_size
 
 def prompt_user_fundamentals(name):
-    """Interactive terminal prompt for fundamental entry of new active IPOs."""
     print(f"\n[CLI Input] Configure fundamentals for active IPO: {name}")
     print("Select Sector from the 11 Predefined Sectors:")
     sectors = list(SECTOR_BENCHMARKS.keys())
@@ -212,7 +204,7 @@ def evaluate_decision(enrichment, sector_name):
         return {"verdict": "Avoid", "verdictCls": "verdict-avoid", "summary": f"Subpar valuation or growth metrics compared to peers in {sector_name}.", "checks": checks}
 
 def fetch_open_ipos():
-    print("\n[Scraper] Fetching currently OPEN IPOs with smart date range parsing...")
+    print("\n[Scraper] Fetching strictly OPEN IPOs...")
     url = "https://ipowatch.in/upcoming-ipo-calendar-ipo-list/"
     headers = {'User-Agent': 'Mozilla/5.0'}
     open_ipos = []
@@ -227,6 +219,10 @@ def fetch_open_ipos():
             prev_elem = table.find_previous(['h2', 'h3', 'h4', 'strong', 'caption'])
             if prev_elem: table_heading = prev_elem.text.lower()
                 
+            # Skip closed or archive tables entirely
+            if any(kw in table_heading for kw in ["closed", "archive", "past", "completed", "listing"]):
+                continue
+                
             ipo_category = "SME IPO" if "sme" in table_heading else "Mainboard IPO"
                 
             for row in table.find_all('tr'):
@@ -240,6 +236,7 @@ def fetch_open_ipos():
                         
                     open_date, close_date = parse_date_range(dates_raw)
 
+                    # STRICT OPEN WINDOW VALIDATION
                     if not is_currently_open(open_date, close_date):
                         continue
 
@@ -264,7 +261,7 @@ def fetch_open_ipos():
 
 def main():
     print("\n" + "="*50)
-    print("  IPO Intelligence Dashboard — Automated Engine")
+    print("  IPO Intelligence Dashboard — Strictly Filtered Engine")
     print("="*50)
 
     cache = load_cache()
@@ -282,7 +279,6 @@ def main():
         ipo_cat = ipo["category"]
         multiplier = 2 if ipo_cat == "SME IPO" else 1
 
-        # 1. Fundamental Enrichment Source (Cache or CLI)
         if slug in cache:
             enrichment = cache[slug]
         else:
@@ -291,7 +287,6 @@ def main():
                 cache[slug] = enrichment
                 save_cache(cache)
 
-        # 2. Pricing and Lot Size Resolution (Prioritize persistent data over scraped auto-values)
         price = ipo["autoPrice"]
         lot = ipo["autoLot"]
         listing = "TBA"
@@ -308,7 +303,6 @@ def main():
                 sector_str = cached_item["sector"]
                 sector_name = sector_str.split(" (")[0]
 
-        # 3. SEBI Mandated Investment Calculation
         min_amt = (price * lot * multiplier) if (price and lot) else None
 
         decision = evaluate_decision(enrichment, sector_name)
@@ -340,7 +334,7 @@ def main():
         "lastUpdated": datetime.now().strftime("%d %b %Y, %I:%M %p")
     }
     save_data(data)
-    print(f"\nDone! Processed {len(upcoming)} active OPEN IPO(s) cleanly.\n")
+    print(f"\nDone! Processed exactly {len(upcoming)} active OPEN IPO(s).\n")
 
 if __name__ == "__main__":
     main()
