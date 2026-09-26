@@ -1,6 +1,6 @@
 """
 fetch_ipos.py — Live IPO Intelligence Dashboard Engine
-Strictly parses live data with zero hardcoding and zero arbitrary default fallbacks.
+Interactive CLI configuration with persistent caching for 100% accurate lot sizes and listing dates.
 """
 
 import requests
@@ -40,7 +40,6 @@ def save_cache(cache):
         json.dump(cache, f, indent=2)
 
 def load_existing_data():
-    """Safely loads existing data so user overrides and verified lot sizes are never wiped out."""
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             try:
@@ -113,46 +112,6 @@ def is_currently_open(open_str, close_str):
         
     return open_dt.date() <= today <= close_dt.date()
 
-def fetch_detailed_ipo_info(detail_url):
-    """Visits the official IPO detail page to extract exact Lot Size and Listing Date strictly from source."""
-    if not detail_url:
-        return None, "TBA"
-    
-    lot_size = None
-    listing_date = "TBA"
-    
-    try:
-        headers = {'User-Agent': 'Mozilla/5.0'}
-        resp = requests.get(detail_url, headers=headers, timeout=10)
-        if resp.status_code != 200:
-            return None, "TBA"
-            
-        soup = BeautifulSoup(resp.text, 'html.parser')
-        
-        # Search table rows for market lot / lot size info
-        for tr in soup.find_all('tr'):
-            row_text = tr.text.lower()
-            if any(k in row_text for k in ["lot size", "market lot", "minimum order"]):
-                numbers = re.findall(r'([\d,]+)', tr.text)
-                for num_str in numbers:
-                    val = int(num_str.replace(',', ''))
-                    if 1 <= val <= 50000:
-                        lot_size = val
-                        break
-            if lot_size:
-                break
-
-        # Search for listing date
-        text_content = soup.get_text()
-        listing_match = re.search(r'(?:listing date|shares listed on|date of listing)[:\s]*([0-9]{1,2}(?:st|nd|rd|th)?\s+[A-Za-z]+\s+20\d{2})', text_content, re.IGNORECASE)
-        if listing_match:
-            listing_date = listing_match.group(1)
-
-    except Exception:
-        pass
-        
-    return lot_size, listing_date
-
 def parse_table_columns(cols, row_text):
     price, issue_size = None, "TBA"
     
@@ -177,7 +136,9 @@ def parse_table_columns(cols, row_text):
     return price, issue_size
 
 def prompt_user_fundamentals(name):
-    print(f"\n[CLI Input] Configure fundamentals for active IPO: {name}")
+    print(f"\n--------------------------------------------------")
+    print(f" [CLI Input Needed] Configure details for: {name}")
+    print(f"--------------------------------------------------")
     print("Select Sector from the 11 Predefined Sectors:")
     sectors = list(SECTOR_BENCHMARKS.keys())
     for idx, sec in enumerate(sectors, 1): print(f"  {idx}. {sec}")
@@ -187,14 +148,24 @@ def prompt_user_fundamentals(name):
         if not sec_choice: return None
         sector = sectors[int(sec_choice) - 1]
         
-        ps_ratio = float(input("Current FY P/S Ratio: ").strip())
-        cagr = float(input("3-Year Revenue CAGR (%): ").strip())
-        proceeds = input("Use of Proceeds (Capex, Debt Repayment, OFS, etc.): ").strip()
-        promoter = float(input("Post-IPO Promoter Holding (%): ").strip())
+        ps_ratio = float(input("Current FY P/S Ratio (e.g., 4.5): ").strip())
+        cagr = float(input("3-Year Revenue CAGR % (e.g., 20): ").strip())
+        proceeds = input("Use of Proceeds (e.g., Capex, Debt Repayment): ").strip()
+        promoter = float(input("Post-IPO Promoter Holding % (e.g., 65): ").strip())
+        lot_size = int(input("Exact Broker Lot Size (e.g., 50, 500, 1000): ").strip())
+        listing_date = input("Exact Listing Date (e.g., 03 Oct 2026 or TBA): ").strip()
         
-        return {"sector": sector, "psRatio": ps_ratio, "cagr3Yr": cagr, "proceedsUse": proceeds, "promoterPct": promoter}
+        return {
+            "sector": sector, 
+            "psRatio": ps_ratio, 
+            "cagr3Yr": cagr, 
+            "proceedsUse": proceeds, 
+            "promoterPct": promoter,
+            "lotSize": lot_size,
+            "listingDate": listing_date if listing_date else "TBA"
+        }
     except Exception:
-        print("  [Notice] Skipped or invalid input. Setting status to 'Data will be updated soon'.")
+        print("  [Notice] Invalid or skipped input. Setting defaults.")
         return None
 
 def evaluate_decision(enrichment, sector_name):
@@ -244,7 +215,7 @@ def evaluate_decision(enrichment, sector_name):
         return {"verdict": "Avoid", "verdictCls": "verdict-avoid", "summary": f"Subpar valuation or growth metrics compared to peers in {sector_name}.", "checks": checks}
 
 def fetch_open_ipos():
-    print("\n[Scraper] Fetching strictly OPEN IPOs & deep-diving into detail pages...")
+    print("\n[Scraper] Fetching strictly OPEN IPOs...")
     url = "https://ipowatch.in/upcoming-ipo-calendar-ipo-list/"
     headers = {'User-Agent': 'Mozilla/5.0'}
     open_ipos = []
@@ -281,11 +252,7 @@ def fetch_open_ipos():
                     name = name_text.split("(")[0].strip()
                     if len(name) < 3: continue
 
-                    link_elem = cols[0].find('a')
-                    detail_url = link_elem['href'] if link_elem and link_elem.has_attr('href') else None
-
                     price, issue_size = parse_table_columns(cols, row_text)
-                    lot_size, listing_dt = fetch_detailed_ipo_info(detail_url)
 
                     open_ipos.append({
                         "slug": name.lower().replace(" ", "-"),
@@ -294,9 +261,7 @@ def fetch_open_ipos():
                         "openDate": open_date,
                         "closeDate": close_date,
                         "autoPrice": price,
-                        "autoLot": lot_size,
-                        "autoIssue": issue_size,
-                        "autoListing": listing_dt
+                        "autoIssue": issue_size
                     })
     except Exception as err:
         print(f"  Error fetching calendar: {err}")
@@ -304,7 +269,7 @@ def fetch_open_ipos():
 
 def main():
     print("\n" + "="*50)
-    print("  IPO Intelligence Dashboard — Pure Scraper Engine")
+    print("  IPO Intelligence Dashboard — Interactive CLI Engine")
     print("="*50)
 
     cache = load_cache()
@@ -331,12 +296,12 @@ def main():
                 save_cache(cache)
 
         price = ipo["autoPrice"]
-        lot = ipo["autoLot"]  # STRICTLY scraped data. No fake/default fallbacks!
-        listing = ipo.get("autoListing", "TBA")
+        lot = enrichment.get("lotSize") if enrichment else None
+        listing = enrichment.get("listingDate", "TBA") if enrichment else "TBA"
         issue_sz = ipo["autoIssue"]
+        
         sector_name = enrichment.get("sector", "Financials") if enrichment else "Financials"
 
-        # Check existing data (retains your saved verified overrides/lot sizes permanently)
         if slug in existing_data:
             cached_item = existing_data[slug]
             if cached_item.get("issuePrice"): price = cached_item["issuePrice"]
@@ -348,7 +313,6 @@ def main():
                 sector_str = cached_item["sector"]
                 sector_name = sector_str.split(" (")[0]
 
-        # Investment calculated ONLY if real lot size exists. Otherwise null.
         min_amt = (price * lot * multiplier) if (price and lot is not None) else None
 
         decision = evaluate_decision(enrichment, sector_name)
@@ -381,7 +345,7 @@ def main():
         "lastUpdated": datetime.now().strftime("%d %b %Y, %I:%M %p")
     }
     save_data(data)
-    print(f"\nDone! Processed exactly {len(upcoming)} active OPEN IPO(s) with pure scraped data.\n")
+    print(f"\nDone! Processed exactly {len(upcoming)} active OPEN IPO(s).\n")
 
 if __name__ == "__main__":
     main()

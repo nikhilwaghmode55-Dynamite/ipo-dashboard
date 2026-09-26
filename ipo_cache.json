@@ -14,5 +14,14 @@
     "proceedsUse": "OFS",
     "promoterPct": 74.0,
     "lotSize": 30
+  },
+  "runwal-enterprises": {
+    "sector": "Information Technology",
+    "psRatio": 5.0,
+    "cagr3Yr": 20.0,
+    "proceedsUse": "Capex",
+    "promoterPct": 70.0,
+    "lotSize": 30,
+    "listingDate": "28 Sep"
   }
 }
