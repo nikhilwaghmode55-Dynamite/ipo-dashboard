@@ -40,7 +40,7 @@ def save_cache(cache):
         json.dump(cache, f, indent=2)
 
 def load_existing_data():
-    """Safely loads existing data, handling any missing slugs gracefully."""
+    """Safely loads existing data so user overrides and lot sizes are never wiped out."""
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             try:
@@ -104,7 +104,6 @@ def parse_date_range(dates_str):
     return open_str, close_str
 
 def is_currently_open(open_str, close_str):
-    """Strictly checks if today falls between open and close dates. Drops closed or future listings."""
     today = datetime.now().date()
     open_dt = parse_date_string(open_str)
     close_dt = parse_date_string(close_str)
@@ -303,11 +302,16 @@ def main():
                 save_cache(cache)
 
         price = ipo["autoPrice"]
-        lot = ipo["autoLot"]
+        
+        # SMART FALLBACK: If lot size isn't in the table, default to 500 (Mainboard) or 1000 (SME) so math works
+        default_lot = 1000 if ipo_cat == "SME IPO" else 500
+        lot = ipo["autoLot"] or default_lot
+
         listing = ipo.get("autoListing", "TBA")
         issue_sz = ipo["autoIssue"]
         sector_name = enrichment.get("sector", "Financials") if enrichment else "Financials"
 
+        # Check existing data (keeps your overrides/custom inputs safe!)
         if slug in existing_data:
             cached_item = existing_data[slug]
             if cached_item.get("issuePrice"): price = cached_item["issuePrice"]
