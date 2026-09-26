@@ -12,5 +12,82 @@
     "cagr3Yr": 16.0,
     "proceedsUse": "Capex",
     "promoterPct": 60.0
+  },
+  "runwal-enterprises": {
+    "sector": "Real Estate",
+    "psRatio": 1.9,
+    "cagr3Yr": 98.79,
+    "proceedsUse": "Debt Repayment",
+    "promoterPct": 84.61
+  },
+  "orient-cables": {
+    "sector": "Industrials",
+    "psRatio": 2.6,
+    "cagr3Yr": 29.0,
+    "proceedsUse": "OFS",
+    "promoterPct": 82.17
+  },
+  "moneyview": {
+    "sector": "Financials",
+    "psRatio": 1.79,
+    "cagr3Yr": 58.0,
+    "proceedsUse": "Capex",
+    "promoterPct": 20.33
+  },
+  "a-one-steels": {
+    "sector": "Materials",
+    "psRatio": 0.74,
+    "cagr3Yr": 11.0,
+    "proceedsUse": "Debt Repayment",
+    "promoterPct": 74.51
+  },
+  "dudani-retail": {
+    "sector": "Consumer Discretionary",
+    "psRatio": 1.19,
+    "cagr3Yr": 0.56,
+    "proceedsUse": "Working Capita",
+    "promoterPct": 65.0
+  },
+  "sai-urja": {
+    "sector": "Industrials",
+    "psRatio": 1.01,
+    "cagr3Yr": 36.6,
+    "proceedsUse": "Working Capital",
+    "promoterPct": 70.7
+  },
+  "himalayan-solar": {
+    "sector": "Industrials",
+    "psRatio": 1.33,
+    "cagr3Yr": 52.54,
+    "proceedsUse": "Working Capital",
+    "promoterPct": 70.13
+  },
+  "bench-mark-infotech": {
+    "sector": "Information Technology",
+    "psRatio": 2.5,
+    "cagr3Yr": 33.23,
+    "proceedsUse": "Working Capital",
+    "promoterPct": 75.14
+  },
+  "green-asia-impex": {
+    "sector": "Consumer Staples",
+    "psRatio": 0.49,
+    "cagr3Yr": 10.52,
+    "proceedsUse": "Capex",
+    "promoterPct": 72.38
+  },
+  "peshwa-wheat": {
+    "sector": "Consumer Staples",
+    "psRatio": 0.89,
+    "cagr3Yr": 148.0,
+    "proceedsUse": "Working Capital",
+    "promoterPct": 52.39
+  },
+  "roopa-screen": {
+    "sector": "Industrials",
+    "psRatio": 1.4,
+    "cagr3Yr": 13.54,
+    "proceedsUse": "Capex",
+    "promoterPct": 63.71
   }
 }
