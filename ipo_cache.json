@@ -1,35 +1,10 @@
 {
   "acevector": {
     "sector": "Information Technology",
-    "psRatio": 1.0,
-    "cagr3Yr": 1.0,
-    "proceedsUse": "1",
-    "promoterPct": 1.0,
-    "lotSize": 1
-  },
-  "german-green-steel": {
-    "sector": "Financials",
-    "psRatio": 5.0,
-    "cagr3Yr": 20.0,
-    "proceedsUse": "OFS",
-    "promoterPct": 74.0,
-    "lotSize": 30
-  },
-  "runwal-enterprises": {
-    "sector": "Information Technology",
     "psRatio": 5.0,
     "cagr3Yr": 20.0,
     "proceedsUse": "Capex",
     "promoterPct": 70.0,
-    "lotSize": 30,
-    "listingDate": "28 Sep"
-  },
-  "orient-cables": {
-    "sector": "Information Technology",
-    "psRatio": 5.0,
-    "cagr3Yr": 30.0,
-    "proceedsUse": "Capex",
-    "promoterPct": 70.0,
-    "lotSize": 300
+    "lotSize": 400
   }
 }

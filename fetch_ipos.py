@@ -1,6 +1,6 @@
 """
 fetch_ipos.py — Live IPO Intelligence Dashboard Engine
-Zero manual listing entry. Automatically sets TBA for listing dates while keeping verified lot sizes.
+Pure automated scraping, strict open-window filtering, persistent storage, and interactive CLI caching.
 """
 
 import requests
@@ -295,9 +295,8 @@ def main():
 
         price = ipo["autoPrice"]
         lot = enrichment.get("lotSize") if enrichment else None
-        listing = "TBA"  # Automatically handled as TBA
+        listing = "TBA"
         issue_sz = ipo["autoIssue"]
-        
         sector_name = enrichment.get("sector", "Financials") if enrichment else "Financials"
 
         if slug in existing_data:
