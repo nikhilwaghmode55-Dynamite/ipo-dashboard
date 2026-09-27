@@ -62,7 +62,7 @@
     .badge-open { background: var(--success-bg); color: var(--success-text); }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 12px;
       margin-bottom: 16px;
       padding: 12px;
@@ -171,17 +171,13 @@
                 <div class="metric-label">Closes</div>
                 <div class="metric-value">${ipo.closeDate || 'TBA'}</div>
               </div>
-              <div>
-                <div class="metric-label">Listing</div>
-                <div class="metric-value">${ipo.listingDate || 'TBA'}</div>
-              </div>
             </div>
 
             <div class="decision-box">
               <div class="verdict-tag ${ipo.verdictCls}">${ipo.verdict}</div>
               ${ipo.summary ? `<div class="summary-text">${ipo.summary}</div>` : ''}
               <div style="margin-top: 8px;">${checksHtml}</div>
-              ${ipo.historicalGain ? `<div class="historical-box">📊 <strong>Sector Benchmark:</strong> ${ipo.historicalGain}</div>` : ''}
+              ${ipo.historicalGain ? `<div class="historical-box">📊 <strong>Benchmark Status:</strong> ${ipo.historicalGain}</div>` : ''}
             </div>
           `;
           container.appendChild(card);

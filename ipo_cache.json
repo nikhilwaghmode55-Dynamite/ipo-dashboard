@@ -1,10 +1,106 @@
 {
   "acevector": {
-    "sector": "Information Technology",
-    "psRatio": 5.0,
-    "cagr3Yr": 20.0,
+    "sector": "Consumer Discretionary",
+    "psRatio": 4.31,
+    "cagr3Yr": 11.12,
+    "proceedsUse": "Growth",
+    "promoterPct": 49.96,
+    "lotSize": 468
+  },
+  "german-green-steel": {
+    "sector": "Industrials",
+    "psRatio": 0.62,
+    "cagr3Yr": 14.41,
     "proceedsUse": "Capex",
-    "promoterPct": 70.0,
-    "lotSize": 400
+    "promoterPct": 68.54,
+    "lotSize": 107
+  },
+  "runwal-enterprises": {
+    "sector": "Real Estate",
+    "psRatio": 2.43,
+    "cagr3Yr": -13.6,
+    "proceedsUse": "Debt Repayment",
+    "promoterPct": 84.61,
+    "lotSize": 49
+  },
+  "orient-cables": {
+    "sector": "Industrials",
+    "psRatio": 2.64,
+    "cagr3Yr": 33.45,
+    "proceedsUse": "Debt Repayment",
+    "promoterPct": 82.17,
+    "lotSize": 55
+  },
+  "moneyview": {
+    "sector": "Financials",
+    "psRatio": 1.79,
+    "cagr3Yr": 58.0,
+    "proceedsUse": "Growth",
+    "promoterPct": 20.33,
+    "lotSize": 441
+  },
+  "a-one-steels": {
+    "sector": "Materials",
+    "psRatio": 0.75,
+    "cagr3Yr": 11.0,
+    "proceedsUse": "Deby Repayment",
+    "promoterPct": 74.51,
+    "lotSize": 37
+  },
+  "dudani-retail": {
+    "sector": "Consumer Discretionary",
+    "psRatio": 1.22,
+    "cagr3Yr": 0.84,
+    "proceedsUse": "Working Capital",
+    "promoterPct": 64.99,
+    "lotSize": 4000
+  },
+  "sai-urja": {
+    "sector": "Industrials",
+    "psRatio": 1.01,
+    "cagr3Yr": 37.03,
+    "proceedsUse": "65.67",
+    "promoterPct": 1200.0,
+    "lotSize": 1200
+  },
+  "himalayan-solar": {
+    "sector": "Industrials",
+    "psRatio": 1.33,
+    "cagr3Yr": 11.31,
+    "proceedsUse": "Working Capital",
+    "promoterPct": 70.13,
+    "lotSize": 1200
+  },
+  "bench-mark-infotech": {
+    "sector": "Information Technology",
+    "psRatio": 2.6,
+    "cagr3Yr": 33.24,
+    "proceedsUse": "Working Capital",
+    "promoterPct": 75.29,
+    "lotSize": 1200
+  },
+  "green-asia-impex": {
+    "sector": "Consumer Staples",
+    "psRatio": 0.49,
+    "cagr3Yr": 10.52,
+    "proceedsUse": "Capex",
+    "promoterPct": 64.39,
+    "lotSize": 1600
+  },
+  "peshwa-wheat": {
+    "sector": "Consumer Staples",
+    "psRatio": 0.89,
+    "cagr3Yr": 122.0,
+    "proceedsUse": "Capex",
+    "promoterPct": 72.15,
+    "lotSize": 1200
+  },
+  "roopa-screen": {
+    "sector": "Industrials",
+    "psRatio": 1.38,
+    "cagr3Yr": 12.47,
+    "proceedsUse": "Capex",
+    "promoterPct": 63.71,
+    "lotSize": 2000
   }
 }

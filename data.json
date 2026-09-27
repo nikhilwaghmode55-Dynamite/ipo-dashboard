@@ -4,34 +4,74 @@
       "slug": "acevector",
       "name": "Acevector",
       "symbol": "ACEVE",
-      "sector": "Information Technology (Mainboard IPO)",
+      "sector": "Consumer Discretionary (Mainboard IPO)",
       "status": "Open",
       "openDate": "25 September",
       "closeDate": "29 September",
-      "listingDate": "TBA",
       "issuePrice": 30,
-      "lotSize": 400,
-      "minAmount": 12000,
+      "lotSize": 468,
+      "minAmount": 14040,
       "issueSize": "\u20b9420 Cr",
-      "historicalGain": "24.5% avg listing gain in last 1 yr (4/5 positive)",
-      "summary": "Strong fundamentals outperforming historical benchmarks in Information Technology.",
+      "historicalGain": "16.5% avg listing gain in last 1 yr (3/5 positive)",
+      "summary": "Subpar valuation or growth metrics compared to peers in Consumer Discretionary.",
+      "verdict": "Avoid",
+      "verdictCls": "verdict-avoid",
+      "checks": [
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "High P/S valuation (4.31x vs sector avg 4.0x)"
+        },
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "Slow revenue growth (11.12%)"
+        },
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "Low promoter holding (49.96%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Proceeds deployed for business expansion (growth)"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "27 Sep 2026, 08:26 AM"
+    },
+    {
+      "slug": "german-green-steel",
+      "name": "German Green Steel",
+      "symbol": "GERMA",
+      "sector": "Industrials (Mainboard IPO)",
+      "status": "Open",
+      "openDate": "25 September",
+      "closeDate": "29 September",
+      "issuePrice": 132,
+      "lotSize": 107,
+      "minAmount": 14124,
+      "issueSize": "\u20b9304 Cr",
+      "historicalGain": "18.2% avg listing gain in last 1 yr (3/4 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Industrials.",
       "verdict": "Apply",
       "verdictCls": "verdict-apply",
       "checks": [
         {
           "icon": "\u2713",
           "cls": "check-pass",
-          "text": "Attractive P/S valuation (5.0x vs sector avg 5.2x)"
-        },
-        {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "Slow revenue growth (20.0%)"
+          "text": "Attractive P/S valuation (0.62x vs sector avg 2.8x)"
         },
         {
           "icon": "\u2713",
           "cls": "check-pass",
-          "text": "High promoter confidence (70.0% holding)"
+          "text": "Robust growth (14.41% vs sector avg 14.0%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "High promoter confidence (68.54% holding)"
         },
         {
           "icon": "\u2713",
@@ -40,88 +80,89 @@
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 08:02 AM"
-    },
-    {
-      "slug": "german-green-steel",
-      "name": "German Green Steel",
-      "symbol": "GERMA",
-      "sector": "Financials (Mainboard IPO)",
-      "status": "Open",
-      "openDate": "25 September",
-      "closeDate": "29 September",
-      "listingDate": "TBA",
-      "issuePrice": 132,
-      "lotSize": null,
-      "minAmount": null,
-      "issueSize": "\u20b9304 Cr",
-      "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
-      "checks": [
-        {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "27 Sep 2026, 08:02 AM"
+      "lastFetched": "27 Sep 2026, 08:27 AM"
     },
     {
       "slug": "runwal-enterprises",
       "name": "Runwal Enterprises",
       "symbol": "RUNWA",
-      "sector": "Financials (Mainboard IPO)",
+      "sector": "Real Estate (Mainboard IPO)",
       "status": "Open",
       "openDate": "25 September",
       "closeDate": "29 September",
-      "listingDate": "TBA",
       "issuePrice": 290,
-      "lotSize": null,
-      "minAmount": null,
+      "lotSize": 49,
+      "minAmount": 14210,
       "issueSize": "\u20b9500 Cr",
-      "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "22.0% avg listing gain in last 1 yr (3/4 positive)",
+      "summary": "Subpar valuation or growth metrics compared to peers in Real Estate.",
+      "verdict": "Avoid",
+      "verdictCls": "verdict-avoid",
       "checks": [
         {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (2.43x vs sector avg 3.0x)"
+        },
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "Slow revenue growth (-13.6%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "High promoter confidence (84.61% holding)"
+        },
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "Proceeds for debt repayment / OFS (debt repayment)"
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 08:02 AM"
+      "lastFetched": "27 Sep 2026, 08:29 AM"
     },
     {
       "slug": "orient-cables",
       "name": "Orient Cables",
       "symbol": "ORIEN",
-      "sector": "Financials (Mainboard IPO)",
+      "sector": "Industrials (Mainboard IPO)",
       "status": "Open",
       "openDate": "25 September",
       "closeDate": "29 September",
-      "listingDate": "TBA",
       "issuePrice": 258,
-      "lotSize": null,
-      "minAmount": null,
+      "lotSize": 55,
+      "minAmount": 14190,
       "issueSize": "\u20b9552 Cr",
-      "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "18.2% avg listing gain in last 1 yr (3/4 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Industrials.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (2.64x vs sector avg 2.8x)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Robust growth (33.45% vs sector avg 14.0%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "High promoter confidence (82.17% holding)"
+        },
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "Proceeds for debt repayment / OFS (debt repayment)"
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 08:02 AM"
+      "lastFetched": "27 Sep 2026, 08:30 AM"
     },
     {
       "slug": "moneyview",
@@ -131,241 +172,367 @@
       "status": "Open",
       "openDate": "24 September",
       "closeDate": "28 September",
-      "listingDate": "TBA",
       "issuePrice": 32,
-      "lotSize": null,
-      "minAmount": null,
+      "lotSize": 441,
+      "minAmount": 14112,
       "issueSize": "\u20b91,092 Cr",
       "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Financials.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (1.79x vs sector avg 3.8x)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Robust growth (58.0% vs sector avg 18.0%)"
+        },
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "Low promoter holding (20.33%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Proceeds deployed for business expansion (growth)"
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 08:02 AM"
+      "lastFetched": "27 Sep 2026, 08:31 AM"
     },
     {
       "slug": "a-one-steels",
       "name": "A-One Steels",
       "symbol": "A-ONE",
-      "sector": "Financials (Mainboard IPO)",
+      "sector": "Materials (Mainboard IPO)",
       "status": "Open",
       "openDate": "24 September",
       "closeDate": "28 September",
-      "listingDate": "TBA",
       "issuePrice": 385,
-      "lotSize": null,
-      "minAmount": null,
+      "lotSize": 37,
+      "minAmount": 14245,
       "issueSize": "\u20b9405 Cr",
-      "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "17.0% avg listing gain in last 1 yr (3/4 positive)",
+      "summary": "Subpar valuation or growth metrics compared to peers in Materials.",
+      "verdict": "Avoid",
+      "verdictCls": "verdict-avoid",
       "checks": [
         {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (0.75x vs sector avg 2.5x)"
+        },
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "Slow revenue growth (11.0%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "High promoter confidence (74.51% holding)"
+        },
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "Proceeds for debt repayment / OFS (deby repayment)"
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 08:02 AM"
+      "lastFetched": "27 Sep 2026, 08:32 AM"
     },
     {
       "slug": "dudani-retail",
       "name": "Dudani Retail",
       "symbol": "DUDAN",
-      "sector": "Financials (SME IPO)",
+      "sector": "Consumer Discretionary (SME IPO)",
       "status": "Open",
       "openDate": "25 September",
       "closeDate": "29 September",
-      "listingDate": "TBA",
       "issuePrice": 29,
-      "lotSize": null,
-      "minAmount": null,
+      "lotSize": 4000,
+      "minAmount": 232000,
       "issueSize": "\u20b911.00 Cr",
-      "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "16.5% avg listing gain in last 1 yr (3/5 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Consumer Discretionary.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (1.22x vs sector avg 4.0x)"
+        },
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "Slow revenue growth (0.84%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "High promoter confidence (64.99% holding)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Proceeds deployed for business expansion (working capital)"
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 08:02 AM"
+      "lastFetched": "27 Sep 2026, 08:33 AM"
     },
     {
       "slug": "sai-urja",
       "name": "Sai Urja",
       "symbol": "SAI U",
-      "sector": "Financials (SME IPO)",
+      "sector": "Industrials (SME IPO)",
       "status": "Open",
       "openDate": "25 September",
       "closeDate": "29 September",
-      "listingDate": "TBA",
       "issuePrice": 107,
-      "lotSize": null,
-      "minAmount": null,
+      "lotSize": 1200,
+      "minAmount": 256800,
       "issueSize": "\u20b924.95 Cr",
-      "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "18.2% avg listing gain in last 1 yr (3/4 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Industrials.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (1.01x vs sector avg 2.8x)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Robust growth (37.03% vs sector avg 14.0%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "High promoter confidence (1200.0% holding)"
+        },
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "Proceeds for debt repayment / OFS (65.67)"
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 08:02 AM"
+      "lastFetched": "27 Sep 2026, 08:34 AM"
     },
     {
       "slug": "himalayan-solar",
       "name": "Himalayan Solar",
       "symbol": "HIMAL",
-      "sector": "Financials (SME IPO)",
+      "sector": "Industrials (SME IPO)",
       "status": "Open",
       "openDate": "25 September",
       "closeDate": "29 September",
-      "listingDate": "TBA",
       "issuePrice": 98,
-      "lotSize": null,
-      "minAmount": null,
+      "lotSize": 1200,
+      "minAmount": 235200,
       "issueSize": "\u20b968.03 Cr",
-      "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "18.2% avg listing gain in last 1 yr (3/4 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Industrials.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (1.33x vs sector avg 2.8x)"
+        },
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "Slow revenue growth (11.31%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "High promoter confidence (70.13% holding)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Proceeds deployed for business expansion (working capital)"
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 08:02 AM"
+      "lastFetched": "27 Sep 2026, 08:35 AM"
     },
     {
       "slug": "bench-mark-infotech",
       "name": "Bench Mark Infotech",
       "symbol": "BENCH",
-      "sector": "Financials (SME IPO)",
+      "sector": "Information Technology (SME IPO)",
       "status": "Open",
       "openDate": "25 September",
       "closeDate": "29 September",
-      "listingDate": "TBA",
       "issuePrice": 104,
-      "lotSize": null,
-      "minAmount": null,
+      "lotSize": 1200,
+      "minAmount": 249600,
       "issueSize": "\u20b942 Cr",
-      "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "24.5% avg listing gain in last 1 yr (4/5 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Information Technology.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (2.6x vs sector avg 5.2x)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Robust growth (33.24% vs sector avg 22.0%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "High promoter confidence (75.29% holding)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Proceeds deployed for business expansion (working capital)"
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 08:02 AM"
+      "lastFetched": "27 Sep 2026, 08:36 AM"
     },
     {
       "slug": "green-asia-impex",
       "name": "Green Asia Impex",
       "symbol": "GREEN",
-      "sector": "Financials (SME IPO)",
+      "sector": "Consumer Staples (SME IPO)",
       "status": "Open",
       "openDate": "24 September",
       "closeDate": "28 September",
-      "listingDate": "TBA",
       "issuePrice": 85,
-      "lotSize": null,
-      "minAmount": null,
+      "lotSize": 1600,
+      "minAmount": 272000,
       "issueSize": "\u20b960.10 Cr",
-      "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "12.0% avg listing gain in last 1 yr (3/4 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Consumer Staples.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (0.49x vs sector avg 3.5x)"
+        },
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "Slow revenue growth (10.52%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "High promoter confidence (64.39% holding)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Proceeds deployed for business expansion (capex)"
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 08:02 AM"
+      "lastFetched": "27 Sep 2026, 08:38 AM"
     },
     {
       "slug": "peshwa-wheat",
       "name": "Peshwa Wheat",
       "symbol": "PESHW",
-      "sector": "Financials (SME IPO)",
+      "sector": "Consumer Staples (SME IPO)",
       "status": "Open",
       "openDate": "24 September",
       "closeDate": "28 September",
-      "listingDate": "TBA",
       "issuePrice": 95,
-      "lotSize": null,
-      "minAmount": null,
+      "lotSize": 1200,
+      "minAmount": 228000,
       "issueSize": "\u20b953.52 Cr",
-      "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "12.0% avg listing gain in last 1 yr (3/4 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Consumer Staples.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (0.89x vs sector avg 3.5x)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Robust growth (122.0% vs sector avg 12.0%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "High promoter confidence (72.15% holding)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Proceeds deployed for business expansion (capex)"
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 08:02 AM"
+      "lastFetched": "27 Sep 2026, 08:38 AM"
     },
     {
       "slug": "roopa-screen",
       "name": "Roopa Screen",
       "symbol": "ROOPA",
-      "sector": "Financials (SME IPO)",
+      "sector": "Industrials (SME IPO)",
       "status": "Open",
       "openDate": "24 September",
       "closeDate": "28 September",
-      "listingDate": "TBA",
       "issuePrice": 60,
-      "lotSize": null,
-      "minAmount": null,
+      "lotSize": 2000,
+      "minAmount": 240000,
       "issueSize": "\u20b919.20 Cr",
-      "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis against Financials.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "18.2% avg listing gain in last 1 yr (3/4 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Industrials.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (1.38x vs sector avg 2.8x)"
+        },
+        {
+          "icon": "\u2717",
+          "cls": "check-fail",
+          "text": "Slow revenue growth (12.47%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "High promoter confidence (63.71% holding)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Proceeds deployed for business expansion (capex)"
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 08:02 AM"
+      "lastFetched": "27 Sep 2026, 08:39 AM"
     }
   ],
-  "lastUpdated": "27 Sep 2026, 08:02 AM"
+  "lastUpdated": "27 Sep 2026, 08:39 AM"
 }

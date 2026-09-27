@@ -1,6 +1,6 @@
 """
 fetch_ipos.py — Live IPO Intelligence Dashboard Engine
-Pure automated scraping, strict open-window filtering, persistent storage, and interactive CLI caching.
+Zero manual listing dates, explicit handling of missing fundamentals, and strict open-window filtering.
 """
 
 import requests
@@ -170,7 +170,7 @@ def evaluate_decision(enrichment, sector_name):
     if not enrichment:
         return {
             "verdict": "Data will be updated soon", "verdictCls": "verdict-caution",
-            "summary": f"Awaiting fundamental RHP data entry for comparative analysis against {sector_name}.",
+            "summary": f"Awaiting fundamental RHP data entry for comparative analysis.",
             "checks": [{"icon": "ℹ", "cls": "check-warn", "text": "Fundamental metrics pending entry"}]
         }
 
@@ -295,25 +295,32 @@ def main():
 
         price = ipo["autoPrice"]
         lot = enrichment.get("lotSize") if enrichment else None
-        listing = "TBA"
         issue_sz = ipo["autoIssue"]
-        sector_name = enrichment.get("sector", "Financials") if enrichment else "Financials"
+        
+        # If no fundamental data exists yet, explicitly state Pending Entry instead of faking Financials
+        if enrichment:
+            sector_name = enrichment.get("sector", "Pending Entry")
+        else:
+            sector_name = "Pending Entry"
 
         if slug in existing_data:
             cached_item = existing_data[slug]
             if cached_item.get("issuePrice"): price = cached_item["issuePrice"]
             if cached_item.get("lotSize"): lot = cached_item["lotSize"]
-            if cached_item.get("listingDate") and cached_item["listingDate"] != "TBA": 
-                listing = cached_item["listingDate"]
             if cached_item.get("issueSize"): issue_sz = cached_item["issueSize"]
-            if cached_item.get("sector"):
+            if cached_item.get("sector") and "Pending" not in cached_item["sector"]:
                 sector_str = cached_item["sector"]
                 sector_name = sector_str.split(" (")[0]
 
         min_amt = (price * lot * multiplier) if (price and lot is not None) else None
 
         decision = evaluate_decision(enrichment, sector_name)
-        bench = SECTOR_BENCHMARKS.get(sector_name, {"avgListingGain": 20.0, "winRate": "3/4 positive"})
+        
+        if enrichment:
+            bench = SECTOR_BENCHMARKS.get(sector_name, {"avgListingGain": 20.0, "winRate": "3/4 positive"})
+            historical_gain = f"{bench['avgListingGain']}% avg listing gain in last 1 yr ({bench['winRate']})"
+        else:
+            historical_gain = "Fundamental data pending entry for sector benchmarking"
 
         upcoming.append({
             "slug": slug,
@@ -323,12 +330,11 @@ def main():
             "status": "Open",
             "openDate": ipo["openDate"],
             "closeDate": ipo["closeDate"],
-            "listingDate": listing,
             "issuePrice": price,
             "lotSize": lot,
             "minAmount": min_amt,
             "issueSize": issue_sz,
-            "historicalGain": f"{bench['avgListingGain']}% avg listing gain in last 1 yr ({bench['winRate']})",
+            "historicalGain": historical_gain,
             "summary": decision["summary"],
             "verdict": decision["verdict"],
             "verdictCls": decision["verdictCls"],
