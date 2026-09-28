@@ -1,6 +1,58 @@
 {
   "upcoming": [
     {
+      "slug": "srit-india",
+      "name": "SRIT India",
+      "symbol": "SRIT ",
+      "sector": "Pending Entry (Mainboard IPO)",
+      "status": "Open",
+      "openDate": "28 September",
+      "closeDate": "30 September",
+      "issuePrice": 123,
+      "lotSize": null,
+      "minAmount": null,
+      "issueSize": "\u20b9218.40 Cr",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "\u2139",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending entry"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "28 Sep 2026, 04:29 AM"
+    },
+    {
+      "slug": "shah-investor's",
+      "name": "Shah Investor's",
+      "symbol": "SHAH ",
+      "sector": "Pending Entry (Mainboard IPO)",
+      "status": "Open",
+      "openDate": "28 September",
+      "closeDate": "30 September",
+      "issuePrice": 159,
+      "lotSize": null,
+      "minAmount": null,
+      "issueSize": "\u20b990.17 Cr",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "\u2139",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending entry"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "28 Sep 2026, 04:29 AM"
+    },
+    {
       "slug": "acevector",
       "name": "Acevector",
       "symbol": "ACEVE",
@@ -39,7 +91,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 04:28 AM"
+      "lastFetched": "28 Sep 2026, 04:29 AM"
     },
     {
       "slug": "german-green-steel",
@@ -80,7 +132,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 04:28 AM"
+      "lastFetched": "28 Sep 2026, 04:29 AM"
     },
     {
       "slug": "runwal-enterprises",
@@ -121,7 +173,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 04:28 AM"
+      "lastFetched": "28 Sep 2026, 04:29 AM"
     },
     {
       "slug": "orient-cables",
@@ -162,7 +214,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 04:28 AM"
+      "lastFetched": "28 Sep 2026, 04:29 AM"
     },
     {
       "slug": "moneyview",
@@ -203,7 +255,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 04:28 AM"
+      "lastFetched": "28 Sep 2026, 04:29 AM"
     },
     {
       "slug": "a-one-steels",
@@ -244,7 +296,85 @@
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 04:28 AM"
+      "lastFetched": "28 Sep 2026, 04:29 AM"
+    },
+    {
+      "slug": "acme-universal",
+      "name": "Acme Universal",
+      "symbol": "ACME ",
+      "sector": "Pending Entry (SME IPO)",
+      "status": "Open",
+      "openDate": "28 September",
+      "closeDate": "30 September",
+      "issuePrice": 65,
+      "lotSize": null,
+      "minAmount": null,
+      "issueSize": "\u20b936 Cr",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "\u2139",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending entry"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "28 Sep 2026, 04:29 AM"
+    },
+    {
+      "slug": "shivchem-agro",
+      "name": "Shivchem Agro",
+      "symbol": "SHIVC",
+      "sector": "Pending Entry (SME IPO)",
+      "status": "Open",
+      "openDate": "28 September",
+      "closeDate": "30 September",
+      "issuePrice": 59,
+      "lotSize": null,
+      "minAmount": null,
+      "issueSize": "\u20b914.01 Cr",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "\u2139",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending entry"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "28 Sep 2026, 04:29 AM"
+    },
+    {
+      "slug": "pind-hospitality",
+      "name": "Pind Hospitality",
+      "symbol": "PIND ",
+      "sector": "Pending Entry (SME IPO)",
+      "status": "Open",
+      "openDate": "28 September",
+      "closeDate": "30 September",
+      "issuePrice": 93,
+      "lotSize": null,
+      "minAmount": null,
+      "issueSize": "\u20b917.82 Cr",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "\u2139",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending entry"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "28 Sep 2026, 04:29 AM"
     },
     {
       "slug": "dudani-retail",
@@ -285,7 +415,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 04:28 AM"
+      "lastFetched": "28 Sep 2026, 04:29 AM"
     },
     {
       "slug": "sai-urja",
@@ -326,7 +456,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 04:28 AM"
+      "lastFetched": "28 Sep 2026, 04:29 AM"
     },
     {
       "slug": "himalayan-solar",
@@ -367,7 +497,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 04:28 AM"
+      "lastFetched": "28 Sep 2026, 04:29 AM"
     },
     {
       "slug": "bench-mark-infotech",
@@ -408,7 +538,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 04:28 AM"
+      "lastFetched": "28 Sep 2026, 04:29 AM"
     },
     {
       "slug": "green-asia-impex",
@@ -449,7 +579,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 04:28 AM"
+      "lastFetched": "28 Sep 2026, 04:29 AM"
     },
     {
       "slug": "peshwa-wheat",
@@ -490,7 +620,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 04:28 AM"
+      "lastFetched": "28 Sep 2026, 04:29 AM"
     },
     {
       "slug": "roopa-screen",
@@ -531,8 +661,8 @@
         }
       ],
       "score": 1,
-      "lastFetched": "27 Sep 2026, 04:28 AM"
+      "lastFetched": "28 Sep 2026, 04:29 AM"
     }
   ],
-  "lastUpdated": "27 Sep 2026, 04:28 AM"
+  "lastUpdated": "28 Sep 2026, 04:29 AM"
 }
