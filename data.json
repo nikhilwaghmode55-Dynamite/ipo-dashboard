@@ -1,4 +1,135 @@
 {
-  "upcoming": [],
-  "lastUpdated": "29 Sep 2026, 04:59 AM"
+  "upcoming": [
+    {
+      "slug": "srit-india",
+      "name": "SRIT India",
+      "symbol": "SRIT ",
+      "sector": "Pending Entry (Mainboard IPO)",
+      "status": "Open",
+      "openDate": "28 September",
+      "closeDate": "30 September",
+      "issuePrice": 123,
+      "lotSize": null,
+      "minAmount": null,
+      "issueSize": "\u20b9218.40 Cr",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "\u2139",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending entry"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "30 Sep 2026, 04:45 AM"
+    },
+    {
+      "slug": "shah-investor's",
+      "name": "Shah Investor's",
+      "symbol": "SHAH ",
+      "sector": "Pending Entry (Mainboard IPO)",
+      "status": "Open",
+      "openDate": "28 September",
+      "closeDate": "30 September",
+      "issuePrice": 159,
+      "lotSize": null,
+      "minAmount": null,
+      "issueSize": "\u20b990.17 Cr",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "\u2139",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending entry"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "30 Sep 2026, 04:45 AM"
+    },
+    {
+      "slug": "acme-universal",
+      "name": "Acme Universal",
+      "symbol": "ACME ",
+      "sector": "Pending Entry (SME IPO)",
+      "status": "Open",
+      "openDate": "28 September",
+      "closeDate": "30 September",
+      "issuePrice": 65,
+      "lotSize": null,
+      "minAmount": null,
+      "issueSize": "\u20b936 Cr",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "\u2139",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending entry"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "30 Sep 2026, 04:45 AM"
+    },
+    {
+      "slug": "shivchem-agro",
+      "name": "Shivchem Agro",
+      "symbol": "SHIVC",
+      "sector": "Pending Entry (SME IPO)",
+      "status": "Open",
+      "openDate": "28 September",
+      "closeDate": "30 September",
+      "issuePrice": 59,
+      "lotSize": null,
+      "minAmount": null,
+      "issueSize": "\u20b914.01 Cr",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "\u2139",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending entry"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "30 Sep 2026, 04:45 AM"
+    },
+    {
+      "slug": "pind-hospitality",
+      "name": "Pind Hospitality",
+      "symbol": "PIND ",
+      "sector": "Pending Entry (SME IPO)",
+      "status": "Open",
+      "openDate": "28 September",
+      "closeDate": "30 September",
+      "issuePrice": 93,
+      "lotSize": null,
+      "minAmount": null,
+      "issueSize": "\u20b917.82 Cr",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "\u2139",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending entry"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "30 Sep 2026, 04:45 AM"
+    }
+  ],
+  "lastUpdated": "30 Sep 2026, 04:45 AM"
 }
