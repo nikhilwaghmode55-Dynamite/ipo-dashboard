@@ -39,7 +39,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "05 Oct 2026, 08:43 PM"
+      "lastFetched": "05 Oct 2026, 08:55 PM"
     },
     {
       "slug": "nityas-gems",
@@ -80,7 +80,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "05 Oct 2026, 08:44 PM"
+      "lastFetched": "05 Oct 2026, 08:55 PM"
     },
     {
       "slug": "r.k.fashion",
@@ -121,7 +121,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "05 Oct 2026, 08:44 PM"
+      "lastFetched": "05 Oct 2026, 08:55 PM"
     },
     {
       "slug": "paramount-syntex",
@@ -162,7 +162,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "05 Oct 2026, 08:44 PM"
+      "lastFetched": "05 Oct 2026, 08:55 PM"
     },
     {
       "slug": "tna-solutions",
@@ -203,7 +203,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "05 Oct 2026, 08:45 PM"
+      "lastFetched": "05 Oct 2026, 08:55 PM"
     },
     {
       "slug": "acme-india-industries",
@@ -244,33 +244,48 @@
         }
       ],
       "score": 1,
-      "lastFetched": "05 Oct 2026, 08:45 PM"
+      "lastFetched": "05 Oct 2026, 08:55 PM"
     },
     {
       "slug": "sollfege-smart-electronics",
       "name": "Sollfege Smart Electronics",
       "symbol": "SOLLF",
-      "sector": "Pending Entry (SME IPO)",
+      "sector": "Information Technology (SME IPO)",
       "status": "Open",
       "openDate": "30 September 2026",
       "closeDate": "5 October 2026",
       "issuePrice": 55,
-      "lotSize": null,
-      "minAmount": null,
+      "lotSize": 350,
+      "minAmount": 38500,
       "issueSize": "\u20b921.78 Cr",
-      "historicalGain": "Fundamental data pending entry for sector benchmarking",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "24.5% avg listing gain in last 1 yr (4/5 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Information Technology.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (5.0x vs sector avg 5.2x)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Robust growth (23.0% vs sector avg 22.0%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "High promoter confidence (67.0% holding)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Proceeds deployed for business expansion (capex and business expansion)"
         }
       ],
       "score": 1,
-      "lastFetched": "05 Oct 2026, 08:46 PM"
+      "lastFetched": "05 Oct 2026, 08:55 PM"
     },
     {
       "slug": "sjp-ultrasonic",
@@ -296,7 +311,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "05 Oct 2026, 08:46 PM"
+      "lastFetched": "05 Oct 2026, 08:55 PM"
     },
     {
       "slug": "eventions",
@@ -322,7 +337,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "05 Oct 2026, 08:46 PM"
+      "lastFetched": "05 Oct 2026, 08:55 PM"
     },
     {
       "slug": "dove-soft",
@@ -348,7 +363,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "05 Oct 2026, 08:46 PM"
+      "lastFetched": "05 Oct 2026, 08:55 PM"
     },
     {
       "slug": "omara-ventures",
@@ -374,7 +389,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "05 Oct 2026, 08:46 PM"
+      "lastFetched": "05 Oct 2026, 08:55 PM"
     },
     {
       "slug": "everestims-technologies",
@@ -400,7 +415,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "05 Oct 2026, 08:46 PM"
+      "lastFetched": "05 Oct 2026, 08:55 PM"
     },
     {
       "slug": "shree-tnb-polymers",
@@ -426,8 +441,8 @@
         }
       ],
       "score": 1,
-      "lastFetched": "05 Oct 2026, 08:46 PM"
+      "lastFetched": "05 Oct 2026, 08:55 PM"
     }
   ],
-  "lastUpdated": "05 Oct 2026, 08:46 PM"
+  "lastUpdated": "05 Oct 2026, 08:55 PM"
 }

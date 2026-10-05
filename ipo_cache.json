@@ -150,5 +150,13 @@
     "proceedsUse": "Capex and Business Expansion",
     "promoterPct": 66.0,
     "lotSize": 600
+  },
+  "sollfege-smart-electronics": {
+    "sector": "Information Technology",
+    "psRatio": 5.0,
+    "cagr3Yr": 23.0,
+    "proceedsUse": "Capex and Business Expansion",
+    "promoterPct": 67.0,
+    "lotSize": 350
   }
 }
