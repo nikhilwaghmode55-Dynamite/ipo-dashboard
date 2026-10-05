@@ -1,6 +1,6 @@
 """
 fetch_ipos.py — Live IPO Intelligence Dashboard Engine
-Zero manual listing dates, explicit handling of missing fundamentals, and strict open-window filtering.
+Features robust cross-month date parsing, horizontal CLI layout, and persistent caching.
 """
 
 import requests
@@ -80,27 +80,53 @@ def parse_date_range(dates_str):
     dates_str = dates_str.strip()
     months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", 
               "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    month_map = {
+        "jan": 1, "feb": 2, "mar": 3, "apr": 4, "may": 5, "jun": 6,
+        "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
+        "january": 1, "february": 2, "march": 3, "april": 4, "may": 5, "june": 6,
+        "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12
+    }
+    rev_month_map = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June", 
+                     7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"}
     
-    found_month = ""
+    found_month_name = ""
     for m in months:
         if m.lower() in dates_str.lower():
-            found_month = m
+            found_month_name = m
             break
             
-    open_str, close_str = dates_str, "TBA"
+    open_part, close_part = dates_str, "TBA"
     if " to " in dates_str.lower():
         parts = dates_str.lower().split(" to ")
-        open_str, close_str = parts[0].strip(), parts[1].strip()
+        open_part, close_part = parts[0].strip(), parts[1].strip()
     elif "-" in dates_str:
         parts = dates_str.split("-")
-        open_str, close_str = parts[0].strip(), parts[1].strip()
+        open_part, close_part = parts[0].strip(), parts[1].strip()
 
-    if found_month and not any(m.lower() in open_str.lower() for m in months):
-        open_str = f"{open_str} {found_month}"
-    if found_month and not any(m.lower() in close_str.lower() for m in months):
-        close_str = f"{close_str} {found_month}"
-        
-    return open_str, close_str
+    open_nums = re.findall(r'\d+', open_part)
+    close_nums = re.findall(r'\d+', close_part)
+    
+    start_day = int(open_nums[0]) if open_nums else 1
+    end_day = int(close_nums[0]) if close_nums else 1
+
+    end_month_num = 9  # default fallback
+    if found_month_name:
+        for k, v in month_map.items():
+            if k in found_month_name.lower():
+                end_month_num = v
+                break
+            
+    start_month_num = end_month_num
+    if start_day > end_day:
+        start_month_num = end_month_num - 1
+        if start_month_num < 1:
+            start_month_num = 12
+
+    current_year = datetime.now().year
+    start_str = f"{start_day} {rev_month_map[start_month_num]} {current_year}"
+    close_str = f"{end_day} {rev_month_map[end_month_num]} {current_year}"
+    
+    return start_str, close_str
 
 def is_currently_open(open_str, close_str):
     today = datetime.now().date()
@@ -136,21 +162,37 @@ def parse_table_columns(cols, row_text):
     return price, issue_size
 
 def prompt_user_fundamentals(name):
-    print(f"\n--------------------------------------------------")
+    print(f"\n" + "="*55)
     print(f" [CLI Input Needed] Configure details for: {name}")
-    print(f"--------------------------------------------------")
-    print("Select Sector from the 11 Predefined Sectors:")
+    print("="*55)
+    print("Select Sector (Displayed Horizontally):")
     sectors = list(SECTOR_BENCHMARKS.keys())
-    for idx, sec in enumerate(sectors, 1): print(f"  {idx}. {sec}")
+    
+    for i in range(0, len(sectors), 2):
+        item1 = f"{i+1:2d}. {sectors[i]:<26}"
+        item2 = f"{i+2:2d}. {sectors[i+1]}" if i+1 < len(sectors) else ""
+        print(f"  {item1}   {item2}")
     
     try:
-        sec_choice = input(f"Enter choice (1-{len(sectors)}) or press Enter to skip: ").strip()
+        sec_choice = input(f"\nEnter sector choice (1-{len(sectors)}) or press Enter to skip: ").strip()
         if not sec_choice: return None
         sector = sectors[int(sec_choice) - 1]
         
         ps_ratio = float(input("Current FY P/S Ratio (e.g., 4.5): ").strip())
         cagr = float(input("3-Year Revenue CAGR % (e.g., 20): ").strip())
-        proceeds = input("Use of Proceeds (e.g., Capex, Debt Repayment): ").strip()
+        
+        print("\nSelect Use of Proceeds:")
+        print("  1. Capex / Business Expansion / Growth / R&D (Positive)")
+        print("  2. Working Capital (Neutral/Positive)")
+        print("  3. Debt Repayment / OFS (Offer for Sale) (Negative)")
+        proc_choice = input("Enter option (1-3): ").strip()
+        proceeds_map = {
+            "1": "Capex and Business Expansion",
+            "2": "Working Capital",
+            "3": "Debt Repayment / OFS"
+        }
+        proceeds = proceeds_map.get(proc_choice, "Debt Repayment / OFS")
+
         promoter = float(input("Post-IPO Promoter Holding % (e.g., 65): ").strip())
         lot_size = int(input("Exact Broker Lot Size (e.g., 50, 500, 1000): ").strip())
         
@@ -200,7 +242,7 @@ def evaluate_decision(enrichment, sector_name):
         checks.append({"icon": "✗", "cls": "check-fail", "text": f"Low promoter holding ({promoter}%)"})
         score -= 1
 
-    if any(k in proceeds for k in ["capex", "growth", "working capital", "r&d"]):
+    if any(k in proceeds for k in ["capex", "growth", "working capital", "expansion"]):
         checks.append({"icon": "✓", "cls": "check-pass", "text": f"Proceeds deployed for business expansion ({proceeds})"})
         score += 1
     else:
@@ -297,7 +339,6 @@ def main():
         lot = enrichment.get("lotSize") if enrichment else None
         issue_sz = ipo["autoIssue"]
         
-        # If no fundamental data exists yet, explicitly state Pending Entry instead of faking Financials
         if enrichment:
             sector_name = enrichment.get("sector", "Pending Entry")
         else:

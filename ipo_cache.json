@@ -102,5 +102,53 @@
     "proceedsUse": "Capex",
     "promoterPct": 63.71,
     "lotSize": 2000
+  },
+  "vishal-nirmiti": {
+    "sector": "Information Technology",
+    "psRatio": 5.0,
+    "cagr3Yr": 20.0,
+    "proceedsUse": "Working Capital",
+    "promoterPct": 70.0,
+    "lotSize": 500
+  },
+  "nityas-gems": {
+    "sector": "Financials",
+    "psRatio": 6.0,
+    "cagr3Yr": 21.0,
+    "proceedsUse": "Capex and Business Expansion",
+    "promoterPct": 71.0,
+    "lotSize": 200
+  },
+  "r.k.fashion": {
+    "sector": "Health Care",
+    "psRatio": 7.0,
+    "cagr3Yr": 22.0,
+    "proceedsUse": "Debt Repayment / OFS",
+    "promoterPct": 72.0,
+    "lotSize": 241
+  },
+  "paramount-syntex": {
+    "sector": "Consumer Discretionary",
+    "psRatio": 8.0,
+    "cagr3Yr": 24.0,
+    "proceedsUse": "Capex and Business Expansion",
+    "promoterPct": 74.0,
+    "lotSize": 300
+  },
+  "tna-solutions": {
+    "sector": "Consumer Staples",
+    "psRatio": 3.0,
+    "cagr3Yr": 15.0,
+    "proceedsUse": "Capex and Business Expansion",
+    "promoterPct": 72.0,
+    "lotSize": 65
+  },
+  "acme-india-industries": {
+    "sector": "Health Care",
+    "psRatio": 4.0,
+    "cagr3Yr": 27.0,
+    "proceedsUse": "Capex and Business Expansion",
+    "promoterPct": 66.0,
+    "lotSize": 600
   }
 }
