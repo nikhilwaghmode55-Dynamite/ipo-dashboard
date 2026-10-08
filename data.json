@@ -1,46 +1,4 @@
 {
-  "upcoming": [
-    {
-      "slug": "r.k.fashion",
-      "name": "R.K.Fashion",
-      "symbol": "R.K.F",
-      "sector": "Health Care (SME IPO)",
-      "status": "Open",
-      "openDate": "5 October 2026",
-      "closeDate": "7 October 2026",
-      "issuePrice": 77,
-      "lotSize": 241,
-      "minAmount": 37114,
-      "issueSize": "\u20b934.99 Cr",
-      "historicalGain": "21.0% avg listing gain in last 1 yr (3/4 positive)",
-      "summary": "Subpar valuation or growth metrics compared to peers in Health Care.",
-      "verdict": "Avoid",
-      "verdictCls": "verdict-avoid",
-      "checks": [
-        {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "High P/S valuation (7.0x vs sector avg 4.5x)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Robust growth (22.0% vs sector avg 20.0%)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "High promoter confidence (72.0% holding)"
-        },
-        {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "Proceeds for debt repayment / OFS (debt repayment / ofs)"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "07 Oct 2026, 11:55 AM"
-    }
-  ],
-  "lastUpdated": "07 Oct 2026, 11:55 AM"
+  "upcoming": [],
+  "lastUpdated": "08 Oct 2026, 12:10 PM"
 }
