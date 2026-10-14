@@ -1,6 +1,6 @@
 """
 fetch_ipos.py — Live IPO Intelligence Dashboard Engine
-Strictly isolates share prices from issue sizes (Cr), robust retry session, and cross-month date parsing.
+Strictly isolates share prices from issue sizes, robust retry session, and cross-month date parsing.
 """
 
 import requests
@@ -143,29 +143,32 @@ def is_currently_open(open_str, close_str):
 def parse_table_columns(cols, row_text):
     price = None
     issue_size = "TBA"
-    all_prices = []
     
+    # 1. Isolate Issue Size string and numerical value first
+    cr_match = re.search(r'₹?\s*([\d,.]+)\s*(?:Cr|crore)', row_text, re.IGNORECASE)
+    issue_val_str = None
+    if cr_match:
+        issue_size = f"₹{cr_match.group(1)} Cr"
+        issue_val_str = cr_match.group(1).replace(',', '').split('.')[0]
+
+    all_prices = []
     for col in cols:
         text = col.text.strip()
         text_lower = text.lower()
         
-        # 1. Parse Issue Size strictly if 'cr' or 'crore' is present
-        if "cr" in text_lower or "crore" in text_lower:
-            cr_match = re.search(r'₹?\s*([\d,.]+)', text, re.IGNORECASE)
-            if cr_match:
-                issue_size = f"₹{cr_match.group(1)} Cr"
-            continue  # Skip price extraction for issue size columns!
+        # Skip issue size, crore, or lot size columns
+        if any(kw in text_lower for kw in ["cr", "crore", "issue", "size", "lot", "shares"]):
+            continue
             
-        # 2. Parse Price strictly if ₹ is present and it is NOT an issue size column
-        if "₹" in text and not any(kw in text_lower for kw in ["cr", "crore", "issue", "size"]):
-            prices = re.findall(r'₹\s*([\d,]+)', text)
-            for p in prices:
-                val = int(p.replace(',', ''))
-                # Share prices are generally under ₹5,000 per share
-                if val < 5000:
-                    all_prices.append(val)
+        prices = re.findall(r'₹?\s*([\d,]+)', text)
+        for p in prices:
+            val = int(p.replace(',', ''))
+            # Realistic share price filter (< 5000) and ensure it's not the issue size number
+            if val < 5000 and (not issue_val_str or str(val) != issue_val_str):
+                all_prices.append(val)
 
     if all_prices:
+        # Cut-off price is always the upper band (maximum price)
         price = max(all_prices)
 
     return price, issue_size
@@ -264,7 +267,7 @@ def evaluate_decision(enrichment, sector_name):
         return {"verdict": "Avoid", "verdictCls": "verdict-avoid", "summary": f"Subpar valuation or growth metrics compared to peers in {sector_name}.", "checks": checks}
 
 def fetch_open_ipos():
-    print("\n[Scraper] Fetching strictly OPEN IPOs with robust retry session...")
+    print("\n[Scraper] Fetching strictly OPEN IPOs with strict price/issue separation...")
     url = "https://ipowatch.in/upcoming-ipo-calendar-ipo-list/"
     open_ipos = []
     
