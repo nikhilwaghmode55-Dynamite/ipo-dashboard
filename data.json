@@ -8,9 +8,9 @@
       "status": "Open",
       "openDate": "14 October 2026",
       "closeDate": "16 October 2026",
-      "issuePrice": 702,
-      "lotSize": 500,
-      "minAmount": 351000,
+      "issuePrice": 289,
+      "lotSize": 51,
+      "minAmount": 14739,
       "issueSize": "\u20b9702 Cr",
       "historicalGain": "24.5% avg listing gain in last 1 yr (4/5 positive)",
       "summary": "Strong fundamentals outperforming historical benchmarks in Information Technology.",
@@ -39,7 +39,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "14 Oct 2026, 01:09 PM"
+      "lastFetched": "14 Oct 2026, 01:20 PM"
     },
     {
       "slug": "hd-fire-protect",
@@ -49,9 +49,9 @@
       "status": "Open",
       "openDate": "13 October 2026",
       "closeDate": "15 October 2026",
-      "issuePrice": 712,
+      "issuePrice": 271,
       "lotSize": 55,
-      "minAmount": 39160,
+      "minAmount": 14905,
       "issueSize": "\u20b9712 Cr",
       "historicalGain": "18.2% avg listing gain in last 1 yr (3/4 positive)",
       "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
@@ -80,7 +80,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "14 Oct 2026, 01:10 PM"
+      "lastFetched": "14 Oct 2026, 01:20 PM"
     },
     {
       "slug": "ravita-engineering",
@@ -90,9 +90,9 @@
       "status": "Open",
       "openDate": "14 October 2026",
       "closeDate": "16 October 2026",
-      "issuePrice": 116,
+      "issuePrice": 112,
       "lotSize": 1200,
-      "minAmount": 278400,
+      "minAmount": 268800,
       "issueSize": "\u20b9116.05 Cr",
       "historicalGain": "18.2% avg listing gain in last 1 yr (3/4 positive)",
       "summary": "Strong fundamentals outperforming historical benchmarks in Industrials.",
@@ -121,7 +121,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "14 Oct 2026, 01:11 PM"
+      "lastFetched": "14 Oct 2026, 01:21 PM"
     },
     {
       "slug": "vaibhav-vyapaar",
@@ -162,8 +162,8 @@
         }
       ],
       "score": 1,
-      "lastFetched": "14 Oct 2026, 01:11 PM"
+      "lastFetched": "14 Oct 2026, 01:21 PM"
     }
   ],
-  "lastUpdated": "14 Oct 2026, 01:11 PM"
+  "lastUpdated": "14 Oct 2026, 01:21 PM"
 }
