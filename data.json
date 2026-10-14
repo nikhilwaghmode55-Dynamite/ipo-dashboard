@@ -20,26 +20,26 @@
         {
           "icon": "\u2713",
           "cls": "check-pass",
-          "text": "Attractive P/S valuation (5.0x vs sector avg 5.2x)"
+          "text": "Attractive P/S valuation (2.29x vs sector avg 5.2x)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Robust growth (35.43% vs sector avg 22.0%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "High promoter confidence (81.82% holding)"
         },
         {
           "icon": "\u2717",
           "cls": "check-fail",
-          "text": "Slow revenue growth (20.0%)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "High promoter confidence (67.0% holding)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Proceeds deployed for business expansion (working capital)"
+          "text": "Proceeds for debt repayment / OFS (debt repayment / ofs)"
         }
       ],
       "score": 1,
-      "lastFetched": "14 Oct 2026, 12:34 PM"
+      "lastFetched": "14 Oct 2026, 12:55 PM"
     },
     {
       "slug": "hd-fire-protect",
@@ -80,7 +80,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "14 Oct 2026, 12:35 PM"
+      "lastFetched": "14 Oct 2026, 12:55 PM"
     },
     {
       "slug": "ravita-engineering",
@@ -121,7 +121,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "14 Oct 2026, 12:36 PM"
+      "lastFetched": "14 Oct 2026, 12:56 PM"
     },
     {
       "slug": "vaibhav-vyapaar",
@@ -162,8 +162,8 @@
         }
       ],
       "score": 1,
-      "lastFetched": "14 Oct 2026, 12:37 PM"
+      "lastFetched": "14 Oct 2026, 12:56 PM"
     }
   ],
-  "lastUpdated": "14 Oct 2026, 12:37 PM"
+  "lastUpdated": "14 Oct 2026, 12:56 PM"
 }

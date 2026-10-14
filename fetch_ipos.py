@@ -1,6 +1,6 @@
 """
 fetch_ipos.py — Live IPO Intelligence Dashboard Engine
-Features robust session retry logic, upper-band cut-off price extraction, and cross-month date parsing.
+Strictly isolates share prices from issue sizes (Cr), robust retry session, and cross-month date parsing.
 """
 
 import requests
@@ -141,28 +141,29 @@ def is_currently_open(open_str, close_str):
     return open_dt.date() <= today <= close_dt.date()
 
 def parse_table_columns(cols, row_text):
-    price, issue_size = None, "TBA"
+    price = None
+    issue_size = "TBA"
     all_prices = []
     
     for col in cols:
         text = col.text.strip()
-        if "cr" in text.lower():
-            cr_match = re.search(r'₹?\s*([\d,.]+)', text)
-            if cr_match: issue_size = f"₹{cr_match.group(1)} Cr"
+        text_lower = text.lower()
+        
+        # 1. Parse Issue Size strictly if 'cr' or 'crore' is present
+        if "cr" in text_lower or "crore" in text_lower:
+            cr_match = re.search(r'₹?\s*([\d,.]+)', text, re.IGNORECASE)
+            if cr_match:
+                issue_size = f"₹{cr_match.group(1)} Cr"
+            continue  # Skip price extraction for issue size columns!
             
-        prices = re.findall(r'₹\s*([\d,]+)', text)
-        for p in prices:
-            val = int(p.replace(',', ''))
-            if val < 25000:
-                all_prices.append(val)
-
-    if not all_prices:
-        clean_row = re.sub(r'₹?\s*[\d,.]+\s*(?:Cr|crore)', '', row_text, flags=re.IGNORECASE)
-        prices = re.findall(r'₹\s*([\d,]+)', clean_row)
-        for p in prices:
-            val = int(p.replace(',', ''))
-            if val < 25000:
-                all_prices.append(val)
+        # 2. Parse Price strictly if ₹ is present and it is NOT an issue size column
+        if "₹" in text and not any(kw in text_lower for kw in ["cr", "crore", "issue", "size"]):
+            prices = re.findall(r'₹\s*([\d,]+)', text)
+            for p in prices:
+                val = int(p.replace(',', ''))
+                # Share prices are generally under ₹5,000 per share
+                if val < 5000:
+                    all_prices.append(val)
 
     if all_prices:
         price = max(all_prices)
