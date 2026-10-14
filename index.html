@@ -20,11 +20,12 @@
       --danger-text: #991b1b;
     }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
       margin: 0;
       padding: 24px;
+      -webkit-font-smoothing: antialiased;
     }
     .container {
       max-width: 900px;
@@ -35,7 +36,7 @@
       border-bottom: 1px solid var(--border);
       padding-bottom: 16px;
     }
-    h1 { margin: 0 0 4px 0; font-size: 24px; }
+    h1 { margin: 0 0 4px 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
     p { margin: 0; color: var(--muted); font-size: 14px; }
     .card {
       background: var(--card-bg);
@@ -43,7 +44,7 @@
       border-radius: 12px;
       padding: 20px;
       margin-bottom: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
     .card-header {
       display: flex;
@@ -51,13 +52,15 @@
       align-items: flex-start;
       margin-bottom: 16px;
     }
-    .ipo-name { font-size: 18px; font-weight: 700; margin: 0; }
-    .ipo-sector { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .ipo-name { font-size: 18px; font-weight: 700; margin: 0; color: #0f172a; }
+    .ipo-sector { font-size: 13px; color: var(--muted); margin-top: 3px; font-weight: 500; }
     .badge {
       padding: 4px 10px;
       border-radius: 20px;
       font-size: 12px;
       font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .badge-open { background: var(--success-bg); color: var(--success-text); }
     .grid {
@@ -65,12 +68,13 @@
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
       gap: 12px;
       margin-bottom: 16px;
-      padding: 12px;
+      padding: 14px;
       background: #f8fafc;
+      border: 1px solid #f1f5f9;
       border-radius: 8px;
     }
-    .metric-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-    .metric-value { font-size: 15px; font-weight: 600; margin-top: 2px; }
+    .metric-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; }
+    .metric-value { font-size: 15px; font-weight: 700; margin-top: 3px; color: #1e293b; }
     .decision-box {
       border-top: 1px solid var(--border);
       padding-top: 14px;
@@ -80,24 +84,34 @@
       padding: 6px 14px;
       border-radius: 6px;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
       margin-bottom: 8px;
     }
     .verdict-apply { background: var(--success-bg); color: var(--success-text); }
     .verdict-caution { background: var(--warning-bg); color: var(--warning-text); }
     .verdict-avoid { background: var(--danger-bg); color: var(--danger-text); }
     .summary-text { font-size: 14px; font-weight: 500; margin-bottom: 10px; color: #334155; }
-    .check-item { font-size: 13px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
-    .check-pass { color: var(--success-text); }
-    .check-fail { color: var(--danger-text); }
-    .check-warn { color: var(--warning-text); }
+    .check-item { font-size: 13px; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; font-weight: 400; }
+    .check-pass { color: var(--success-text); font-weight: 500; }
+    .check-fail { color: var(--danger-text); font-weight: 500; }
+    .check-warn { color: var(--warning-text); font-weight: 500; }
     .historical-box {
       font-size: 13px;
       color: var(--primary);
       background: #eff6ff;
+      border: 1px solid #dbeafe;
       padding: 8px 12px;
       border-radius: 6px;
       margin-top: 10px;
+    }
+    .rhp-note {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 12px;
+      text-align: right;
+      letter-spacing: 0.2px;
     }
   </style>
 </head>
@@ -105,21 +119,34 @@
   <div class="container">
     <header>
       <h1>Live IPO Decision Engine</h1>
-      <p>Pre-application analytical framework &amp; open listings tracker (<span id="last-updated">Loading...</span>)</p>
+      <p>Pre-Application Analytical Framework &amp; Open Listings Tracker (<span id="last-updated">Loading...</span>)</p>
     </header>
 
     <div id="cards-container">
-      <p style="text-align:center; color: var(--muted);">Loading open IPOs...</p>
+      <p style="text-align:center; color: var(--muted);">Loading Open IPOs...</p>
     </div>
   </div>
 
   <script>
+    // Standardize financial acronym casing for clean presentation
+    function formatText(text) {
+      if (!text) return '';
+      return text
+        .replace(/\bofs\b/gi, 'OFS')
+        .replace(/\brhp\b/gi, 'RHP')
+        .replace(/\bcagr\b/gi, 'CAGR')
+        .replace(/\bp\/s\b/gi, 'P/S')
+        .replace(/\bipo\b/gi, 'IPO')
+        .replace(/\bsme\b/gi, 'SME')
+        .replace(/\br&d\b/gi, 'R&D');
+    }
+
     async function loadData() {
       try {
         const response = await fetch('data.json?v=' + new Date().getTime());
         const data = await response.json();
         
-        document.getElementById('last-updated').textContent = `Last updated: ${data.lastUpdated || 'Just now'}`;
+        document.getElementById('last-updated').textContent = `Last Updated: ${data.lastUpdated || 'Just Now'}`;
         
         const container = document.getElementById('cards-container');
         container.innerHTML = '';
@@ -127,7 +154,7 @@
         const openIpos = data.upcoming || [];
 
         if (openIpos.length === 0) {
-          container.innerHTML = `<div class="card" style="text-align: center; color: var(--muted);">No OPEN IPOs found for today. Check back when an issue opens!</div>`;
+          container.innerHTML = `<div class="card" style="text-align: center; color: var(--muted);">No Open IPOs Found for Today. Check Back When an Issue Opens!</div>`;
           return;
         }
 
@@ -135,7 +162,7 @@
           let checksHtml = '';
           if (ipo.checks) {
             ipo.checks.forEach(c => {
-              checksHtml += `<div class="check-item ${c.cls}"><span>${c.icon}</span> <span>${c.text}</span></div>`;
+              checksHtml += `<div class="check-item ${c.cls}"><span>${c.icon}</span> <span>${formatText(c.text)}</span></div>`;
             });
           }
 
@@ -145,7 +172,7 @@
             <div class="card-header">
               <div>
                 <div class="ipo-name">${ipo.name}</div>
-                <div class="ipo-sector">${ipo.sector}</div>
+                <div class="ipo-sector">${formatText(ipo.sector)}</div>
               </div>
               <span class="badge badge-open">${ipo.status}</span>
             </div>
@@ -157,7 +184,7 @@
               </div>
               <div>
                 <div class="metric-label">Lot Size</div>
-                <div class="metric-value">${ipo.lotSize ? ipo.lotSize + ' shares' : 'TBA'}</div>
+                <div class="metric-value">${ipo.lotSize ? ipo.lotSize + ' Shares' : 'TBA'}</div>
               </div>
               <div>
                 <div class="metric-label">Investment Needed</div>
@@ -175,16 +202,17 @@
 
             <div class="decision-box">
               <div class="verdict-tag ${ipo.verdictCls}">${ipo.verdict}</div>
-              ${ipo.summary ? `<div class="summary-text">${ipo.summary}</div>` : ''}
+              ${ipo.summary ? `<div class="summary-text">${formatText(ipo.summary)}</div>` : ''}
               <div style="margin-top: 8px;">${checksHtml}</div>
-              ${ipo.historicalGain ? `<div class="historical-box">📊 <strong>Benchmark Status:</strong> ${ipo.historicalGain}</div>` : ''}
+              ${ipo.historicalGain ? `<div class="historical-box">📊 <strong>Benchmark Status:</strong> ${formatText(ipo.historicalGain)}</div>` : ''}
+              <div class="rhp-note">Metrics Evaluated Based on Finalized Red Herring Prospectus (RHP) Fundamentals &amp; Exchange Data.</div>
             </div>
           `;
           container.appendChild(card);
         });
 
       } catch (err) {
-        document.getElementById('cards-container').innerHTML = `<div class="card" style="color: red;">Error loading data.json. Ensure workflow has generated output files.</div>`;
+        document.getElementById('cards-container').innerHTML = `<div class="card" style="color: red;">Error Loading data.json. Ensure Workflow Has Generated Output Files.</div>`;
       }
     }
 
