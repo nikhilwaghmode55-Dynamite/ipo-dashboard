@@ -1,9 +1,11 @@
 """
 fetch_ipos.py — Live IPO Intelligence Dashboard Engine
-Features robust cross-month date parsing, horizontal CLI layout, and persistent caching.
+Features robust session retry logic, upper-band cut-off price extraction, and cross-month date parsing.
 """
 
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 import json
 import os
 import re
@@ -109,7 +111,7 @@ def parse_date_range(dates_str):
     start_day = int(open_nums[0]) if open_nums else 1
     end_day = int(close_nums[0]) if close_nums else 1
 
-    end_month_num = 9  # default fallback
+    end_month_num = datetime.now().month
     if found_month_name:
         for k, v in month_map.items():
             if k in found_month_name.lower():
@@ -140,24 +142,30 @@ def is_currently_open(open_str, close_str):
 
 def parse_table_columns(cols, row_text):
     price, issue_size = None, "TBA"
+    all_prices = []
     
     for col in cols:
         text = col.text.strip()
         if "cr" in text.lower():
             cr_match = re.search(r'₹?\s*([\d,.]+)', text)
             if cr_match: issue_size = f"₹{cr_match.group(1)} Cr"
-        elif "₹" in text and "cr" not in text.lower():
-            p_match = re.search(r'₹\s*([\d,]+)', text)
-            if p_match:
-                val = int(p_match.group(1).replace(',', ''))
-                if val < 25000: price = val
+            
+        prices = re.findall(r'₹\s*([\d,]+)', text)
+        for p in prices:
+            val = int(p.replace(',', ''))
+            if val < 25000:
+                all_prices.append(val)
 
-    if not price:
+    if not all_prices:
         clean_row = re.sub(r'₹?\s*[\d,.]+\s*(?:Cr|crore)', '', row_text, flags=re.IGNORECASE)
         prices = re.findall(r'₹\s*([\d,]+)', clean_row)
-        if prices:
-            clean_p = [int(p.replace(',', '')) for p in prices if int(p.replace(',', '')) < 25000]
-            if clean_p: price = max(clean_p)
+        for p in prices:
+            val = int(p.replace(',', ''))
+            if val < 25000:
+                all_prices.append(val)
+
+    if all_prices:
+        price = max(all_prices)
 
     return price, issue_size
 
@@ -255,13 +263,25 @@ def evaluate_decision(enrichment, sector_name):
         return {"verdict": "Avoid", "verdictCls": "verdict-avoid", "summary": f"Subpar valuation or growth metrics compared to peers in {sector_name}.", "checks": checks}
 
 def fetch_open_ipos():
-    print("\n[Scraper] Fetching strictly OPEN IPOs...")
+    print("\n[Scraper] Fetching strictly OPEN IPOs with robust retry session...")
     url = "https://ipowatch.in/upcoming-ipo-calendar-ipo-list/"
-    headers = {'User-Agent': 'Mozilla/5.0'}
     open_ipos = []
     
     try:
-        response = requests.get(url, headers=headers, timeout=15)
+        session = requests.Session()
+        retries = Retry(total=3, backoff_factor=2, status_forcelist=[500, 502, 503, 504], raise_on_status=False)
+        adapter = HTTPAdapter(max_retries=retries)
+        session.mount("https://", adapter)
+        session.mount("http://", adapter)
+        
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept-Language': 'en-US,en;q=0.9',
+        }
+        
+        response = session.get(url, headers=headers, timeout=25)
+        response.raise_for_status()
+        
         soup = BeautifulSoup(response.text, 'html.parser')
         tables = soup.find_all('table')
         
@@ -270,7 +290,7 @@ def fetch_open_ipos():
             prev_elem = table.find_previous(['h2', 'h3', 'h4', 'strong', 'caption'])
             if prev_elem: table_heading = prev_elem.text.lower()
                 
-            if any(kw in table_heading for kw in ["closed", "archive", "past", "completed", "listing"]):
+            if any(kw in table_heading for kw in ["archive", "completed listing"]):
                 continue
                 
             ipo_category = "SME IPO" if "sme" in table_heading else "Mainboard IPO"
@@ -294,15 +314,16 @@ def fetch_open_ipos():
 
                     price, issue_size = parse_table_columns(cols, row_text)
 
-                    open_ipos.append({
-                        "slug": name.lower().replace(" ", "-"),
-                        "name": name,
-                        "category": ipo_category,
-                        "openDate": open_date,
-                        "closeDate": close_date,
-                        "autoPrice": price,
-                        "autoIssue": issue_size
-                    })
+                    if not any(item['slug'] == name.lower().replace(" ", "-") for item in open_ipos):
+                        open_ipos.append({
+                            "slug": name.lower().replace(" ", "-"),
+                            "name": name,
+                            "category": ipo_category,
+                            "openDate": open_date,
+                            "closeDate": close_date,
+                            "autoPrice": price,
+                            "autoIssue": issue_size
+                        })
     except Exception as err:
         print(f"  Error fetching calendar: {err}")
     return open_ipos

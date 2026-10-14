@@ -158,5 +158,37 @@
     "proceedsUse": "Capex and Business Expansion",
     "promoterPct": 67.0,
     "lotSize": 350
+  },
+  "fusion-cx": {
+    "sector": "Information Technology",
+    "psRatio": 5.0,
+    "cagr3Yr": 20.0,
+    "proceedsUse": "Working Capital",
+    "promoterPct": 67.0,
+    "lotSize": 500
+  },
+  "hd-fire-protect": {
+    "sector": "Industrials",
+    "psRatio": 9.71,
+    "cagr3Yr": 14.54,
+    "proceedsUse": "Debt Repayment / OFS",
+    "promoterPct": 85.0,
+    "lotSize": 55
+  },
+  "ravita-engineering": {
+    "sector": "Industrials",
+    "psRatio": 1.52,
+    "cagr3Yr": 354.21,
+    "proceedsUse": "Capex and Business Expansion",
+    "promoterPct": 72.5,
+    "lotSize": 1200
+  },
+  "vaibhav-vyapaar": {
+    "sector": "Financials",
+    "psRatio": 4.14,
+    "cagr3Yr": 20.48,
+    "proceedsUse": "Capex and Business Expansion",
+    "promoterPct": 72.34,
+    "lotSize": 2000
   }
 }

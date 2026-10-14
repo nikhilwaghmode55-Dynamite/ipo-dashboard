@@ -1,17 +1,17 @@
 {
   "upcoming": [
     {
-      "slug": "vishal-nirmiti",
-      "name": "Vishal Nirmiti",
-      "symbol": "VISHA",
+      "slug": "fusion-cx",
+      "name": "Fusion CX",
+      "symbol": "FUSIO",
       "sector": "Information Technology (Mainboard IPO)",
       "status": "Open",
-      "openDate": "30 September 2026",
-      "closeDate": "5 October 2026",
-      "issuePrice": 208,
+      "openDate": "14 October 2026",
+      "closeDate": "16 October 2026",
+      "issuePrice": 702,
       "lotSize": 500,
-      "minAmount": 104000,
-      "issueSize": "\u20b9178 Cr",
+      "minAmount": 351000,
+      "issueSize": "\u20b9702 Cr",
       "historicalGain": "24.5% avg listing gain in last 1 yr (4/5 positive)",
       "summary": "Strong fundamentals outperforming historical benchmarks in Information Technology.",
       "verdict": "Apply",
@@ -30,7 +30,7 @@
         {
           "icon": "\u2713",
           "cls": "check-pass",
-          "text": "High promoter confidence (70.0% holding)"
+          "text": "High promoter confidence (67.0% holding)"
         },
         {
           "icon": "\u2713",
@@ -39,80 +39,39 @@
         }
       ],
       "score": 1,
-      "lastFetched": "05 Oct 2026, 08:55 PM"
+      "lastFetched": "14 Oct 2026, 12:34 PM"
     },
     {
-      "slug": "nityas-gems",
-      "name": "Nityas Gems",
-      "symbol": "NITYA",
-      "sector": "Financials (Mainboard IPO)",
+      "slug": "hd-fire-protect",
+      "name": "HD Fire Protect",
+      "symbol": "HD FI",
+      "sector": "Industrials (Mainboard IPO)",
       "status": "Open",
-      "openDate": "30 September 2026",
-      "closeDate": "5 October 2026",
-      "issuePrice": 70,
-      "lotSize": 200,
-      "minAmount": 14000,
-      "issueSize": "\u20b9108.35 Cr",
-      "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
-      "summary": "Strong fundamentals outperforming historical benchmarks in Financials.",
-      "verdict": "Apply",
-      "verdictCls": "verdict-apply",
-      "checks": [
-        {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "High P/S valuation (6.0x vs sector avg 3.8x)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Robust growth (21.0% vs sector avg 18.0%)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "High promoter confidence (71.0% holding)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Proceeds deployed for business expansion (capex and business expansion)"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "05 Oct 2026, 08:55 PM"
-    },
-    {
-      "slug": "r.k.fashion",
-      "name": "R.K.Fashion",
-      "symbol": "R.K.F",
-      "sector": "Health Care (SME IPO)",
-      "status": "Open",
-      "openDate": "5 October 2026",
-      "closeDate": "7 October 2026",
-      "issuePrice": 77,
-      "lotSize": 241,
-      "minAmount": 37114,
-      "issueSize": "\u20b934.99 Cr",
-      "historicalGain": "21.0% avg listing gain in last 1 yr (3/4 positive)",
-      "summary": "Subpar valuation or growth metrics compared to peers in Health Care.",
+      "openDate": "13 October 2026",
+      "closeDate": "15 October 2026",
+      "issuePrice": 712,
+      "lotSize": 55,
+      "minAmount": 39160,
+      "issueSize": "\u20b9712 Cr",
+      "historicalGain": "18.2% avg listing gain in last 1 yr (3/4 positive)",
+      "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
       "verdict": "Avoid",
       "verdictCls": "verdict-avoid",
       "checks": [
         {
           "icon": "\u2717",
           "cls": "check-fail",
-          "text": "High P/S valuation (7.0x vs sector avg 4.5x)"
+          "text": "High P/S valuation (9.71x vs sector avg 2.8x)"
         },
         {
           "icon": "\u2713",
           "cls": "check-pass",
-          "text": "Robust growth (22.0% vs sector avg 20.0%)"
+          "text": "Robust growth (14.54% vs sector avg 14.0%)"
         },
         {
           "icon": "\u2713",
           "cls": "check-pass",
-          "text": "High promoter confidence (72.0% holding)"
+          "text": "High promoter confidence (85.0% holding)"
         },
         {
           "icon": "\u2717",
@@ -121,80 +80,80 @@
         }
       ],
       "score": 1,
-      "lastFetched": "05 Oct 2026, 08:55 PM"
+      "lastFetched": "14 Oct 2026, 12:35 PM"
     },
     {
-      "slug": "paramount-syntex",
-      "name": "Paramount Syntex",
-      "symbol": "PARAM",
-      "sector": "Consumer Discretionary (SME IPO)",
+      "slug": "ravita-engineering",
+      "name": "Ravita Engineering",
+      "symbol": "RAVIT",
+      "sector": "Industrials (SME IPO)",
       "status": "Open",
-      "openDate": "30 September 2026",
-      "closeDate": "6 October 2026",
-      "issuePrice": 119,
-      "lotSize": 300,
-      "minAmount": 71400,
-      "issueSize": "\u20b982 Cr",
-      "historicalGain": "16.5% avg listing gain in last 1 yr (3/5 positive)",
-      "summary": "Strong fundamentals outperforming historical benchmarks in Consumer Discretionary.",
+      "openDate": "14 October 2026",
+      "closeDate": "16 October 2026",
+      "issuePrice": 116,
+      "lotSize": 1200,
+      "minAmount": 278400,
+      "issueSize": "\u20b9116.05 Cr",
+      "historicalGain": "18.2% avg listing gain in last 1 yr (3/4 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Industrials.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
+      "checks": [
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (1.52x vs sector avg 2.8x)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Robust growth (354.21% vs sector avg 14.0%)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "High promoter confidence (72.5% holding)"
+        },
+        {
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Proceeds deployed for business expansion (capex and business expansion)"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "14 Oct 2026, 12:36 PM"
+    },
+    {
+      "slug": "vaibhav-vyapaar",
+      "name": "Vaibhav Vyapaar",
+      "symbol": "VAIBH",
+      "sector": "Financials (SME IPO)",
+      "status": "Open",
+      "openDate": "13 October 2026",
+      "closeDate": "15 October 2026",
+      "issuePrice": 52,
+      "lotSize": 2000,
+      "minAmount": 208000,
+      "issueSize": "\u20b940.54 Cr",
+      "historicalGain": "29.4% avg listing gain in last 1 yr (4/6 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Financials.",
       "verdict": "Apply",
       "verdictCls": "verdict-apply",
       "checks": [
         {
           "icon": "\u2717",
           "cls": "check-fail",
-          "text": "High P/S valuation (8.0x vs sector avg 4.0x)"
+          "text": "High P/S valuation (4.14x vs sector avg 3.8x)"
         },
         {
           "icon": "\u2713",
           "cls": "check-pass",
-          "text": "Robust growth (24.0% vs sector avg 16.0%)"
+          "text": "Robust growth (20.48% vs sector avg 18.0%)"
         },
         {
           "icon": "\u2713",
           "cls": "check-pass",
-          "text": "High promoter confidence (74.0% holding)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Proceeds deployed for business expansion (capex and business expansion)"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "05 Oct 2026, 08:55 PM"
-    },
-    {
-      "slug": "tna-solutions",
-      "name": "TNA Solutions",
-      "symbol": "TNA S",
-      "sector": "Consumer Staples (SME IPO)",
-      "status": "Open",
-      "openDate": "30 September 2026",
-      "closeDate": "6 October 2026",
-      "issuePrice": 66,
-      "lotSize": 65,
-      "minAmount": 8580,
-      "issueSize": "\u20b937.86 Cr",
-      "historicalGain": "12.0% avg listing gain in last 1 yr (3/4 positive)",
-      "summary": "Strong fundamentals outperforming historical benchmarks in Consumer Staples.",
-      "verdict": "Apply",
-      "verdictCls": "verdict-apply",
-      "checks": [
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Attractive P/S valuation (3.0x vs sector avg 3.5x)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Robust growth (15.0% vs sector avg 12.0%)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "High promoter confidence (72.0% holding)"
+          "text": "High promoter confidence (72.34% holding)"
         },
         {
           "icon": "\u2713",
@@ -203,246 +162,8 @@
         }
       ],
       "score": 1,
-      "lastFetched": "05 Oct 2026, 08:55 PM"
-    },
-    {
-      "slug": "acme-india-industries",
-      "name": "Acme India Industries",
-      "symbol": "ACME ",
-      "sector": "Health Care (SME IPO)",
-      "status": "Open",
-      "openDate": "30 September 2026",
-      "closeDate": "6 October 2026",
-      "issuePrice": 186,
-      "lotSize": 600,
-      "minAmount": 223200,
-      "issueSize": "\u20b9122 Cr",
-      "historicalGain": "21.0% avg listing gain in last 1 yr (3/4 positive)",
-      "summary": "Strong fundamentals outperforming historical benchmarks in Health Care.",
-      "verdict": "Apply",
-      "verdictCls": "verdict-apply",
-      "checks": [
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Attractive P/S valuation (4.0x vs sector avg 4.5x)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Robust growth (27.0% vs sector avg 20.0%)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "High promoter confidence (66.0% holding)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Proceeds deployed for business expansion (capex and business expansion)"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "05 Oct 2026, 08:55 PM"
-    },
-    {
-      "slug": "sollfege-smart-electronics",
-      "name": "Sollfege Smart Electronics",
-      "symbol": "SOLLF",
-      "sector": "Information Technology (SME IPO)",
-      "status": "Open",
-      "openDate": "30 September 2026",
-      "closeDate": "5 October 2026",
-      "issuePrice": 55,
-      "lotSize": 350,
-      "minAmount": 38500,
-      "issueSize": "\u20b921.78 Cr",
-      "historicalGain": "24.5% avg listing gain in last 1 yr (4/5 positive)",
-      "summary": "Strong fundamentals outperforming historical benchmarks in Information Technology.",
-      "verdict": "Apply",
-      "verdictCls": "verdict-apply",
-      "checks": [
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Attractive P/S valuation (5.0x vs sector avg 5.2x)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Robust growth (23.0% vs sector avg 22.0%)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "High promoter confidence (67.0% holding)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Proceeds deployed for business expansion (capex and business expansion)"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "05 Oct 2026, 08:55 PM"
-    },
-    {
-      "slug": "sjp-ultrasonic",
-      "name": "SJP Ultrasonic",
-      "symbol": "SJP U",
-      "sector": "Pending Entry (SME IPO)",
-      "status": "Open",
-      "openDate": "30 September 2026",
-      "closeDate": "5 October 2026",
-      "issuePrice": 67,
-      "lotSize": null,
-      "minAmount": null,
-      "issueSize": "\u20b923.45 Cr",
-      "historicalGain": "Fundamental data pending entry for sector benchmarking",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
-      "checks": [
-        {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "05 Oct 2026, 08:55 PM"
-    },
-    {
-      "slug": "eventions",
-      "name": "Eventions",
-      "symbol": "EVENT",
-      "sector": "Pending Entry (SME IPO)",
-      "status": "Open",
-      "openDate": "30 September 2026",
-      "closeDate": "5 October 2026",
-      "issuePrice": 112,
-      "lotSize": null,
-      "minAmount": null,
-      "issueSize": "\u20b938.12 Cr",
-      "historicalGain": "Fundamental data pending entry for sector benchmarking",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
-      "checks": [
-        {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "05 Oct 2026, 08:55 PM"
-    },
-    {
-      "slug": "dove-soft",
-      "name": "Dove Soft",
-      "symbol": "DOVE ",
-      "sector": "Pending Entry (SME IPO)",
-      "status": "Open",
-      "openDate": "30 September 2026",
-      "closeDate": "5 October 2026",
-      "issuePrice": 104,
-      "lotSize": null,
-      "minAmount": null,
-      "issueSize": "\u20b973.26 Cr",
-      "historicalGain": "Fundamental data pending entry for sector benchmarking",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
-      "checks": [
-        {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "05 Oct 2026, 08:55 PM"
-    },
-    {
-      "slug": "omara-ventures",
-      "name": "Omara Ventures",
-      "symbol": "OMARA",
-      "sector": "Pending Entry (SME IPO)",
-      "status": "Open",
-      "openDate": "30 September 2026",
-      "closeDate": "5 October 2026",
-      "issuePrice": 296,
-      "lotSize": null,
-      "minAmount": null,
-      "issueSize": "\u20b942 Cr",
-      "historicalGain": "Fundamental data pending entry for sector benchmarking",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
-      "checks": [
-        {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "05 Oct 2026, 08:55 PM"
-    },
-    {
-      "slug": "everestims-technologies",
-      "name": "EverestIMS Technologies",
-      "symbol": "EVERE",
-      "sector": "Pending Entry (SME IPO)",
-      "status": "Open",
-      "openDate": "29 September 2026",
-      "closeDate": "5 October 2026",
-      "issuePrice": 80,
-      "lotSize": null,
-      "minAmount": null,
-      "issueSize": "\u20b948.46 Cr",
-      "historicalGain": "Fundamental data pending entry for sector benchmarking",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
-      "checks": [
-        {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "05 Oct 2026, 08:55 PM"
-    },
-    {
-      "slug": "shree-tnb-polymers",
-      "name": "Shree TNB Polymers",
-      "symbol": "SHREE",
-      "sector": "Pending Entry (SME IPO)",
-      "status": "Open",
-      "openDate": "28 September 2026",
-      "closeDate": "5 October 2026",
-      "issuePrice": 47,
-      "lotSize": null,
-      "minAmount": null,
-      "issueSize": "\u20b931.20 Cr",
-      "historicalGain": "Fundamental data pending entry for sector benchmarking",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
-      "checks": [
-        {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "05 Oct 2026, 08:55 PM"
+      "lastFetched": "14 Oct 2026, 12:37 PM"
     }
   ],
-  "lastUpdated": "05 Oct 2026, 08:55 PM"
+  "lastUpdated": "14 Oct 2026, 12:37 PM"
 }
