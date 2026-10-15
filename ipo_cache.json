@@ -30,5 +30,45 @@
     "proceedsUse": "Capex and Business Expansion",
     "promoterPct": 72.34,
     "lotSize": 2000
+  },
+  "bonfiglioli-transmissions": {
+    "sector": "Industrials",
+    "psRatio": 5.47,
+    "cagr3Yr": 9.22,
+    "proceedsUse": "Debt Repayment / OFS",
+    "promoterPct": 77.0,
+    "lotSize": 25
+  },
+  "tonbo-imaging": {
+    "sector": "Industrials",
+    "psRatio": 11.06,
+    "cagr3Yr": 55.3,
+    "proceedsUse": "Debt Repayment / OFS",
+    "promoterPct": 15.72,
+    "lotSize": 21
+  },
+  "zetwerk": {
+    "sector": "Industrials",
+    "psRatio": 1.61,
+    "cagr3Yr": 13.45,
+    "proceedsUse": "Debt Repayment / OFS",
+    "promoterPct": 11.36,
+    "lotSize": 99
+  },
+  "sahajanand-medical": {
+    "sector": "Health Care",
+    "psRatio": 2.89,
+    "cagr3Yr": 15.87,
+    "proceedsUse": "Debt Repayment / OFS",
+    "promoterPct": 36.2,
+    "lotSize": 43
+  },
+  "shellz-india": {
+    "sector": "Consumer Staples",
+    "psRatio": 1.12,
+    "cagr3Yr": 8.9,
+    "proceedsUse": "Working Capital",
+    "promoterPct": 63.64,
+    "lotSize": 800
   }
 }
