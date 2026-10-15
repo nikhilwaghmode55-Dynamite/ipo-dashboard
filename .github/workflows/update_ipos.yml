@@ -2,7 +2,7 @@ name: Auto-Fetch Latest IPOs
 
 on:
   schedule:
-    - cron: '30 5 * * *' # Daily at 11:00 AM IST (05:30 UTC)
+    - cron: '30 4 * * *' # Daily at 10:00 AM IST (04:30 UTC)
   workflow_dispatch:
 
 jobs:
