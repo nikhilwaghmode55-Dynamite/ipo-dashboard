@@ -11,7 +11,7 @@
       "issuePrice": 700,
       "lotSize": 21,
       "minAmount": 14700,
-      "issueSize": "TBA",
+      "issueSize": "\u20b9665 Cr",
       "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
       "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
       "verdict": "Avoid",
@@ -39,7 +39,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 11:03 PM"
+      "lastFetched": "16 Oct 2026, 11:09 PM"
     },
     {
       "slug": "zetwerk-manufacturing-business",
@@ -52,7 +52,7 @@
       "issuePrice": 151,
       "lotSize": 99,
       "minAmount": 14949,
-      "issueSize": "TBA",
+      "issueSize": "\u20b9143 Cr",
       "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
       "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
       "verdict": "Avoid",
@@ -80,7 +80,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 11:03 PM"
+      "lastFetched": "16 Oct 2026, 11:09 PM"
     },
     {
       "slug": "bonfiglioli-transmissions",
@@ -93,7 +93,7 @@
       "issuePrice": 586,
       "lotSize": 25,
       "minAmount": 14650,
-      "issueSize": "TBA",
+      "issueSize": "\u20b9558 Cr",
       "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
       "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
       "verdict": "Avoid",
@@ -121,7 +121,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 11:03 PM"
+      "lastFetched": "16 Oct 2026, 11:09 PM"
     },
     {
       "slug": "sahajanand-medical-technologies",
@@ -134,7 +134,7 @@
       "issuePrice": 344,
       "lotSize": 43,
       "minAmount": 14792,
-      "issueSize": "TBA",
+      "issueSize": "\u20b9327 Cr",
       "historicalGain": "21.0% avg listing gain in last 1 yr (15/18 positive)",
       "summary": "Subpar valuation or growth metrics compared to peers in Health Care.",
       "verdict": "Avoid",
@@ -162,7 +162,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 11:03 PM"
+      "lastFetched": "16 Oct 2026, 11:09 PM"
     },
     {
       "slug": "shellz-india",
@@ -175,7 +175,7 @@
       "issuePrice": 179,
       "lotSize": 800,
       "minAmount": 286400,
-      "issueSize": "TBA",
+      "issueSize": "\u20b9170 Cr",
       "historicalGain": "12.0% avg listing gain in last 1 yr (11/15 positive)",
       "summary": "Subpar valuation or growth metrics compared to peers in Consumer Staples.",
       "verdict": "Avoid",
@@ -203,8 +203,8 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 11:03 PM"
+      "lastFetched": "16 Oct 2026, 11:09 PM"
     }
   ],
-  "lastUpdated": "16 Oct 2026, 11:03 PM"
+  "lastUpdated": "16 Oct 2026, 11:09 PM"
 }

@@ -1,6 +1,6 @@
 """
 fetch_ipos.py — Live IPO Intelligence Dashboard Engine
-Triple-Lock Issue Size Extraction, 2026 Price Blocker, 5 PM Expiry, and Robust Headers.
+Pure Deduction Extraction (Fixes TBA Issue Size), 2026 Blocker, and 5 PM Expiry.
 """
 
 import requests
@@ -143,90 +143,94 @@ def is_currently_open(open_str, close_str, now):
     
     return open_dt.date() <= today <= close_dt.date()
 
-def parse_table_columns(cols, headers, current_year):
+def parse_table_columns_deduction(cols, headers, current_year):
     price = None
     issue_size = "TBA"
     auto_lot = None
 
-    # Step 1: Broad regex for 'Cr'
-    row_text = " ".join([c.text.strip() for c in cols])
-    cr_match = re.search(r'₹?\s*([\d,.]+)\s*(?:Cr|crore|Crores)', row_text, re.IGNORECASE)
+    col_texts = [c.text.strip() for c in cols]
+    
+    # 1. Global 'Cr' Check
+    row_str = " ".join(col_texts)
+    cr_match = re.search(r'₹?\s*([\d,.]+)\s*(?:Cr|crore|Crores)', row_str, re.IGNORECASE)
     if cr_match:
-        val_str = cr_match.group(1).replace(',', '').rstrip('.')
-        if val_str not in ("0", "0.00", ""):
-            issue_size = f"₹{val_str} Cr"
+        issue_size = f"₹{cr_match.group(1).rstrip('.')} Cr"
 
-    # Step 2: Header mapping for Issue Size
-    size_idx = -1
-    if headers:
-        for i, h in enumerate(headers):
-            if ("size" in h or "cr" in h or "amount" in h) and "lot" not in h and "share" not in h:
-                size_idx = i
-                break
+    # 2. Map via Headers
+    size_idx, lot_idx, price_idx = -1, -1, -1
+    for i, h in enumerate(headers):
+        hl = h.lower()
+        if "price" in hl: price_idx = i
+        elif "size" in hl or "cr" in hl or "amount" in hl:
+            if "lot" not in hl and "share" not in hl: size_idx = i
+        elif "lot" in hl or "share" in hl: lot_idx = i
 
-    if issue_size == "TBA" and size_idx != -1 and size_idx < len(cols):
-        text = cols[size_idx].text.strip()
-        m = re.search(r'([\d,]+\.?\d*)', text)
+    if issue_size == "TBA" and size_idx != -1 and size_idx < len(col_texts):
+        m = re.search(r'([\d,]+\.?\d*)', col_texts[size_idx])
+        if m and m.group(1) not in ("0", ".", ""):
+            issue_size = f"₹{m.group(1).rstrip('.')} Cr"
+
+    if not auto_lot and lot_idx != -1 and lot_idx < len(col_texts):
+        m = re.search(r'(\d+)', col_texts[lot_idx].replace(',', ''))
         if m:
-            val_str = m.group(1).replace(',', '').rstrip('.')
-            if val_str not in ("0", "0.00", ""):
-                issue_size = f"₹{val_str} Cr"
+            val = int(m.group(1))
+            if 1 <= val <= 10000 and val != current_year:
+                auto_lot = val
 
-    # Step 3: Standalone decimal fallback (e.g. 852.18) bypassing headers entirely
+    if not price and price_idx != -1 and price_idx < len(col_texts):
+        nums = [int(n) for n in re.findall(r'\b(\d{2,4})\b', col_texts[price_idx].replace(',', ''))]
+        valid = [n for n in nums if 10 <= n <= 5000 and n != current_year]
+        if valid: price = max(valid)
+
+    # 3. Deduction Engine (The Ultimate Fallback)
+    for i, text in enumerate(col_texts):
+        if i < 2 or not text: continue 
+        
+        clean = text.replace(',', '')
+        
+        # Deduce Price
+        if not price and ("₹" in text or "-" in text or "to" in text.lower()):
+            nums = [int(n) for n in re.findall(r'\b(\d{2,4})\b', clean)]
+            valid = [n for n in nums if 10 <= n <= 5000 and n != current_year]
+            if valid: price = max(valid)
+            
+        # Deduce Lot
+        if not auto_lot:
+            if "share" in text.lower() or "lot" in text.lower():
+                m = re.search(r'\b(\d+)\b', clean)
+                if m:
+                    val = int(m.group(1))
+                    if 1 <= val <= 10000 and val != current_year: auto_lot = val
+            elif i != size_idx and i != price_idx:
+                m = re.fullmatch(r'(\d+)', clean)
+                if m:
+                    val = int(m.group(1))
+                    if 1 <= val <= 10000 and val != current_year: auto_lot = val
+                        
+        # Deduce Issue Size (Decimals usually guarantee it's Issue Size)
+        if issue_size == "TBA" and i != lot_idx and i != price_idx:
+            if "." in text:
+                m = re.search(r'([\d]+\.\d+)', clean)
+                if m:
+                    val_str = m.group(1).rstrip('.')
+                    if val_str not in ("0", "0.00", ""):
+                        issue_size = f"₹{val_str} Cr"
+
+    # 4. Final Absolute Guarantee for Issue Size
     if issue_size == "TBA":
-        for idx, col in enumerate(cols):
-            if idx == 0: continue
-            text = col.text.strip()
-            if re.search(r'(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|-|to|share)', text, re.IGNORECASE):
-                continue
-            m = re.fullmatch(r'^₹?\s*([\d,]+\.\d{1,2})$', text)
+        used_vals = []
+        if price: used_vals.append(str(price))
+        if auto_lot: used_vals.append(str(auto_lot))
+        
+        for i, text in enumerate(col_texts):
+            if i < 2: continue
+            clean = text.replace(',', '')
+            m = re.search(r'([\d]+\.?\d*)', clean)
             if m:
-                val_str = m.group(1).replace(',', '').rstrip('.')
-                if val_str not in ("0", "0.00", ""):
-                    issue_size = f"₹{val_str} Cr"
+                v_str = m.group(1).rstrip('.')
+                if v_str not in used_vals and v_str not in ("0", "0.00", "") and v_str != str(current_year):
+                    issue_size = f"₹{v_str} Cr"
                     break
-
-    issue_val_str = issue_size.replace('₹', '').replace(' Cr', '') if issue_size != "TBA" else None
-
-    # Parse Price and Lot (Explicitly blocking 2026 to fix the price bug)
-    all_prices = []
-    for idx, col in enumerate(cols):
-        text = col.text.strip()
-        if not text: continue
-        text_lower = text.lower()
-        header_text = headers[idx].lower() if headers and idx < len(headers) else ""
-
-        if idx == 0 or "date" in header_text or "day" in header_text: 
-            continue
-
-        # Skip Issue Size column to avoid false positives in price
-        if idx == size_idx:
-            continue
-
-        # Lot Size Detection (Strict 1-10000, blocks current year)
-        if not auto_lot and not any(sym in text for sym in ["₹", "Rs", "to", "-", "–", "%", "Cr", "."]):
-            if "price" not in header_text:
-                clean_text = text.replace(',', '')
-                nums = re.findall(r'\b(\d{1,5})\b', clean_text)
-                for n in nums:
-                    val = int(n)
-                    if 1 <= val <= 10000 and val != current_year:
-                        if not issue_val_str or str(val) != issue_val_str:
-                            auto_lot = val
-                            break
-
-        # Share Price Detection (Explicitly blocks current year)
-        if any(sym in text_lower for sym in ["₹", "rs", "-", "–", "to"]) or "price" in header_text:
-            clean_text = text.replace(',', '')
-            nums = re.findall(r'\b(\d{2,4})\b', clean_text)
-            for n in nums:
-                val = int(n)
-                if 10 <= val <= 5000 and val != current_year:
-                    if not issue_val_str or str(val) != issue_val_str or "price" in header_text:
-                        all_prices.append(val)
-
-    if all_prices:
-        price = max(all_prices)
 
     return price, issue_size, auto_lot
 
@@ -326,15 +330,13 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'html.parser')
     for table in soup.find_all('table'):
-        
-        # Robustly extract headers by skipping merged row titles
         table_headers = []
         for tr in table.find_all('tr'):
             cells = tr.find_all(['th', 'td'])
             if len(cells) >= 3:
-                header_texts = [c.text.strip().lower() for c in cells]
-                if any(x in header_texts[0] for x in ["company", "ipo", "name", "issuer"]):
-                    table_headers = header_texts
+                texts = [c.text.strip().lower() for c in cells]
+                if any("company" in x or "ipo" in x for x in texts):
+                    table_headers = texts
                     break
 
         table_heading = ""
@@ -357,7 +359,7 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
             name = clean_company_name(raw_name)
             if len(name) < 3: continue
 
-            price, issue_size, auto_lot = parse_table_columns(cols, table_headers, now.year)
+            price, issue_size, auto_lot = parse_table_columns_deduction(cols, table_headers, now.year)
             canon, slug = canonical_key(name), name.lower().replace(" ", "-")
 
             if canon not in merged_ipos:
@@ -373,7 +375,7 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
 
 def fetch_open_ipos():
     now = now_ist()
-    print(f"\n[Scraper vFinal] Executing Triple-Lock Extraction Pipeline...")
+    print(f"\n[Scraper Engine vFinal] Deduction Parsing Enabled ({now.strftime('%I:%M %p')} IST)...")
     ipowatch_urls = [
         ("https://ipowatch.in/upcoming-ipo-calendar-ipo-list/", None), 
         ("https://ipowatch.in/upcoming-ipo-list/", None), 
