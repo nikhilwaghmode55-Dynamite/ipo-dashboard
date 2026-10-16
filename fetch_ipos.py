@@ -1,6 +1,6 @@
 """
 fetch_ipos.py — Live IPO Intelligence Dashboard Engine
-Restored Afternoon Issue Size Logic, Colspan Header Fix, 2026 Price Blocker, and 5 PM Expiry.
+Triple-Lock Issue Size Extraction, 2026 Price Blocker, 5 PM Expiry, and Robust Headers.
 """
 
 import requests
@@ -138,7 +138,7 @@ def is_currently_open(open_str, close_str, now):
     close_dt = parse_date_string(close_str, now.year)
     if not open_dt or not close_dt: return False
     
-    # 5:00 PM Market Close Expiry removes Fusion CX and Ravita Engineering instantly
+    # 5:00 PM Market Close Expiry
     if today == close_dt.date() and now.hour >= 17: return False 
     
     return open_dt.date() <= today <= close_dt.date()
@@ -147,37 +147,63 @@ def parse_table_columns(cols, headers, current_year):
     price = None
     issue_size = "TBA"
     auto_lot = None
-    issue_val_str = None
 
-    # Restored Afternoon Logic: Broad regex across the entire reconstructed row
+    # Step 1: Broad regex for 'Cr'
     row_text = " ".join([c.text.strip() for c in cols])
     cr_match = re.search(r'₹?\s*([\d,.]+)\s*(?:Cr|crore|Crores)', row_text, re.IGNORECASE)
     if cr_match:
-        clean_cr = cr_match.group(1).rstrip('.,')
-        issue_size = f"₹{clean_cr} Cr"
-        issue_val_str = clean_cr.replace(',', '').split('.')[0]
+        val_str = cr_match.group(1).replace(',', '').rstrip('.')
+        if val_str not in ("0", "0.00", ""):
+            issue_size = f"₹{val_str} Cr"
 
+    # Step 2: Header mapping for Issue Size
+    size_idx = -1
+    if headers:
+        for i, h in enumerate(headers):
+            if ("size" in h or "cr" in h or "amount" in h) and "lot" not in h and "share" not in h:
+                size_idx = i
+                break
+
+    if issue_size == "TBA" and size_idx != -1 and size_idx < len(cols):
+        text = cols[size_idx].text.strip()
+        m = re.search(r'([\d,]+\.?\d*)', text)
+        if m:
+            val_str = m.group(1).replace(',', '').rstrip('.')
+            if val_str not in ("0", "0.00", ""):
+                issue_size = f"₹{val_str} Cr"
+
+    # Step 3: Standalone decimal fallback (e.g. 852.18) bypassing headers entirely
+    if issue_size == "TBA":
+        for idx, col in enumerate(cols):
+            if idx == 0: continue
+            text = col.text.strip()
+            if re.search(r'(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|-|to|share)', text, re.IGNORECASE):
+                continue
+            m = re.fullmatch(r'^₹?\s*([\d,]+\.\d{1,2})$', text)
+            if m:
+                val_str = m.group(1).replace(',', '').rstrip('.')
+                if val_str not in ("0", "0.00", ""):
+                    issue_size = f"₹{val_str} Cr"
+                    break
+
+    issue_val_str = issue_size.replace('₹', '').replace(' Cr', '') if issue_size != "TBA" else None
+
+    # Parse Price and Lot (Explicitly blocking 2026 to fix the price bug)
     all_prices = []
     for idx, col in enumerate(cols):
         text = col.text.strip()
         if not text: continue
         text_lower = text.lower()
-        header_text = headers[idx].lower() if idx < len(headers) else ""
+        header_text = headers[idx].lower() if headers and idx < len(headers) else ""
 
         if idx == 0 or "date" in header_text or "day" in header_text: 
             continue
 
-        if issue_size == "TBA":
-            if "cr" in text_lower or "crore" in text_lower or "size" in header_text or "cr" in header_text or "amount" in header_text:
-                if "lot" not in header_text and "share" not in header_text and "price" not in header_text:
-                    m = re.search(r'([\d,]+\.?\d*)', text)
-                    if m and m.group(1) not in ("0", "0.00", "."):
-                        clean_cr = m.group(1).rstrip('.,')
-                        issue_size = f"₹{clean_cr} Cr"
-                        issue_val_str = clean_cr.replace(',', '').split('.')[0]
-                        continue
+        # Skip Issue Size column to avoid false positives in price
+        if idx == size_idx:
+            continue
 
-        # Lot Size Detection (Strict 1-10000, explicitly blocks current year like 2026)
+        # Lot Size Detection (Strict 1-10000, blocks current year)
         if not auto_lot and not any(sym in text for sym in ["₹", "Rs", "to", "-", "–", "%", "Cr", "."]):
             if "price" not in header_text:
                 clean_text = text.replace(',', '')
@@ -189,7 +215,7 @@ def parse_table_columns(cols, headers, current_year):
                             auto_lot = val
                             break
 
-        # Share Price Detection (Explicitly blocks current year like 2026)
+        # Share Price Detection (Explicitly blocks current year)
         if any(sym in text_lower for sym in ["₹", "rs", "-", "–", "to"]) or "price" in header_text:
             clean_text = text.replace(',', '')
             nums = re.findall(r'\b(\d{2,4})\b', clean_text)
@@ -300,14 +326,16 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'html.parser')
     for table in soup.find_all('table'):
+        
+        # Robustly extract headers by skipping merged row titles
         table_headers = []
         for tr in table.find_all('tr'):
-            ths = tr.find_all(['th', 'td'])
-            if ths and any(x.name == 'th' for x in ths):
-                table_headers = [th.text.strip().lower() for th in ths]
-                break
-        if not table_headers and table.find('tr'):
-            table_headers = [td.text.strip().lower() for td in table.find('tr').find_all('td')]
+            cells = tr.find_all(['th', 'td'])
+            if len(cells) >= 3:
+                header_texts = [c.text.strip().lower() for c in cells]
+                if any(x in header_texts[0] for x in ["company", "ipo", "name", "issuer"]):
+                    table_headers = header_texts
+                    break
 
         table_heading = ""
         prev_elem = table.find_previous(['h2', 'h3'])
@@ -345,7 +373,7 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
 
 def fetch_open_ipos():
     now = now_ist()
-    print(f"\n[Scraper v7.0 FINAL] Unbreakable Dashboard Update ({now.strftime('%I:%M %p')} IST)...")
+    print(f"\n[Scraper vFinal] Executing Triple-Lock Extraction Pipeline...")
     ipowatch_urls = [
         ("https://ipowatch.in/upcoming-ipo-calendar-ipo-list/", None), 
         ("https://ipowatch.in/upcoming-ipo-list/", None), 
