@@ -90,6 +90,7 @@ def parse_date_string(date_str, current_year):
     for fmt in ("%d %B %Y", "%d %b %Y", "%d-%b-%Y", "%d/%m/%Y", "%B %d, %Y"):
         try:
             dt = datetime.strptime(date_str, fmt)
+            # STRICT CURRENT YEAR ENFORCEMENT
             if dt.year != current_year: return None
             return dt
         except ValueError: continue
@@ -106,22 +107,27 @@ def parse_date_range(dates_str, current_year):
     if not dates_str or "tba" in dates_str.lower() or "to be announced" in dates_str.lower(): return None, None
     found_years = re.findall(r'\b(20\d{2})\b', dates_str)
     if found_years and int(found_years[0]) != current_year: return None, None
+    
     cleaned = re.sub(r'\b20\d{2}-\d{2}-\d{2}\b', '', dates_str)
     cleaned = re.sub(r'(\d+)(?:st|nd|rd|th)\b', r'\1', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\s*(?:to|–|—|-)\s*', ' - ', cleaned, flags=re.IGNORECASE).strip()
     if " - " not in cleaned: return None, None
+    
     parts = cleaned.split(" - ")
     open_part, close_part = parts[0].strip(), parts[-1].strip()
     end_month = extract_month_num(close_part) or extract_month_num(open_part)
     if not end_month: return None, None
     start_month = extract_month_num(open_part) or end_month
+    
     open_no_yr = re.sub(r'\b20\d{2}\b', '', open_part)
     close_no_yr = re.sub(r'\b20\d{2}\b', '', close_part)
     open_nums = [int(x) for x in re.findall(r'\b\d{1,2}\b', open_no_yr) if 1 <= int(x) <= 31]
     close_nums = [int(x) for x in re.findall(r'\b\d{1,2}\b', close_no_yr) if 1 <= int(x) <= 31]
     if not open_nums or not close_nums: return None, None
+    
     start_day, end_day = open_nums[0], close_nums[0]
     if not extract_month_num(open_part) and start_day > end_day: start_month = 12 if end_month == 1 else end_month - 1
+    
     rev_month_map = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June", 7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"}
     return f"{start_day} {rev_month_map[start_month]} {current_year}", f"{end_day} {rev_month_map[end_month]} {current_year}"
 
@@ -131,7 +137,7 @@ def is_currently_open(open_str, close_str, now):
     close_dt = parse_date_string(close_str, now.year)
     if not open_dt or not close_dt: return False
     
-    # 5 PM Hard Expiry Rule
+    # 5:00 PM MARKET CLOSE EXPIRY: Instantly removes closed IPOs
     if today == close_dt.date() and now.hour >= 17: return False 
     return open_dt.date() <= today <= close_dt.date()
 
@@ -141,7 +147,7 @@ def parse_table_columns(cols, row_text, current_year):
     auto_lot = None
 
     # =========================================================
-    # EXACT v2.2 ISSUE SIZE LOGIC (Restored from your message)
+    # EXACT v2.2 ISSUE SIZE LOGIC (AUTHENTIC EXTRACTION)
     # =========================================================
     cr_match = re.search(r'₹?\s*([\d,.]+)\s*(?:Cr|crore|Crores)', row_text, re.IGNORECASE)
     issue_val_str = None
@@ -150,27 +156,12 @@ def parse_table_columns(cols, row_text, current_year):
         issue_size = f"₹{clean_cr} Cr"
         issue_val_str = clean_cr.replace(',', '').split('.')[0]
 
-    # =========================================================
-    # STRUCTURAL INSURANCE (If ipowatch removes "Cr" from table)
-    # Issue Size is reliably located in Column Index 3
-    # =========================================================
-    if issue_size == "TBA" and len(cols) >= 5:
-        text3 = cols[3].text.strip()
-        # Ensures the column contains digits, but NOT a date or price range
-        if re.search(r'\d', text3) and "-" not in text3 and "to" not in text3.lower():
-            m = re.search(r'([\d,]+\.?\d*)', text3)
-            if m:
-                val = m.group(1).replace(',', '').rstrip('.')
-                if val not in ("0", "") and val != str(current_year):
-                    issue_size = f"₹{val} Cr"
-                    issue_val_str = val.split('.')[0]
-
     all_prices = []
     for idx, col in enumerate(cols):
         text = col.text.strip()
         text_lower = text.lower()
 
-        # Check explicit issue size column if missing (v2.2 logic)
+        # Check explicit issue size column if missing (v2.2 Logic)
         if issue_size == "TBA" and ("cr" in text_lower or "crore" in text_lower):
             m = re.search(r'₹?\s*([\d,.]+)', text)
             if m:
@@ -180,22 +171,22 @@ def parse_table_columns(cols, row_text, current_year):
 
         if idx in (0, 1): continue
 
-        # Auto-detect lot size (pure integer typically between 1 and 10000)
+        # Auto-detect lot size (WITH 2026 BLOCKER ADDED)
         if not auto_lot and not any(sym in text for sym in ["₹", "Rs", "to", "-", "–", "%", "Cr"]):
-            nums = re.findall(r'\b\d{1,5}\b', text.replace(',', ''))
+            nums = re.findall(r'\b\d{1,5}\b', text)
             for n in nums:
-                val = int(n)
-                # 2026 BLOCKER
+                val = int(n.replace(',', ''))
+                # Ensures val != 2026 and isn't the Issue Size
                 if 1 <= val <= 10000 and val != current_year and (not issue_val_str or str(val) != issue_val_str):
                     auto_lot = val
                     break
 
-        # Check for share price
+        # Check for share price (WITH 2026 BLOCKER ADDED)
         if any(sym in text_lower for sym in ["₹", "rs", "-", "–", "to"]):
-            nums = re.findall(r'\b\d{2,4}\b', text.replace(',', ''))
+            nums = re.findall(r'\d[\d,]*', text)
             for n in nums:
-                val = int(n)
-                # 2026 BLOCKER
+                val = int(n.replace(',', ''))
+                # Ensures val != 2026 and isn't the Issue Size
                 if 10 <= val <= 5000 and val != current_year and (not issue_val_str or str(val) != issue_val_str):
                     all_prices.append(val)
 
@@ -209,8 +200,13 @@ def is_github_actions():
 
 def prompt_user_fundamentals(name):
     if is_github_actions(): return None
-    print(f"\n" + "="*55 + f"\n [CLI Input Needed] Configure fundamentals for: {name}\n" + "="*55)
+
+    print(f"\n" + "="*55)
+    print(f" [CLI Input Needed] Configure details for: {name}")
+    print("="*55)
+    print("Select Sector (Displayed Horizontally):")
     sectors = list(SECTOR_BENCHMARKS.keys())
+    
     for i in range(0, len(sectors), 2):
         item1 = f"{i+1:2d}. {sectors[i]:<26}"
         item2 = f"{i+2:2d}. {sectors[i+1]}" if i+1 < len(sectors) else ""
@@ -220,9 +216,13 @@ def prompt_user_fundamentals(name):
         sector = None
         while not sector:
             sec_choice = input(f"\nEnter sector choice (1-{len(sectors)}) or press Enter to skip: ").strip()
-            if not sec_choice: return None
-            if sec_choice.isdigit() and 1 <= int(sec_choice) <= len(sectors): sector = sectors[int(sec_choice) - 1]
-            else: print(f"  [Error] Please enter a whole number between 1 and {len(sectors)}.")
+            if not sec_choice:
+                print(f"  [Skipped] Left {name} as 'Data will be updated soon'.")
+                return None
+            if sec_choice.isdigit() and 1 <= int(sec_choice) <= len(sectors):
+                sector = sectors[int(sec_choice) - 1]
+            else:
+                print(f"  [Error] Please enter a whole number between 1 and {len(sectors)}.")
         
         ps_ratio = None
         while ps_ratio is None:
@@ -243,8 +243,15 @@ def prompt_user_fundamentals(name):
         proceeds = None
         while not proceeds:
             proc_choice = input("Enter option (1-3): ").strip()
-            if proc_choice in ["1", "2", "3"]: proceeds = {"1": "Capex and Business Expansion", "2": "Working Capital", "3": "Debt Repayment / OFS"}[proc_choice]
-            else: print("  [Error] Please enter 1, 2, or 3.")
+            if proc_choice in ["1", "2", "3"]:
+                proceeds_map = {
+                    "1": "Capex and Business Expansion",
+                    "2": "Working Capital",
+                    "3": "Debt Repayment / OFS"
+                }
+                proceeds = proceeds_map[proc_choice]
+            else:
+                print("  [Error] Please enter 1, 2, or 3.")
 
         promoter = None
         while promoter is None:
@@ -252,89 +259,153 @@ def prompt_user_fundamentals(name):
             try: promoter = float(val)
             except ValueError: print("  [Error] Please enter a valid decimal number.")
         
-        return {"sector": sector, "psRatio": ps_ratio, "cagr3Yr": cagr, "proceedsUse": proceeds, "promoterPct": promoter}
-    except (EOFError, KeyboardInterrupt): return None
+        return {
+            "sector": sector, 
+            "psRatio": ps_ratio, 
+            "cagr3Yr": cagr, 
+            "proceedsUse": proceeds, 
+            "promoterPct": promoter
+        }
+    except (EOFError, KeyboardInterrupt):
+        return None
 
 def evaluate_decision(enrichment, sector_name):
-    if not enrichment: return {"verdict": "Data will be updated soon", "verdictCls": "verdict-caution", "summary": "Awaiting fundamental RHP data entry for comparative analysis.", "checks": [{"icon": "ℹ", "cls": "check-warn", "text": "Fundamental metrics pending entry"}]}
+    if not enrichment:
+        return {
+            "verdict": "Data will be updated soon", "verdictCls": "verdict-caution",
+            "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+            "checks": [{"icon": "ℹ", "cls": "check-warn", "text": "Fundamental metrics pending entry"}]
+        }
 
     bench = SECTOR_BENCHMARKS.get(sector_name, {"avgPS": 3.5, "avgCagr": 15.0})
     ps, cagr, promoter = enrichment["psRatio"], enrichment["cagr3Yr"], enrichment["promoterPct"]
     proceeds = enrichment["proceedsUse"]
     score, checks = 0, []
 
-    if ps <= bench["avgPS"]: checks.append({"icon": "✓", "cls": "check-pass", "text": f"Attractive P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"}); score += 2
-    else: checks.append({"icon": "✗", "cls": "check-fail", "text": f"High P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"}); score -= 1
+    if ps <= bench["avgPS"]:
+        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Attractive P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"})
+        score += 2
+    else:
+        checks.append({"icon": "✗", "cls": "check-fail", "text": f"High P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"})
+        score -= 1
 
-    if cagr >= bench["avgCagr"]: checks.append({"icon": "✓", "cls": "check-pass", "text": f"Robust growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"}); score += 2
-    else: checks.append({"icon": "✗", "cls": "check-fail", "text": f"Slow revenue growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"}); score -= 1
+    if cagr >= bench["avgCagr"]:
+        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Robust growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"})
+        score += 2
+    else:
+        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Slow revenue growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"})
+        score -= 1
 
-    if promoter >= 50: checks.append({"icon": "✓", "cls": "check-pass", "text": f"High promoter confidence ({promoter}% holding)"}); score += 1
-    else: checks.append({"icon": "✗", "cls": "check-fail", "text": f"Low promoter holding ({promoter}%)"}); score -= 1
+    if promoter >= 50:
+        checks.append({"icon": "✓", "cls": "check-pass", "text": f"High promoter confidence ({promoter}% holding)"})
+        score += 1
+    else:
+        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Low promoter holding ({promoter}%)"})
+        score -= 1
 
-    if any(k in proceeds.lower() for k in ["capex", "growth", "working capital", "expansion"]): checks.append({"icon": "✓", "cls": "check-pass", "text": f"Major chunk of issue allocated to {proceeds}"}); score += 1
-    else: checks.append({"icon": "✗", "cls": "check-fail", "text": f"Major chunk of issue goes to {proceeds}"}); score -= 1
+    if any(k in proceeds.lower() for k in ["capex", "growth", "working capital", "expansion"]):
+        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Major chunk of issue allocated to {proceeds}"})
+        score += 1
+    else:
+        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Major chunk of issue goes to {proceeds}"})
+        score -= 1
 
-    if score >= 3: return {"verdict": "Apply", "verdictCls": "verdict-apply", "summary": f"Strong fundamentals outperforming historical benchmarks in {sector_name}.", "checks": checks}
-    else: return {"verdict": "Avoid", "verdictCls": "verdict-avoid", "summary": f"Subpar valuation or growth metrics compared to peers in {sector_name}.", "checks": checks}
+    if score >= 3:
+        return {"verdict": "Apply", "verdictCls": "verdict-apply", "summary": f"Strong fundamentals outperforming historical benchmarks in {sector_name}.", "checks": checks}
+    else:
+        return {"verdict": "Avoid", "verdictCls": "verdict-avoid", "summary": f"Subpar valuation or growth metrics compared to peers in {sector_name}.", "checks": checks}
 
 def extract_row_dates(cols, current_year):
     for col in cols[1:]:
         open_d, close_d = parse_date_range(col.text.strip(), current_year)
-        if open_d and close_d: return open_d, close_d
+        if open_d and close_d:
+            return open_d, close_d
     if len(cols) >= 3:
-        d1, d2 = parse_date_string(cols[1].text.strip(), current_year), parse_date_string(cols[2].text.strip(), current_year)
-        if d1 and d2: return d1.strftime("%d %B %Y"), d2.strftime("%d %B %Y")
+        d1 = parse_date_string(cols[1].text.strip(), current_year)
+        d2 = parse_date_string(cols[2].text.strip(), current_year)
+        if d1 and d2:
+            return d1.strftime("%d %B %Y"), d2.strftime("%d %B %Y")
     return None, None
 
 def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
     response = session.get(url, headers=headers, timeout=20)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'html.parser')
-    for table in soup.find_all('table'):
+    tables = soup.find_all('table')
 
+    current_year = now.year
+
+    for table in tables:
+        
         table_heading = ""
         prev_elem = table.find_previous(['h2', 'h3'])
-        if prev_elem: table_heading = prev_elem.text.lower()
+        if prev_elem:
+            table_heading = prev_elem.text.lower()
 
         for row in table.find_all('tr'):
             cols = row.find_all('td')
-            if len(cols) < 2: continue
-            
+            if len(cols) < 2:
+                continue
             row_text = row.text.strip()
             raw_name = cols[0].text.strip()
 
-            if not raw_name or raw_name.lower() in {"company", "ipo", "ipo name", "company name", "issuer"} or "sse" in raw_name.lower() or "social stock" in raw_name.lower(): continue
+            if not raw_name or raw_name.lower() in {"company", "ipo", "ipo name", "company name", "issuer"}:
+                continue
+            if "sse" in raw_name.lower() or "social stock" in raw_name.lower():
+                continue
 
-            open_date, close_date = extract_row_dates(cols, now.year)
-            if not is_currently_open(open_date, close_date, now): continue
+            open_date, close_date = extract_row_dates(cols, current_year)
+            if not is_currently_open(open_date, close_date, now):
+                continue
 
-            ipo_category = "SME IPO" if "sme" in raw_name.lower() or "sme" in row_text.lower() or "sme" in table_heading or default_cat == "SME IPO" else "Mainboard IPO"
+            if "sme" in raw_name.lower() or "sme" in row_text.lower() or "sme" in table_heading or default_cat == "SME IPO":
+                ipo_category = "SME IPO"
+            else:
+                ipo_category = "Mainboard IPO"
+
             name = clean_company_name(raw_name)
-            if len(name) < 3: continue
+            if len(name) < 3:
+                continue
 
-            price, issue_size, auto_lot = parse_table_columns(cols, row_text, now.year)
-            canon, slug = canonical_key(name), name.lower().replace(" ", "-")
+            price, issue_size, auto_lot = parse_table_columns(cols, row_text, current_year)
+            canon = canonical_key(name)
+            slug = name.lower().replace(" ", "-")
 
             if canon not in merged_ipos:
-                merged_ipos[canon] = {"slug": slug, "name": name, "category": ipo_category, "openDate": open_date, "closeDate": close_date, "autoPrice": price, "autoIssue": issue_size, "autoLot": auto_lot}
+                merged_ipos[canon] = {
+                    "slug": slug,
+                    "name": name,
+                    "category": ipo_category,
+                    "openDate": open_date,
+                    "closeDate": close_date,
+                    "autoPrice": price,
+                    "autoIssue": issue_size,
+                    "autoLot": auto_lot
+                }
             else:
                 existing = merged_ipos[canon]
-                existing["openDate"], existing["closeDate"] = open_date, close_date
-                if len(name) > len(existing["name"]): existing["name"], existing["slug"] = name, slug
-                if not existing["autoPrice"] and price: existing["autoPrice"] = price
-                if existing["autoIssue"] == "TBA" and issue_size != "TBA": existing["autoIssue"] = issue_size
-                if not existing.get("autoLot") and auto_lot: existing["autoLot"] = auto_lot
-                if ipo_category == "SME IPO": existing["category"] = "SME IPO"
+                existing["openDate"] = open_date
+                existing["closeDate"] = close_date
+                if len(name) > len(existing["name"]):
+                    existing["name"] = name
+                    existing["slug"] = slug
+                if not existing["autoPrice"] and price:
+                    existing["autoPrice"] = price
+                if existing["autoIssue"] == "TBA" and issue_size != "TBA":
+                    existing["autoIssue"] = issue_size
+                if not existing.get("autoLot") and auto_lot:
+                    existing["autoLot"] = auto_lot
+                if ipo_category == "SME IPO":
+                    existing["category"] = "SME IPO"
 
 def fetch_open_ipos():
     now = now_ist()
-    print(f"\n[Scraper] Authentic v2.2 Parsing Active ({now.strftime('%I:%M %p')} IST)...")
+    print(f"\n[Scraper v2.2 Restored] Fetching OPEN IPOs with strict current-year enforcement ({now.strftime('%I:%M %p')} IST)...")
     ipowatch_urls = [
-        ("https://ipowatch.in/upcoming-ipo-calendar-ipo-list/", None), 
-        ("https://ipowatch.in/upcoming-ipo-list/", None), 
-        ("https://ipowatch.in/upcoming-sme-ipo-list/", "SME IPO"), 
-        ("https://ipowatch.in/ipo-list/", None), 
+        ("https://ipowatch.in/upcoming-ipo-calendar-ipo-list/", None),
+        ("https://ipowatch.in/upcoming-ipo-list/", None),
+        ("https://ipowatch.in/upcoming-sme-ipo-list/", "SME IPO"),
+        ("https://ipowatch.in/ipo-list/", None),
         ("https://ipowatch.in/sme-ipo-list/", "SME IPO")
     ]
     fallback_url = "https://ipo.indiratrade.com/Home"
@@ -344,15 +415,24 @@ def fetch_open_ipos():
     adapter = HTTPAdapter(max_retries=retries)
     session.mount("https://", adapter)
     session.mount("http://", adapter)
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'Accept-Language': 'en-US,en;q=0.9'}
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Accept-Language': 'en-US,en;q=0.9',
+    }
 
     merged_ipos = {}
     for url, default_cat in ipowatch_urls:
-        try: scrape_into_merged(session, url, default_cat, headers, merged_ipos, now)
-        except Exception: pass
+        try:
+            scrape_into_merged(session, url, default_cat, headers, merged_ipos, now)
+        except Exception as err:
+            pass
+
     if not merged_ipos:
-        try: scrape_into_merged(session, fallback_url, None, headers, merged_ipos, now)
-        except Exception: pass
+        try:
+            scrape_into_merged(session, fallback_url, None, headers, merged_ipos, now)
+        except Exception as err:
+            pass
 
     results = list(merged_ipos.values())
     print(f"  [Scraper] Found {len(results)} active OPEN IPO(s):")
@@ -362,16 +442,32 @@ def fetch_open_ipos():
 
 def main():
     now = now_ist()
-    print("\n" + "="*50 + "\n  IPO Intelligence Dashboard — Interactive CLI Engine\n" + "="*50)
-    cache, existing_data, open_ipos = load_cache(), load_existing_data(), fetch_open_ipos()
+    print("\n" + "="*50)
+    print("  IPO Intelligence Dashboard — Interactive CLI Engine")
+    print("="*50)
 
+    cache = load_cache()
+    existing_data = load_existing_data()
+    open_ipos = fetch_open_ipos()
+
+    # Aggressive State Retention
     if existing_data:
         scraped_canons = {canonical_key(ipo["name"]) for ipo in open_ipos}
         for slug, item in existing_data.items():
             if is_currently_open(item.get("openDate"), item.get("closeDate"), now):
                 canon = canonical_key(item.get("name", slug))
                 if canon not in scraped_canons:
-                    open_ipos.append({"slug": slug, "name": item.get("name", slug), "category": "SME IPO" if "SME" in item.get("sector", "") else "Mainboard IPO", "openDate": item.get("openDate"), "closeDate": item.get("closeDate"), "autoPrice": item.get("issuePrice"), "autoIssue": item.get("issueSize", "TBA"), "autoLot": item.get("lotSize")})
+                    cat = "SME IPO" if "SME" in item.get("sector", "") else "Mainboard IPO"
+                    open_ipos.append({
+                        "slug": slug,
+                        "name": item.get("name", slug),
+                        "category": cat,
+                        "openDate": item.get("openDate"),
+                        "closeDate": item.get("closeDate"),
+                        "autoPrice": item.get("issuePrice"),
+                        "autoIssue": item.get("issueSize", "TBA"),
+                        "autoLot": item.get("lotSize")
+                    })
 
     if not open_ipos:
         print("\nNo OPEN IPOs found for today.")
@@ -380,24 +476,32 @@ def main():
 
     upcoming = []
     for ipo in open_ipos:
-        slug, name, ipo_cat = ipo["slug"], ipo["name"], ipo["category"]
+        slug, name = ipo["slug"], ipo["name"]
+        ipo_cat = ipo["category"]
         multiplier = 2 if ipo_cat == "SME IPO" else 1
 
         enrichment = find_in_dict(slug, name, cache)
-        if not enrichment or not enrichment.get("sector"):
+        if enrichment and enrichment.get("sector"):
+            print(f"  [Cached] Loaded saved fundamentals for: {name}")
+        else:
             enrichment = prompt_user_fundamentals(name)
-            if enrichment: cache[slug] = enrichment; save_cache(cache)
+            if enrichment:
+                cache[slug] = enrichment
+                save_cache(cache)
 
         price = ipo["autoPrice"]
-        lot = ipo.get("autoLot")
+        lot = (enrichment.get("lotSize") if enrichment else None) or ipo.get("autoLot")
         issue_sz = ipo["autoIssue"]
         sector_name = enrichment.get("sector", "Pending Entry") if enrichment else "Pending Entry"
 
         cached_item = find_in_dict(slug, name, existing_data)
         if cached_item:
-            if not price and cached_item.get("issuePrice"): price = cached_item["issuePrice"]
-            if not lot and cached_item.get("lotSize"): lot = cached_item["lotSize"]
-            if issue_sz == "TBA" and cached_item.get("issueSize") and cached_item.get("issueSize") != "TBA": issue_sz = cached_item["issueSize"]
+            if not price and cached_item.get("issuePrice"):
+                price = cached_item["issuePrice"]
+            if not lot and cached_item.get("lotSize"):
+                lot = cached_item["lotSize"]
+            if issue_sz == "TBA" and cached_item.get("issueSize") and cached_item.get("issueSize") != "TBA":
+                issue_sz = cached_item["issueSize"]
 
         min_amt = (price * lot * multiplier) if (price and lot is not None) else None
         decision = evaluate_decision(enrichment, sector_name)
@@ -405,11 +509,35 @@ def main():
         if enrichment:
             bench = SECTOR_BENCHMARKS.get(sector_name, {"avgListingGain": 20.0, "winRate": "40/50 positive"})
             historical_gain = f"{bench['avgListingGain']}% avg listing gain in last 1 yr ({bench['winRate']})"
-        else: historical_gain = "Fundamental data pending entry for sector benchmarking"
+        else:
+            historical_gain = "Fundamental data pending entry for sector benchmarking"
 
-        upcoming.append({"slug": slug, "name": name, "symbol": name[:5].upper(), "sector": f"{sector_name} ({ipo_cat})", "status": "Open", "openDate": ipo["openDate"], "closeDate": ipo["closeDate"], "issuePrice": price, "lotSize": lot, "minAmount": min_amt, "issueSize": issue_sz, "historicalGain": historical_gain, "summary": decision["summary"], "verdict": decision["verdict"], "verdictCls": decision["verdictCls"], "checks": decision["checks"], "score": 1, "lastFetched": now.strftime("%d %b %Y, %I:%M %p")})
+        upcoming.append({
+            "slug": slug,
+            "name": name,
+            "symbol": name[:5].upper(),
+            "sector": f"{sector_name} ({ipo_cat})",
+            "status": "Open",
+            "openDate": ipo["openDate"],
+            "closeDate": ipo["closeDate"],
+            "issuePrice": price,
+            "lotSize": lot,
+            "minAmount": min_amt,
+            "issueSize": issue_sz,
+            "historicalGain": historical_gain,
+            "summary": decision["summary"],
+            "verdict": decision["verdict"],
+            "verdictCls": decision["verdictCls"],
+            "checks": decision["checks"],
+            "score": 1,
+            "lastFetched": now.strftime("%d %b %Y, %I:%M %p"),
+        })
 
-    save_data({"upcoming": upcoming, "lastUpdated": now.strftime("%d %b %Y, %I:%M %p")})
+    data = {
+        "upcoming": upcoming,
+        "lastUpdated": now.strftime("%d %b %Y, %I:%M %p")
+    }
+    save_data(data)
     print(f"\nDone! Processed exactly {len(upcoming)} active OPEN IPO(s).\n")
 
 if __name__ == "__main__":

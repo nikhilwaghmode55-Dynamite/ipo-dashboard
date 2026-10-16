@@ -4,7 +4,7 @@
       "slug": "tonbo-imaging-india",
       "name": "Tonbo Imaging India",
       "symbol": "TONBO",
-      "sector": "Industrials (Mainboard IPO)",
+      "sector": "Pending Entry (Mainboard IPO)",
       "status": "Open",
       "openDate": "15 October 2026",
       "closeDate": "19 October 2026",
@@ -12,40 +12,25 @@
       "lotSize": 21,
       "minAmount": 14700,
       "issueSize": "TBA",
-      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
-      "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
-      "verdict": "Avoid",
-      "verdictCls": "verdict-avoid",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
       "checks": [
         {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "High P/S valuation (11.06x vs Sector Average 2.8x)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Robust growth (55.3% vs Sector Average 14.0%)"
-        },
-        {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "Low promoter holding (15.72%)"
-        },
-        {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "Major chunk of issue goes to Debt Repayment / OFS"
+          "icon": "\u2139",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending entry"
         }
       ],
       "score": 1,
-      "lastFetched": "17 Oct 2026, 12:35 AM"
+      "lastFetched": "17 Oct 2026, 12:40 AM"
     },
     {
       "slug": "zetwerk-manufacturing-business",
       "name": "Zetwerk Manufacturing Business",
       "symbol": "ZETWE",
-      "sector": "Industrials (Mainboard IPO)",
+      "sector": "Pending Entry (Mainboard IPO)",
       "status": "Open",
       "openDate": "15 October 2026",
       "closeDate": "19 October 2026",
@@ -53,40 +38,25 @@
       "lotSize": 99,
       "minAmount": 14949,
       "issueSize": "TBA",
-      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
-      "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
-      "verdict": "Avoid",
-      "verdictCls": "verdict-avoid",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
       "checks": [
         {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Attractive P/S valuation (1.61x vs Sector Average 2.8x)"
-        },
-        {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "Slow revenue growth (13.45% vs Sector Average 14.0%)"
-        },
-        {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "Low promoter holding (11.36%)"
-        },
-        {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "Major chunk of issue goes to Debt Repayment / OFS"
+          "icon": "\u2139",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending entry"
         }
       ],
       "score": 1,
-      "lastFetched": "17 Oct 2026, 12:35 AM"
+      "lastFetched": "17 Oct 2026, 12:40 AM"
     },
     {
       "slug": "bonfiglioli-transmissions",
       "name": "Bonfiglioli Transmissions",
       "symbol": "BONFI",
-      "sector": "Industrials (Mainboard IPO)",
+      "sector": "Pending Entry (Mainboard IPO)",
       "status": "Open",
       "openDate": "15 October 2026",
       "closeDate": "19 October 2026",
@@ -94,40 +64,25 @@
       "lotSize": 25,
       "minAmount": 14650,
       "issueSize": "TBA",
-      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
-      "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
-      "verdict": "Avoid",
-      "verdictCls": "verdict-avoid",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
       "checks": [
         {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "High P/S valuation (5.47x vs Sector Average 2.8x)"
-        },
-        {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "Slow revenue growth (9.22% vs Sector Average 14.0%)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "High promoter confidence (77.0% holding)"
-        },
-        {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "Major chunk of issue goes to Debt Repayment / OFS"
+          "icon": "\u2139",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending entry"
         }
       ],
       "score": 1,
-      "lastFetched": "17 Oct 2026, 12:35 AM"
+      "lastFetched": "17 Oct 2026, 12:40 AM"
     },
     {
       "slug": "sahajanand-medical-technologies",
       "name": "Sahajanand Medical Technologies",
       "symbol": "SAHAJ",
-      "sector": "Health Care (Mainboard IPO)",
+      "sector": "Pending Entry (Mainboard IPO)",
       "status": "Open",
       "openDate": "15 October 2026",
       "closeDate": "19 October 2026",
@@ -135,40 +90,25 @@
       "lotSize": 43,
       "minAmount": 14792,
       "issueSize": "TBA",
-      "historicalGain": "21.0% avg listing gain in last 1 yr (15/18 positive)",
-      "summary": "Subpar valuation or growth metrics compared to peers in Health Care.",
-      "verdict": "Avoid",
-      "verdictCls": "verdict-avoid",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
       "checks": [
         {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Attractive P/S valuation (2.89x vs Sector Average 4.5x)"
-        },
-        {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "Slow revenue growth (15.87% vs Sector Average 20.0%)"
-        },
-        {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "Low promoter holding (36.2%)"
-        },
-        {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "Major chunk of issue goes to Debt Repayment / OFS"
+          "icon": "\u2139",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending entry"
         }
       ],
       "score": 1,
-      "lastFetched": "17 Oct 2026, 12:35 AM"
+      "lastFetched": "17 Oct 2026, 12:40 AM"
     },
     {
       "slug": "shellz-india",
       "name": "Shellz India",
       "symbol": "SHELL",
-      "sector": "Consumer Staples (SME IPO)",
+      "sector": "Pending Entry (SME IPO)",
       "status": "Open",
       "openDate": "15 October 2026",
       "closeDate": "19 October 2026",
@@ -176,35 +116,20 @@
       "lotSize": 800,
       "minAmount": 286400,
       "issueSize": "TBA",
-      "historicalGain": "12.0% avg listing gain in last 1 yr (11/15 positive)",
-      "summary": "Strong fundamentals outperforming historical benchmarks in Consumer Staples.",
-      "verdict": "Apply",
-      "verdictCls": "verdict-apply",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
       "checks": [
         {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Attractive P/S valuation (1.12x vs Sector Average 3.5x)"
-        },
-        {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "Slow revenue growth (8.9% vs Sector Average 12.0%)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "High promoter confidence (63.64% holding)"
-        },
-        {
-          "icon": "\u2713",
-          "cls": "check-pass",
-          "text": "Major chunk of issue allocated to Working Capital"
+          "icon": "\u2139",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending entry"
         }
       ],
       "score": 1,
-      "lastFetched": "17 Oct 2026, 12:35 AM"
+      "lastFetched": "17 Oct 2026, 12:40 AM"
     }
   ],
-  "lastUpdated": "17 Oct 2026, 12:35 AM"
+  "lastUpdated": "17 Oct 2026, 12:40 AM"
 }
