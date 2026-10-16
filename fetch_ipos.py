@@ -1,6 +1,6 @@
 """
 fetch_ipos.py — Live IPO Intelligence Dashboard Engine
-Pure Deduction Extraction (Fixes TBA Issue Size), 2026 Blocker, and 5 PM Expiry.
+Ultimate Number Deduction Extraction (Permanent Issue Size Fix), 2026 Blocker, and 5 PM Expiry.
 """
 
 import requests
@@ -61,10 +61,8 @@ def find_in_dict(target_slug, target_name, data_dict):
 def load_cache():
     if os.path.exists(CACHE_FILE):
         with open(CACHE_FILE, "r", encoding="utf-8") as f:
-            try:
-                content = f.read().strip()
-                return json.loads(content) if content else {}
-            except json.JSONDecodeError: return {}
+            try: return json.loads(f.read().strip()) or {}
+            except: return {}
     return {}
 
 def save_cache(cache):
@@ -75,15 +73,9 @@ def load_existing_data():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             try:
-                content = f.read().strip()
-                if not content: return {}
-                data = json.loads(content)
-                result = {}
-                for item in data.get("upcoming", []):
-                    slug = item.get("slug") or item.get("name", "").lower().replace(" ", "-")
-                    if slug: result[slug] = item
-                return result
-            except json.JSONDecodeError: return {}
+                data = json.loads(f.read().strip()) or {}
+                return {item.get("slug") or item.get("name", "").lower().replace(" ", "-"): item for item in data.get("upcoming", [])}
+            except: return {}
     return {}
 
 def save_data(data):
@@ -104,9 +96,8 @@ def parse_date_string(date_str, current_year):
 
 def extract_month_num(text):
     month_map = {"january": 1, "february": 2, "march": 3, "april": 4, "may": 5, "june": 6, "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12, "jan": 1, "feb": 2, "mar": 3, "apr": 4, "jun": 6, "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12}
-    text_lower = text.lower()
     for name, num in sorted(month_map.items(), key=lambda x: -len(x[0])):
-        if re.search(rf'\b{name}\b', text_lower): return num
+        if re.search(rf'\b{name}\b', text.lower()): return num
     return None
 
 def parse_date_range(dates_str, current_year):
@@ -138,112 +129,116 @@ def is_currently_open(open_str, close_str, now):
     close_dt = parse_date_string(close_str, now.year)
     if not open_dt or not close_dt: return False
     
-    # 5:00 PM Market Close Expiry
+    # 5:00 PM Market Close Expiry instantly removes closed IPOs
     if today == close_dt.date() and now.hour >= 17: return False 
-    
     return open_dt.date() <= today <= close_dt.date()
 
-def parse_table_columns_deduction(cols, headers, current_year):
+def parse_table_columns_ultimate(cols, headers, current_year):
+    """The Ultimate Number Deduction Engine. Ignores HTML formatting and uses pure logic."""
     price = None
     issue_size = "TBA"
-    auto_lot = None
+    lot = None
 
-    col_texts = [c.text.strip() for c in cols]
+    all_numbers = []
     
-    # 1. Global 'Cr' Check
-    row_str = " ".join(col_texts)
-    cr_match = re.search(r'₹?\s*([\d,.]+)\s*(?:Cr|crore|Crores)', row_str, re.IGNORECASE)
-    if cr_match:
-        issue_size = f"₹{cr_match.group(1).rstrip('.')} Cr"
-
-    # 2. Map via Headers
-    size_idx, lot_idx, price_idx = -1, -1, -1
-    for i, h in enumerate(headers):
-        hl = h.lower()
-        if "price" in hl: price_idx = i
-        elif "size" in hl or "cr" in hl or "amount" in hl:
-            if "lot" not in hl and "share" not in hl: size_idx = i
-        elif "lot" in hl or "share" in hl: lot_idx = i
-
-    if issue_size == "TBA" and size_idx != -1 and size_idx < len(col_texts):
-        m = re.search(r'([\d,]+\.?\d*)', col_texts[size_idx])
-        if m and m.group(1) not in ("0", ".", ""):
-            issue_size = f"₹{m.group(1).rstrip('.')} Cr"
-
-    if not auto_lot and lot_idx != -1 and lot_idx < len(col_texts):
-        m = re.search(r'(\d+)', col_texts[lot_idx].replace(',', ''))
-        if m:
-            val = int(m.group(1))
-            if 1 <= val <= 10000 and val != current_year:
-                auto_lot = val
-
-    if not price and price_idx != -1 and price_idx < len(col_texts):
-        nums = [int(n) for n in re.findall(r'\b(\d{2,4})\b', col_texts[price_idx].replace(',', ''))]
-        valid = [n for n in nums if 10 <= n <= 5000 and n != current_year]
-        if valid: price = max(valid)
-
-    # 3. Deduction Engine (The Ultimate Fallback)
-    for i, text in enumerate(col_texts):
-        if i < 2 or not text: continue 
+    # Extract every number from the row and tag it with its context
+    for idx, col in enumerate(cols):
+        if idx == 0: continue
+        text = col.text.strip()
+        if not text: continue
         
-        clean = text.replace(',', '')
-        
-        # Deduce Price
-        if not price and ("₹" in text or "-" in text or "to" in text.lower()):
-            nums = [int(n) for n in re.findall(r'\b(\d{2,4})\b', clean)]
-            valid = [n for n in nums if 10 <= n <= 5000 and n != current_year]
-            if valid: price = max(valid)
+        # Skip dates completely so 19 or 2026 never bleed into numbers
+        if re.search(r'(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)', text, re.IGNORECASE): 
+            continue
             
-        # Deduce Lot
-        if not auto_lot:
-            if "share" in text.lower() or "lot" in text.lower():
-                m = re.search(r'\b(\d+)\b', clean)
-                if m:
-                    val = int(m.group(1))
-                    if 1 <= val <= 10000 and val != current_year: auto_lot = val
-            elif i != size_idx and i != price_idx:
-                m = re.fullmatch(r'(\d+)', clean)
-                if m:
-                    val = int(m.group(1))
-                    if 1 <= val <= 10000 and val != current_year: auto_lot = val
-                        
-        # Deduce Issue Size (Decimals usually guarantee it's Issue Size)
-        if issue_size == "TBA" and i != lot_idx and i != price_idx:
-            if "." in text:
-                m = re.search(r'([\d]+\.\d+)', clean)
-                if m:
-                    val_str = m.group(1).rstrip('.')
-                    if val_str not in ("0", "0.00", ""):
-                        issue_size = f"₹{val_str} Cr"
-
-    # 4. Final Absolute Guarantee for Issue Size
-    if issue_size == "TBA":
-        used_vals = []
-        if price: used_vals.append(str(price))
-        if auto_lot: used_vals.append(str(auto_lot))
+        header_text = headers[idx].lower() if headers and idx < len(headers) else ""
         
-        for i, text in enumerate(col_texts):
-            if i < 2: continue
-            clean = text.replace(',', '')
-            m = re.search(r'([\d]+\.?\d*)', clean)
-            if m:
-                v_str = m.group(1).rstrip('.')
-                if v_str not in used_vals and v_str not in ("0", "0.00", "") and v_str != str(current_year):
-                    issue_size = f"₹{v_str} Cr"
-                    break
+        # Find integers and decimals
+        matches = re.finditer(r'([\d,]+(?:\.\d+)?)', text)
+        for m in matches:
+            val_str = m.group(1).replace(',', '')
+            try:
+                val_float = float(val_str)
+                # HARD BLOCK on current year being processed as a value
+                if val_float > 0 and val_float != current_year:
+                    all_numbers.append({
+                        "raw": val_str,
+                        "val": val_float,
+                        "is_dec": '.' in val_str,
+                        "has_cr": "cr" in text.lower(),
+                        "has_shares": "share" in text.lower() or "lot" in text.lower(),
+                        "has_rupee": "₹" in text or "rs" in text.lower(),
+                        "is_range": "-" in text or "to" in text.lower(),
+                        "in_price_col": "price" in header_text,
+                        "in_size_col": ("size" in header_text or "cr" in header_text or "amount" in header_text) and "lot" not in header_text,
+                        "in_lot_col": "lot" in header_text or "share" in header_text,
+                        "assigned": False
+                    })
+            except ValueError: pass
 
-    return price, issue_size, auto_lot
+    # PASS 1: Explicit Context (Cr, Size column, Shares)
+    for n in all_numbers:
+        if n["has_cr"] or n["in_size_col"]:
+            if issue_size == "TBA": 
+                issue_size = f"₹{n['raw'].rstrip('.')} Cr"
+            n["assigned"] = True
+
+    for n in all_numbers:
+        if n["assigned"]: continue
+        if n["has_shares"] or n["in_lot_col"]:
+            if not lot and n["val"] == int(n["val"]): 
+                lot = int(n["val"])
+            n["assigned"] = True
+
+    for n in all_numbers:
+        if n["assigned"]: continue
+        if n["has_rupee"] or n["is_range"] or n["in_price_col"]:
+            if 10 <= n["val"] <= 5000:
+                if not price or n["val"] > price: 
+                    price = int(n["val"])
+            n["assigned"] = True
+
+    # PASS 2: Decimals are almost always Issue Sizes
+    if issue_size == "TBA":
+        for n in all_numbers:
+            if not n["assigned"] and n["is_dec"]:
+                issue_size = f"₹{n['raw'].rstrip('.')} Cr"
+                n["assigned"] = True
+                break
+
+    # PASS 3: Process any remaining unassigned numbers based on logical constraints
+    unassigned = [n for n in all_numbers if not n["assigned"]]
+    
+    if not lot:
+        for n in unassigned:
+            if n["val"] == int(n["val"]) and 1 <= n["val"] <= 10000:
+                lot = int(n["val"])
+                n["assigned"] = True
+                break
+                
+    if not price:
+        for n in unassigned:
+            if n["val"] == int(n["val"]) and 10 <= n["val"] <= 5000:
+                price = int(n["val"])
+                n["assigned"] = True
+                break
+                
+    # If Issue Size is STILL TBA, take the largest unassigned number left
+    if issue_size == "TBA":
+        unassigned = [n for n in all_numbers if not n["assigned"]]
+        if unassigned:
+            unassigned.sort(key=lambda x: x["val"], reverse=True)
+            issue_size = f"₹{unassigned[0]['raw'].rstrip('.')} Cr"
+            unassigned[0]["assigned"] = True
+
+    return price, issue_size, lot
 
 def is_github_actions():
     return os.environ.get("GITHUB_ACTIONS") == "true" or "--headless" in sys.argv
 
 def prompt_user_fundamentals(name):
-    if is_github_actions():
-        return None
-
-    print(f"\n" + "="*55)
-    print(f" [CLI Input Needed] Configure fundamentals for: {name}")
-    print("="*55)
+    if is_github_actions(): return None
+    print(f"\n" + "="*55 + f"\n [CLI Input Needed] Configure fundamentals for: {name}\n" + "="*55)
     sectors = list(SECTOR_BENCHMARKS.keys())
     for i in range(0, len(sectors), 2):
         item1 = f"{i+1:2d}. {sectors[i]:<26}"
@@ -277,9 +272,7 @@ def prompt_user_fundamentals(name):
         proceeds = None
         while not proceeds:
             proc_choice = input("Enter option (1-3): ").strip()
-            if proc_choice in ["1", "2", "3"]:
-                proceeds_map = {"1": "Capex and Business Expansion", "2": "Working Capital", "3": "Debt Repayment / OFS"}
-                proceeds = proceeds_map[proc_choice]
+            if proc_choice in ["1", "2", "3"]: proceeds = {"1": "Capex and Business Expansion", "2": "Working Capital", "3": "Debt Repayment / OFS"}[proc_choice]
             else: print("  [Error] Please enter 1, 2, or 3.")
 
         promoter = None
@@ -289,12 +282,10 @@ def prompt_user_fundamentals(name):
             except ValueError: print("  [Error] Please enter a valid decimal number.")
         
         return {"sector": sector, "psRatio": ps_ratio, "cagr3Yr": cagr, "proceedsUse": proceeds, "promoterPct": promoter}
-    except (EOFError, KeyboardInterrupt):
-        return None
+    except (EOFError, KeyboardInterrupt): return None
 
 def evaluate_decision(enrichment, sector_name):
-    if not enrichment:
-        return {"verdict": "Data will be updated soon", "verdictCls": "verdict-caution", "summary": "Awaiting fundamental RHP data entry for comparative analysis.", "checks": [{"icon": "ℹ", "cls": "check-warn", "text": "Fundamental metrics pending entry"}]}
+    if not enrichment: return {"verdict": "Data will be updated soon", "verdictCls": "verdict-caution", "summary": "Awaiting fundamental RHP data entry for comparative analysis.", "checks": [{"icon": "ℹ", "cls": "check-warn", "text": "Fundamental metrics pending entry"}]}
 
     bench = SECTOR_BENCHMARKS.get(sector_name, {"avgPS": 3.5, "avgCagr": 15.0})
     ps, cagr, promoter = enrichment["psRatio"], enrichment["cagr3Yr"], enrichment["promoterPct"]
@@ -330,12 +321,14 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'html.parser')
     for table in soup.find_all('table'):
+        
+        # Grab headers reliably, skipping merged title rows
         table_headers = []
         for tr in table.find_all('tr'):
             cells = tr.find_all(['th', 'td'])
             if len(cells) >= 3:
                 texts = [c.text.strip().lower() for c in cells]
-                if any("company" in x or "ipo" in x for x in texts):
+                if any("company" in x or "ipo" in x for x in texts) and any("price" in x or "size" in x for x in texts):
                     table_headers = texts
                     break
 
@@ -359,7 +352,7 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
             name = clean_company_name(raw_name)
             if len(name) < 3: continue
 
-            price, issue_size, auto_lot = parse_table_columns_deduction(cols, table_headers, now.year)
+            price, issue_size, auto_lot = parse_table_columns_ultimate(cols, table_headers, now.year)
             canon, slug = canonical_key(name), name.lower().replace(" ", "-")
 
             if canon not in merged_ipos:
@@ -375,7 +368,7 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
 
 def fetch_open_ipos():
     now = now_ist()
-    print(f"\n[Scraper Engine vFinal] Deduction Parsing Enabled ({now.strftime('%I:%M %p')} IST)...")
+    print(f"\n[Scraper Engine] Ultimate Deduction Parser Active ({now.strftime('%I:%M %p')} IST)...")
     ipowatch_urls = [
         ("https://ipowatch.in/upcoming-ipo-calendar-ipo-list/", None), 
         ("https://ipowatch.in/upcoming-ipo-list/", None), 
