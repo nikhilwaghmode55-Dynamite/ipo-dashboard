@@ -137,49 +137,45 @@ def is_currently_open(open_str, close_str, now):
     open_dt = parse_date_string(open_str, now.year)
     close_dt = parse_date_string(close_str, now.year)
     if not open_dt or not close_dt: return False
-    # 5:00 PM Market Close Expiry
+    
+    # 5:00 PM Market Close Expiry removes Fusion CX and Ravita Engineering instantly
     if today == close_dt.date() and now.hour >= 17: return False 
+    
     return open_dt.date() <= today <= close_dt.date()
 
-def parse_table_columns(cols, row_text, headers, current_year):
+def parse_table_columns(cols, headers, current_year):
     price = None
     issue_size = "TBA"
     auto_lot = None
     issue_val_str = None
 
-    # 1. AFTERNOON LOGIC: Broad regex across the entire row
+    # Restored Afternoon Logic: Broad regex across the entire reconstructed row
+    row_text = " ".join([c.text.strip() for c in cols])
     cr_match = re.search(r'₹?\s*([\d,.]+)\s*(?:Cr|crore|Crores)', row_text, re.IGNORECASE)
     if cr_match:
         clean_cr = cr_match.group(1).rstrip('.,')
         issue_size = f"₹{clean_cr} Cr"
         issue_val_str = clean_cr.replace(',', '').split('.')[0]
 
-    # 2. HEADER MAPPING (With strict index alignment)
-    if issue_size == "TBA":
-        size_idx = -1
-        for i, h in enumerate(headers):
-            if ("size" in h or "cr" in h or "amount" in h) and "lot" not in h and "share" not in h:
-                size_idx = i
-                break
-        
-        if size_idx != -1 and size_idx < len(cols):
-            text = cols[size_idx].text.strip()
-            m = re.search(r'([\d,]+\.?\d*)', text)
-            if m and m.group(1) not in ("0", "0.00", "."):
-                clean_cr = m.group(1).rstrip('.,')
-                issue_size = f"₹{clean_cr} Cr"
-                issue_val_str = clean_cr.replace(',', '').split('.')[0]
-
     all_prices = []
     for idx, col in enumerate(cols):
         text = col.text.strip()
+        if not text: continue
         text_lower = text.lower()
         header_text = headers[idx].lower() if idx < len(headers) else ""
-        if idx == 0 or not text: continue
 
-        # Skip the Issue Size column to avoid contaminating Price/Lot detection
-        if ("size" in header_text or "cr" in header_text or "amount" in header_text) and "lot" not in header_text and "share" not in header_text:
+        if idx == 0 or "date" in header_text or "day" in header_text: 
             continue
+
+        if issue_size == "TBA":
+            if "cr" in text_lower or "crore" in text_lower or "size" in header_text or "cr" in header_text or "amount" in header_text:
+                if "lot" not in header_text and "share" not in header_text and "price" not in header_text:
+                    m = re.search(r'([\d,]+\.?\d*)', text)
+                    if m and m.group(1) not in ("0", "0.00", "."):
+                        clean_cr = m.group(1).rstrip('.,')
+                        issue_size = f"₹{clean_cr} Cr"
+                        issue_val_str = clean_cr.replace(',', '').split('.')[0]
+                        continue
 
         # Lot Size Detection (Strict 1-10000, explicitly blocks current year like 2026)
         if not auto_lot and not any(sym in text for sym in ["₹", "Rs", "to", "-", "–", "%", "Cr", "."]):
@@ -188,9 +184,10 @@ def parse_table_columns(cols, row_text, headers, current_year):
                 nums = re.findall(r'\b(\d{1,5})\b', clean_text)
                 for n in nums:
                     val = int(n)
-                    if 1 <= val <= 10000 and val != current_year and (not issue_val_str or str(val) != issue_val_str):
-                        auto_lot = val
-                        break
+                    if 1 <= val <= 10000 and val != current_year:
+                        if not issue_val_str or str(val) != issue_val_str:
+                            auto_lot = val
+                            break
 
         # Share Price Detection (Explicitly blocks current year like 2026)
         if any(sym in text_lower for sym in ["₹", "rs", "-", "–", "to"]) or "price" in header_text:
@@ -198,8 +195,9 @@ def parse_table_columns(cols, row_text, headers, current_year):
             nums = re.findall(r'\b(\d{2,4})\b', clean_text)
             for n in nums:
                 val = int(n)
-                if 10 <= val <= 5000 and val != current_year and (not issue_val_str or str(val) != issue_val_str):
-                    all_prices.append(val)
+                if 10 <= val <= 5000 and val != current_year:
+                    if not issue_val_str or str(val) != issue_val_str or "price" in header_text:
+                        all_prices.append(val)
 
     if all_prices:
         price = max(all_prices)
@@ -302,13 +300,14 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'html.parser')
     for table in soup.find_all('table'):
-        # Correctly extract headers by skipping merged title rows
         table_headers = []
         for tr in table.find_all('tr'):
-            cells = tr.find_all(['th', 'td'])
-            if len(cells) >= 4:
-                table_headers = [c.text.strip().lower() for c in cells]
+            ths = tr.find_all(['th', 'td'])
+            if ths and any(x.name == 'th' for x in ths):
+                table_headers = [th.text.strip().lower() for th in ths]
                 break
+        if not table_headers and table.find('tr'):
+            table_headers = [td.text.strip().lower() for td in table.find('tr').find_all('td')]
 
         table_heading = ""
         prev_elem = table.find_previous(['h2', 'h3'])
@@ -330,7 +329,7 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
             name = clean_company_name(raw_name)
             if len(name) < 3: continue
 
-            price, issue_size, auto_lot = parse_table_columns(cols, row_text, table_headers, now.year)
+            price, issue_size, auto_lot = parse_table_columns(cols, table_headers, now.year)
             canon, slug = canonical_key(name), name.lower().replace(" ", "-")
 
             if canon not in merged_ipos:
@@ -346,8 +345,14 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
 
 def fetch_open_ipos():
     now = now_ist()
-    print("\n[Scraper vFinal] Restored Issue Sizes, Blocked 2026 Prices, and Enabled 5 PM Expiry...")
-    ipowatch_urls = [("https://ipowatch.in/upcoming-ipo-calendar-ipo-list/", None), ("https://ipowatch.in/upcoming-ipo-list/", None), ("https://ipowatch.in/upcoming-sme-ipo-list/", "SME IPO"), ("https://ipowatch.in/ipo-list/", None), ("https://ipowatch.in/sme-ipo-list/", "SME IPO")]
+    print(f"\n[Scraper v7.0 FINAL] Unbreakable Dashboard Update ({now.strftime('%I:%M %p')} IST)...")
+    ipowatch_urls = [
+        ("https://ipowatch.in/upcoming-ipo-calendar-ipo-list/", None), 
+        ("https://ipowatch.in/upcoming-ipo-list/", None), 
+        ("https://ipowatch.in/upcoming-sme-ipo-list/", "SME IPO"), 
+        ("https://ipowatch.in/ipo-list/", None), 
+        ("https://ipowatch.in/sme-ipo-list/", "SME IPO")
+    ]
     fallback_url = "https://ipo.indiratrade.com/Home"
 
     session = requests.Session()
