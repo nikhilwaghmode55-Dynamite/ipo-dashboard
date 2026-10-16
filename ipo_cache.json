@@ -2,16 +2,9 @@
   "tonbo-imaging-india": {
     "sector": "Industrials",
     "psRatio": 11.06,
-    "cagr3Yr": 55.03,
+    "cagr3Yr": 55.3,
     "proceedsUse": "Debt Repayment / OFS",
     "promoterPct": 15.72
-  },
-  "zetwerk-manufacturing-business": {
-    "sector": "Industrials",
-    "psRatio": 1.61,
-    "cagr3Yr": 13.45,
-    "proceedsUse": "Debt Repayment / OFS",
-    "promoterPct": 11.36
   },
   "bonfiglioli-transmissions": {
     "sector": "Industrials",
@@ -31,7 +24,7 @@
     "sector": "Consumer Staples",
     "psRatio": 1.12,
     "cagr3Yr": 8.9,
-    "proceedsUse": "Working Capital",
+    "proceedsUse": "Debt Repayment / OFS",
     "promoterPct": 63.64
   },
   "fusion-cx": {
