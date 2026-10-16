@@ -1,6 +1,6 @@
 """
-fetch_ipos.py — Live IPO Intelligence Dashboard Engine (v5.0)
-Index-Mapped Issue Sizes, Realistic Historical Benchmarks, and Professional Grammar.
+fetch_ipos.py — Live IPO Intelligence Dashboard Engine (v6.0 Final)
+Triple-Lock Issue Size Extraction (Decimal Format Fallback), 5 PM Expiry, and Unbreakable CLI.
 """
 
 import requests
@@ -22,7 +22,6 @@ IST = timezone(timedelta(hours=5, minutes=30))
 def now_ist():
     return datetime.now(IST)
 
-# Updated with realistic Indian market historical win rates (Last 12-24 Months)
 SECTOR_BENCHMARKS = {
     "Information Technology": {"avgPS": 5.2, "avgCagr": 22.0, "avgListingGain": 24.5, "winRate": "28/32 positive"},
     "Financials": {"avgPS": 3.8, "avgCagr": 18.0, "avgListingGain": 29.4, "winRate": "42/50 positive"},
@@ -141,54 +140,75 @@ def is_currently_open(open_str, close_str):
     open_dt = parse_date_string(open_str)
     close_dt = parse_date_string(close_str)
     if not open_dt or not close_dt: return False
-    if today == close_dt.date() and now.hour >= 17: return False # 5 PM Hard Expiry
+    
+    # Expiration Rule: If it's the closing date AND it is past 5:00 PM IST (17:00), mark as closed
+    if today == close_dt.date() and now.hour >= 17: return False 
+    
     return open_dt.date() <= today <= close_dt.date()
 
 def parse_table_columns(cols, row_text, headers):
     price, issue_size, auto_lot = None, "TBA", None
     issue_val_str = None
 
-    # 1. Index-Mapped Extraction for Issue Size
-    for idx, header_text in enumerate(headers):
-        if idx < len(cols):
-            text = cols[idx].text.strip()
-            if "size" in header_text.lower() or "cr" in header_text.lower() or "amount" in header_text.lower():
-                if "lot" not in header_text.lower() and "share" not in header_text.lower():
-                    m = re.search(r'([\d,.]+)', text)
-                    if m and m.group(1) not in ("0", "0.00", "."):
-                        clean_cr = m.group(1).rstrip('.,')
-                        issue_size = f"₹{clean_cr} Cr"
-                        issue_val_str = clean_cr.replace(',', '').split('.')[0]
-                        break
+    # 1. TRIPLE-LOCK ISSUE SIZE EXTRACTION
+    
+    # Method A: Look for explicit 'Cr' in the row
+    cr_match = re.search(r'₹?\s*([\d,.]+)\s*(?:Cr|crore|Crores)', row_text, re.IGNORECASE)
+    if cr_match:
+        clean_cr = cr_match.group(1).rstrip('.,')
+        issue_size = f"₹{clean_cr} Cr"
+        issue_val_str = clean_cr.replace(',', '').split('.')[0]
+        
+    for idx, col in enumerate(cols):
+        text = col.text.strip()
+        text_lower = text.lower()
+        header_text = headers[idx].lower() if headers and idx < len(headers) else ""
+        if idx == 0 or not text: continue
 
-    # 2. General scan for Price and Lot Size
+        # Method B: Header Mapping
+        if issue_size == "TBA":
+            if ("size" in header_text or "cr" in header_text or "amount" in header_text) and "lot" not in header_text and "share" not in header_text:
+                m = re.search(r'^₹?\s*([\d,.]+)', text)
+                if m and m.group(1) not in ("0", "0.00", "."):
+                    clean_cr = m.group(1).rstrip('.,')
+                    issue_size = f"₹{clean_cr} Cr"
+                    issue_val_str = clean_cr.replace(',', '').split('.')[0]
+
+        # Method C: Format Fallback (Matches pure decimal numbers like 702.00 or 151.50)
+        if issue_size == "TBA":
+            if re.fullmatch(r'₹?\s*[\d,]+\.\d{1,2}', text):
+                clean_cr = re.sub(r'[^\d,.]', '', text).rstrip('.')
+                issue_size = f"₹{clean_cr} Cr"
+                issue_val_str = clean_cr.replace(',', '').split('.')[0]
+
+        # 2. Lot Size Auto-Detect (Strict 1-10000 integer, no Rs/₹ symbols, no decimals)
+        if not auto_lot and not any(sym in text for sym in ["₹", "Rs", "to", "-", "–", "%", "Cr", "."]):
+            if "price" not in header_text and "size" not in header_text:
+                clean_num = text.replace(',', '')
+                if re.fullmatch(r'\d{1,5}', clean_num):
+                    val = int(clean_num)
+                    if 1 <= val <= 10000 and (not issue_val_str or str(val) != issue_val_str):
+                        auto_lot = val
+
+    # 3. Share Price Detection
     all_prices = []
     for idx, col in enumerate(cols):
         text = col.text.strip()
         text_lower = text.lower()
         header_text = headers[idx].lower() if headers and idx < len(headers) else ""
-        if idx in (0, 1): continue
-
-        if not auto_lot and not any(sym in text for sym in ["₹", "Rs", "to", "-", "–", "%", "Cr"]):
-            if "price" not in header_text:
-                nums = re.findall(r'\b\d{1,5}\b', text)
-                for n in nums:
-                    val = int(n.replace(',', ''))
-                    if 1 <= val <= 10000 and (not issue_val_str or str(val) != issue_val_str):
-                        auto_lot = val
-                        break
+        if idx == 0: continue
 
         if any(sym in text_lower for sym in ["₹", "rs", "-", "–", "to"]):
             nums = re.findall(r'\d[\d,]*', text)
             for n in nums:
                 val = int(n.replace(',', ''))
-                if 10 <= val < 5000 and (not issue_val_str or str(val) != issue_val_str):
+                if 10 <= val <= 5000 and (not issue_val_str or str(val) != issue_val_str):
                     all_prices.append(val)
         elif "price" in header_text:
-            nums = re.findall(r'\b\d{2,4}\b', text)
+            nums = re.findall(r'\d[\d,]*', text)
             for n in nums:
                 val = int(n.replace(',', ''))
-                if 10 <= val < 5000 and (not issue_val_str or str(val) != issue_val_str):
+                if 10 <= val <= 5000 and (not issue_val_str or str(val) != issue_val_str):
                     all_prices.append(val)
 
     if all_prices: price = max(all_prices)
@@ -351,8 +371,14 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos):
                 if ipo_category == "SME IPO": existing["category"] = "SME IPO"
 
 def fetch_open_ipos():
-    print("\n[Scraper v5.0] Header-Mapped Sizes, Formal Grammar, and Realistic Benchmarks...")
-    ipowatch_urls = [("https://ipowatch.in/upcoming-ipo-calendar-ipo-list/", None), ("https://ipowatch.in/upcoming-ipo-list/", None), ("https://ipowatch.in/upcoming-sme-ipo-list/", "SME IPO"), ("https://ipowatch.in/ipo-list/", None), ("https://ipowatch.in/sme-ipo-list/", "SME IPO")]
+    print("\n[Scraper v6.0] Triple-Lock Issue Size Extraction & Unbreakable Prompts...")
+    ipowatch_urls = [
+        ("https://ipowatch.in/upcoming-ipo-calendar-ipo-list/", None), 
+        ("https://ipowatch.in/upcoming-ipo-list/", None), 
+        ("https://ipowatch.in/upcoming-sme-ipo-list/", "SME IPO"), 
+        ("https://ipowatch.in/ipo-list/", None), 
+        ("https://ipowatch.in/sme-ipo-list/", "SME IPO")
+    ]
     fallback_url = "https://ipo.indiratrade.com/Home"
 
     session = requests.Session()
