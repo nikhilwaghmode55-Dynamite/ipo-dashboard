@@ -2,7 +2,7 @@ name: Auto-Fetch Latest IPOs
 
 on:
   schedule:
-    - cron: '30 4 * * *' # Daily at 10:00 AM IST (04:30 UTC)
+    - cron: '17 2,4,5,7,9,11 * * *'
   workflow_dispatch:
 
 jobs:
@@ -13,25 +13,27 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
           pip install requests beautifulsoup4 urllib3
 
-      - name: Run fetch script
+      - name: Run fetch script in unattended cloud mode
+        env:
+          GITHUB_ACTIONS: "true"
         run: |
-          python fetch_ipos.py
+          python fetch_ipos.py --headless
 
       - name: Commit and push changes if data updated
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add data.json index.html
+          git add data.json
           if [ -f ipo_cache.json ]; then git add ipo_cache.json; fi
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Automated IPO decision engine refresh [skip ci]" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Automated IPO decision engine refresh [skip ci]" && git pull --rebase origin main && git push origin main)
