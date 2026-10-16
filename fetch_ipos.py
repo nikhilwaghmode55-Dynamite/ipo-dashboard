@@ -1,6 +1,6 @@
 """
-fetch_ipos.py — Live IPO Intelligence Dashboard Engine (v3.1)
-Unbreakable CLI validation loops, Header-Mapped Issue Size Extraction, and Aggressive State Retention.
+fetch_ipos.py — Live IPO Intelligence Dashboard Engine (v4.1)
+5 PM Market-Close Expiry, Symmetrical Benchmarking, and Cleaned Proceeds Typography.
 """
 
 import requests
@@ -181,11 +181,18 @@ def parse_date_range(dates_str):
     return start_str, close_str
 
 def is_currently_open(open_str, close_str):
-    today = now_ist().date()
+    now = now_ist()
+    today = now.date()
     open_dt = parse_date_string(open_str)
     close_dt = parse_date_string(close_str)
+    
     if not open_dt or not close_dt:
         return False
+        
+    # 5:00 PM Market Close Expiry
+    if today == close_dt.date() and now.hour >= 17:
+        return False
+        
     return open_dt.date() <= today <= close_dt.date()
 
 def parse_table_columns(cols, row_text, headers):
@@ -193,7 +200,6 @@ def parse_table_columns(cols, row_text, headers):
     issue_size = "TBA"
     auto_lot = None
 
-    # 1. Broad regex for explicit 'Cr'
     cr_match = re.search(r'₹?\s*([\d,.]+)\s*(?:Cr|crore|Crores)', row_text, re.IGNORECASE)
     issue_val_str = None
     if cr_match:
@@ -205,12 +211,11 @@ def parse_table_columns(cols, row_text, headers):
     for idx, col in enumerate(cols):
         text = col.text.strip()
         text_lower = text.lower()
-        header_text = headers[idx].lower() if idx < len(headers) else ""
+        header_text = headers[idx].lower() if headers and idx < len(headers) else ""
 
         if idx in (0, 1):
             continue
 
-        # Issue Size Mapping via Column Header OR Cell Text
         if issue_size == "TBA":
             if "cr" in text_lower or "crore" in text_lower:
                 m = re.search(r'₹?\s*([\d,.]+)', text)
@@ -220,15 +225,14 @@ def parse_table_columns(cols, row_text, headers):
                     issue_val_str = clean_cr.replace(',', '').split('.')[0]
                     continue
             elif ("issue" in header_text and "size" in header_text) or ("cr" in header_text or "crore" in header_text):
-                if "lot" not in header_text and "shares" not in header_text:
-                    m = re.search(r'₹?\s*([\d,.]+)', text)
+                if "lot" not in header_text and "share" not in header_text:
+                    m = re.search(r'([\d,.]+)', text)
                     if m and m.group(1) != "0":
                         clean_cr = m.group(1).rstrip('.,')
                         issue_size = f"₹{clean_cr} Cr"
                         issue_val_str = clean_cr.replace(',', '').split('.')[0]
                         continue
 
-        # Lot Size Detection (Strict 1 to 10,000 bounds)
         if not auto_lot and not any(sym in text for sym in ["₹", "Rs", "to", "-", "–", "%", "Cr"]):
             if "price" not in header_text:
                 nums = re.findall(r'\b\d{1,5}\b', text)
@@ -238,7 +242,6 @@ def parse_table_columns(cols, row_text, headers):
                         auto_lot = val
                         break
 
-        # Share Price Detection
         if any(sym in text_lower for sym in ["₹", "rs", "-", "–", "to"]):
             nums = re.findall(r'\d[\d,]*', text)
             for n in nums:
@@ -277,7 +280,6 @@ def prompt_user_fundamentals(name):
         print(f"  {item1}   {item2}")
     
     try:
-        # Unbreakable Sector Loop
         sector = None
         while not sector:
             sec_choice = input(f"\nEnter sector choice (1-{len(sectors)}) or press Enter to skip: ").strip()
@@ -289,21 +291,18 @@ def prompt_user_fundamentals(name):
             else:
                 print(f"  [Error] Please enter a whole number between 1 and {len(sectors)}.")
         
-        # Unbreakable P/S Loop
         ps_ratio = None
         while ps_ratio is None:
             val = input("Current FY P/S Ratio (e.g., 4.5): ").strip()
             try: ps_ratio = float(val)
             except ValueError: print("  [Error] Please enter a valid decimal number.")
             
-        # Unbreakable CAGR Loop
         cagr = None
         while cagr is None:
             val = input("3-Year Revenue CAGR % (e.g., 20): ").strip()
             try: cagr = float(val)
             except ValueError: print("  [Error] Please enter a valid decimal number.")
         
-        # Unbreakable Proceeds Loop
         print("\nSelect Use of Proceeds:")
         print("  1. Capex / Business Expansion / Growth / R&D (Positive)")
         print("  2. Working Capital (Neutral/Positive)")
@@ -317,7 +316,6 @@ def prompt_user_fundamentals(name):
             else:
                 print("  [Error] Please enter 1, 2, or 3.")
 
-        # Unbreakable Promoter Holding Loop
         promoter = None
         while promoter is None:
             val = input("Post-IPO Promoter Holding % (e.g., 65): ").strip()
@@ -345,7 +343,7 @@ def evaluate_decision(enrichment, sector_name):
 
     bench = SECTOR_BENCHMARKS.get(sector_name, {"avgPS": 3.5, "avgCagr": 15.0})
     ps, cagr, promoter = enrichment["psRatio"], enrichment["cagr3Yr"], enrichment["promoterPct"]
-    proceeds = enrichment["proceedsUse"].lower()
+    proceeds = enrichment["proceedsUse"]
     score, checks = 0, []
 
     if ps <= bench["avgPS"]:
@@ -359,7 +357,7 @@ def evaluate_decision(enrichment, sector_name):
         checks.append({"icon": "✓", "cls": "check-pass", "text": f"Robust growth ({cagr}% vs sector avg {bench['avgCagr']}%)"})
         score += 2
     else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Slow revenue growth ({cagr}%)"})
+        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Slow revenue growth ({cagr}% vs sector avg {bench['avgCagr']}%)"})
         score -= 1
 
     if promoter >= 50:
@@ -369,11 +367,11 @@ def evaluate_decision(enrichment, sector_name):
         checks.append({"icon": "✗", "cls": "check-fail", "text": f"Low promoter holding ({promoter}%)"})
         score -= 1
 
-    if any(k in proceeds for k in ["capex", "growth", "working capital", "expansion"]):
-        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Proceeds deployed for business expansion ({proceeds})"})
+    if any(k in proceeds.lower() for k in ["capex", "growth", "working capital", "expansion"]):
+        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Major chunk of issue allocated to {proceeds}"})
         score += 1
     else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Proceeds for debt repayment / OFS ({proceeds})"})
+        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Major chunk of issue goes to {proceeds}"})
         score -= 1
 
     if score >= 3:
@@ -400,12 +398,14 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos):
     tables = soup.find_all('table')
 
     for table in tables:
-        # Dynamically map headers for exact Issue Size mapping
-        first_row = table.find('tr')
-        if first_row:
-            table_headers = [th.text.strip() for th in first_row.find_all(['th', 'td'])]
-        else:
-            table_headers = []
+        table_headers = []
+        for tr in table.find_all('tr'):
+            ths = tr.find_all(['th', 'td'])
+            if ths and any(x.name == 'th' for x in ths):
+                table_headers = [th.text.strip() for th in ths]
+                break
+        if not table_headers and table.find('tr'):
+            table_headers = [td.text.strip() for td in table.find('tr').find_all('td')]
 
         table_heading = ""
         prev_elem = table.find_previous(['h2', 'h3'])
@@ -469,11 +469,13 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos):
                     existing["category"] = "SME IPO"
 
 def fetch_open_ipos():
-    print("\n[Scraper v3.1] Fetching OPEN IPOs with Header-Mapped Sizes & Persistent States...")
+    print("\n[Scraper v4.1] Fetching strictly OPEN IPOs (Auto 5 PM Expiry)...")
     ipowatch_urls = [
         ("https://ipowatch.in/upcoming-ipo-calendar-ipo-list/", None),
-        ("https://ipowatch.in/upcoming-ipo-list/", None),
-        ("https://ipowatch.in/upcoming-sme-ipo-list/", "SME IPO"),
+        ("https://ipowatch.in/upcoming-ipo-list/", None),          
+        ("https://ipowatch.in/upcoming-sme-ipo-list/", "SME IPO"), 
+        ("https://ipowatch.in/ipo-list/", None),                   
+        ("https://ipowatch.in/sme-ipo-list/", "SME IPO"),          
     ]
     fallback_url = "https://ipo.indiratrade.com/Home"
 
@@ -516,15 +518,13 @@ def main():
     existing_data = load_existing_data()
     open_ipos = fetch_open_ipos()
 
-    # Aggressive State Retention: Retain any IPOs from existing data.json that are still open today,
-    # EVEN IF the financial portals scrubbed them from their live tables early (e.g. after 5 PM).
     if existing_data:
         scraped_canons = {canonical_key(ipo["name"]) for ipo in open_ipos}
         for slug, item in existing_data.items():
             if is_currently_open(item.get("openDate"), item.get("closeDate")):
                 canon = canonical_key(item.get("name", slug))
                 if canon not in scraped_canons:
-                    print(f"  [Retention] Recovering early-removed IPO from cache: {item.get('name')}")
+                    print(f"  [Retention] Recovering missing open IPO from local cache: {item.get('name')}")
                     cat = "SME IPO" if "SME" in item.get("sector", "") else "Mainboard IPO"
                     open_ipos.append({
                         "slug": slug,
