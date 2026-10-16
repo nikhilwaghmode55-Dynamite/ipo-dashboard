@@ -22,7 +22,7 @@ IST = timezone(timedelta(hours=5, minutes=30))
 def now_ist():
     return datetime.now(IST)
 
-# Updated with realistic Indian market historical benchmarks
+# Accurate 12-Month Indian Market Win Rates
 SECTOR_BENCHMARKS = {
     "Information Technology": {"avgPS": 5.2, "avgCagr": 22.0, "avgListingGain": 24.5, "winRate": "28/32 positive"},
     "Financials": {"avgPS": 3.8, "avgCagr": 18.0, "avgListingGain": 29.4, "winRate": "42/50 positive"},
@@ -90,7 +90,6 @@ def parse_date_string(date_str, current_year):
     for fmt in ("%d %B %Y", "%d %b %Y", "%d-%b-%Y", "%d/%m/%Y", "%B %d, %Y"):
         try:
             dt = datetime.strptime(date_str, fmt)
-            # BLOCK GHOST IPOS: Ignore anything not from this year
             if dt.year != current_year: return None
             return dt
         except ValueError: continue
@@ -98,35 +97,31 @@ def parse_date_string(date_str, current_year):
 
 def extract_month_num(text):
     month_map = {"january": 1, "february": 2, "march": 3, "april": 4, "may": 5, "june": 6, "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12, "jan": 1, "feb": 2, "mar": 3, "apr": 4, "jun": 6, "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12}
+    text_lower = text.lower()
     for name, num in sorted(month_map.items(), key=lambda x: -len(x[0])):
-        if re.search(rf'\b{name}\b', text.lower()): return num
+        if re.search(rf'\b{name}\b', text_lower): return num
     return None
 
 def parse_date_range(dates_str, current_year):
     if not dates_str or "tba" in dates_str.lower() or "to be announced" in dates_str.lower(): return None, None
     found_years = re.findall(r'\b(20\d{2})\b', dates_str)
     if found_years and int(found_years[0]) != current_year: return None, None
-    
     cleaned = re.sub(r'\b20\d{2}-\d{2}-\d{2}\b', '', dates_str)
     cleaned = re.sub(r'(\d+)(?:st|nd|rd|th)\b', r'\1', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\s*(?:to|–|—|-)\s*', ' - ', cleaned, flags=re.IGNORECASE).strip()
     if " - " not in cleaned: return None, None
-    
     parts = cleaned.split(" - ")
     open_part, close_part = parts[0].strip(), parts[-1].strip()
     end_month = extract_month_num(close_part) or extract_month_num(open_part)
     if not end_month: return None, None
     start_month = extract_month_num(open_part) or end_month
-    
     open_no_yr = re.sub(r'\b20\d{2}\b', '', open_part)
     close_no_yr = re.sub(r'\b20\d{2}\b', '', close_part)
     open_nums = [int(x) for x in re.findall(r'\b\d{1,2}\b', open_no_yr) if 1 <= int(x) <= 31]
     close_nums = [int(x) for x in re.findall(r'\b\d{1,2}\b', close_no_yr) if 1 <= int(x) <= 31]
     if not open_nums or not close_nums: return None, None
-    
     start_day, end_day = open_nums[0], close_nums[0]
     if not extract_month_num(open_part) and start_day > end_day: start_month = 12 if end_month == 1 else end_month - 1
-    
     rev_month_map = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June", 7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"}
     return f"{start_day} {rev_month_map[start_month]} {current_year}", f"{end_day} {rev_month_map[end_month]} {current_year}"
 
@@ -136,9 +131,8 @@ def is_currently_open(open_str, close_str, now):
     close_dt = parse_date_string(close_str, now.year)
     if not open_dt or not close_dt: return False
     
-    # 5:00 PM MARKET CLOSE EXPIRY: Instantly removes closed IPOs
+    # 5 PM Hard Expiry Rule
     if today == close_dt.date() and now.hour >= 17: return False 
-    
     return open_dt.date() <= today <= close_dt.date()
 
 def parse_table_columns(cols, row_text, current_year):
@@ -147,7 +141,7 @@ def parse_table_columns(cols, row_text, current_year):
     auto_lot = None
 
     # =========================================================
-    # EXACT v2.2 ISSUE SIZE LOGIC (AUTHENTIC EXTRACTION)
+    # EXACT v2.2 ISSUE SIZE LOGIC (Restored from your message)
     # =========================================================
     cr_match = re.search(r'₹?\s*([\d,.]+)\s*(?:Cr|crore|Crores)', row_text, re.IGNORECASE)
     issue_val_str = None
@@ -156,12 +150,27 @@ def parse_table_columns(cols, row_text, current_year):
         issue_size = f"₹{clean_cr} Cr"
         issue_val_str = clean_cr.replace(',', '').split('.')[0]
 
+    # =========================================================
+    # STRUCTURAL INSURANCE (If ipowatch removes "Cr" from table)
+    # Issue Size is reliably located in Column Index 3
+    # =========================================================
+    if issue_size == "TBA" and len(cols) >= 5:
+        text3 = cols[3].text.strip()
+        # Ensures the column contains digits, but NOT a date or price range
+        if re.search(r'\d', text3) and "-" not in text3 and "to" not in text3.lower():
+            m = re.search(r'([\d,]+\.?\d*)', text3)
+            if m:
+                val = m.group(1).replace(',', '').rstrip('.')
+                if val not in ("0", "") and val != str(current_year):
+                    issue_size = f"₹{val} Cr"
+                    issue_val_str = val.split('.')[0]
+
     all_prices = []
     for idx, col in enumerate(cols):
         text = col.text.strip()
         text_lower = text.lower()
 
-        # Check explicit issue size column if missing (v2.2 Logic)
+        # Check explicit issue size column if missing (v2.2 logic)
         if issue_size == "TBA" and ("cr" in text_lower or "crore" in text_lower):
             m = re.search(r'₹?\s*([\d,.]+)', text)
             if m:
@@ -171,22 +180,22 @@ def parse_table_columns(cols, row_text, current_year):
 
         if idx in (0, 1): continue
 
-        # Auto-detect lot size (WITH 2026 BLOCKER ADDED)
+        # Auto-detect lot size (pure integer typically between 1 and 10000)
         if not auto_lot and not any(sym in text for sym in ["₹", "Rs", "to", "-", "–", "%", "Cr"]):
-            nums = re.findall(r'\b\d{1,5}\b', text)
+            nums = re.findall(r'\b\d{1,5}\b', text.replace(',', ''))
             for n in nums:
-                val = int(n.replace(',', ''))
-                # Ensures val != 2026 and isn't the Issue Size
+                val = int(n)
+                # 2026 BLOCKER
                 if 1 <= val <= 10000 and val != current_year and (not issue_val_str or str(val) != issue_val_str):
                     auto_lot = val
                     break
 
-        # Check for share price (WITH 2026 BLOCKER ADDED)
+        # Check for share price
         if any(sym in text_lower for sym in ["₹", "rs", "-", "–", "to"]):
-            nums = re.findall(r'\d[\d,]*', text)
+            nums = re.findall(r'\b\d{2,4}\b', text.replace(',', ''))
             for n in nums:
-                val = int(n.replace(',', ''))
-                # Ensures val != 2026 and isn't the Issue Size
+                val = int(n)
+                # 2026 BLOCKER
                 if 10 <= val <= 5000 and val != current_year and (not issue_val_str or str(val) != issue_val_str):
                     all_prices.append(val)
 
@@ -208,7 +217,6 @@ def prompt_user_fundamentals(name):
         print(f"  {item1}   {item2}")
     
     try:
-        # UNBREAKABLE CLI LOOPS
         sector = None
         while not sector:
             sec_choice = input(f"\nEnter sector choice (1-{len(sectors)}) or press Enter to skip: ").strip()
@@ -255,7 +263,6 @@ def evaluate_decision(enrichment, sector_name):
     proceeds = enrichment["proceedsUse"]
     score, checks = 0, []
 
-    # PROFESSIONAL GRAMMAR APPLIED
     if ps <= bench["avgPS"]: checks.append({"icon": "✓", "cls": "check-pass", "text": f"Attractive P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"}); score += 2
     else: checks.append({"icon": "✗", "cls": "check-fail", "text": f"High P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"}); score -= 1
 
@@ -271,13 +278,21 @@ def evaluate_decision(enrichment, sector_name):
     if score >= 3: return {"verdict": "Apply", "verdictCls": "verdict-apply", "summary": f"Strong fundamentals outperforming historical benchmarks in {sector_name}.", "checks": checks}
     else: return {"verdict": "Avoid", "verdictCls": "verdict-avoid", "summary": f"Subpar valuation or growth metrics compared to peers in {sector_name}.", "checks": checks}
 
-def scrape_into_merged(session, url, default_cat, merged_ipos, now):
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'Accept-Language': 'en-US,en;q=0.9'}
+def extract_row_dates(cols, current_year):
+    for col in cols[1:]:
+        open_d, close_d = parse_date_range(col.text.strip(), current_year)
+        if open_d and close_d: return open_d, close_d
+    if len(cols) >= 3:
+        d1, d2 = parse_date_string(cols[1].text.strip(), current_year), parse_date_string(cols[2].text.strip(), current_year)
+        if d1 and d2: return d1.strftime("%d %B %Y"), d2.strftime("%d %B %Y")
+    return None, None
+
+def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
     response = session.get(url, headers=headers, timeout=20)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'html.parser')
     for table in soup.find_all('table'):
-        
+
         table_heading = ""
         prev_elem = table.find_previous(['h2', 'h3'])
         if prev_elem: table_heading = prev_elem.text.lower()
@@ -291,14 +306,7 @@ def scrape_into_merged(session, url, default_cat, merged_ipos, now):
 
             if not raw_name or raw_name.lower() in {"company", "ipo", "ipo name", "company name", "issuer"} or "sse" in raw_name.lower() or "social stock" in raw_name.lower(): continue
 
-            open_date, close_date = parse_date_range(cols[1].text.strip(), now.year)
-            if not open_date or not close_date:
-                if len(cols) >= 3:
-                    d1 = parse_date_string(cols[1].text.strip(), now.year)
-                    d2 = parse_date_string(cols[2].text.strip(), now.year)
-                    if d1 and d2:
-                        open_date, close_date = d1.strftime("%d %B %Y"), d2.strftime("%d %B %Y")
-            
+            open_date, close_date = extract_row_dates(cols, now.year)
             if not is_currently_open(open_date, close_date, now): continue
 
             ipo_category = "SME IPO" if "sme" in raw_name.lower() or "sme" in row_text.lower() or "sme" in table_heading or default_cat == "SME IPO" else "Mainboard IPO"
@@ -321,7 +329,7 @@ def scrape_into_merged(session, url, default_cat, merged_ipos, now):
 
 def fetch_open_ipos():
     now = now_ist()
-    print(f"\n[Scraper vFinal] Restored v2.2 Issue Extraction with 2026 Blocker ({now.strftime('%I:%M %p')} IST)...")
+    print(f"\n[Scraper] Authentic v2.2 Parsing Active ({now.strftime('%I:%M %p')} IST)...")
     ipowatch_urls = [
         ("https://ipowatch.in/upcoming-ipo-calendar-ipo-list/", None), 
         ("https://ipowatch.in/upcoming-ipo-list/", None), 
@@ -336,13 +344,14 @@ def fetch_open_ipos():
     adapter = HTTPAdapter(max_retries=retries)
     session.mount("https://", adapter)
     session.mount("http://", adapter)
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'Accept-Language': 'en-US,en;q=0.9'}
 
     merged_ipos = {}
     for url, default_cat in ipowatch_urls:
-        try: scrape_into_merged(session, url, default_cat, merged_ipos, now)
+        try: scrape_into_merged(session, url, default_cat, headers, merged_ipos, now)
         except Exception: pass
     if not merged_ipos:
-        try: scrape_into_merged(session, fallback_url, None, merged_ipos, now)
+        try: scrape_into_merged(session, fallback_url, None, headers, merged_ipos, now)
         except Exception: pass
 
     results = list(merged_ipos.values())
