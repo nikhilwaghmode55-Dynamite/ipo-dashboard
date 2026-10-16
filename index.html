@@ -38,6 +38,16 @@
     }
     h1 { margin: 0 0 4px 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
     p { margin: 0; color: var(--muted); font-size: 14px; }
+    .disclaimer-alert {
+      background: #f1f5f9;
+      border-left: 4px solid var(--muted);
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #334155;
+      margin-bottom: 24px;
+      border-radius: 0 6px 6px 0;
+      font-weight: 500;
+    }
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -106,13 +116,6 @@
       border-radius: 6px;
       margin-top: 10px;
     }
-    .rhp-note {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 12px;
-      text-align: right;
-      letter-spacing: 0.2px;
-    }
   </style>
 </head>
 <body>
@@ -122,13 +125,16 @@
       <p>Pre-Application Analytical Framework &amp; Open Listings Tracker (<span id="last-updated">Loading...</span>)</p>
     </header>
 
+    <div class="disclaimer-alert">
+      <strong>Disclaimer:</strong> This framework conducts strict fundamental analysis based on Finalized Red Herring Prospectus (RHP) data and historical sector averages. It does not account for Grey Market Premium (GMP) or market sentiment. This is an analytical tool, not financial or investment advice.
+    </div>
+
     <div id="cards-container">
       <p style="text-align:center; color: var(--muted);">Loading Open IPOs...</p>
     </div>
   </div>
 
   <script>
-    // Standardize financial acronym casing for clean presentation
     function formatText(text) {
       if (!text) return '';
       return text
@@ -137,8 +143,7 @@
         .replace(/\bcagr\b/gi, 'CAGR')
         .replace(/\bp\/s\b/gi, 'P/S')
         .replace(/\bipo\b/gi, 'IPO')
-        .replace(/\bsme\b/gi, 'SME')
-        .replace(/\br&d\b/gi, 'R&D');
+        .replace(/\bsme\b/gi, 'SME');
     }
 
     async function loadData() {
@@ -205,7 +210,6 @@
               ${ipo.summary ? `<div class="summary-text">${formatText(ipo.summary)}</div>` : ''}
               <div style="margin-top: 8px;">${checksHtml}</div>
               ${ipo.historicalGain ? `<div class="historical-box">📊 <strong>Benchmark Status:</strong> ${formatText(ipo.historicalGain)}</div>` : ''}
-              <div class="rhp-note">Metrics Evaluated Based on Finalized Red Herring Prospectus (RHP) Fundamentals &amp; Exchange Data.</div>
             </div>
           `;
           container.appendChild(card);
@@ -215,7 +219,6 @@
         document.getElementById('cards-container').innerHTML = `<div class="card" style="color: red;">Error Loading data.json. Ensure Workflow Has Generated Output Files.</div>`;
       }
     }
-
     loadData();
   </script>
 </body>

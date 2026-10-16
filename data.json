@@ -12,7 +12,7 @@
       "lotSize": 21,
       "minAmount": 14700,
       "issueSize": "TBA",
-      "historicalGain": "18.2% avg listing gain in last 1 yr (3/4 positive)",
+      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
       "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
       "verdict": "Avoid",
       "verdictCls": "verdict-avoid",
@@ -20,12 +20,12 @@
         {
           "icon": "\u2717",
           "cls": "check-fail",
-          "text": "High P/S valuation (11.06x vs sector avg 2.8x)"
+          "text": "High P/S valuation (11.06x vs Sector Average 2.8x)"
         },
         {
           "icon": "\u2713",
           "cls": "check-pass",
-          "text": "Robust growth (55.3% vs sector avg 14.0%)"
+          "text": "Robust growth (55.3% vs Sector Average 14.0%)"
         },
         {
           "icon": "\u2717",
@@ -39,7 +39,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 09:41 PM"
+      "lastFetched": "16 Oct 2026, 09:55 PM"
     },
     {
       "slug": "zetwerk-manufacturing-business",
@@ -53,7 +53,7 @@
       "lotSize": 99,
       "minAmount": 14949,
       "issueSize": "TBA",
-      "historicalGain": "18.2% avg listing gain in last 1 yr (3/4 positive)",
+      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
       "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
       "verdict": "Avoid",
       "verdictCls": "verdict-avoid",
@@ -61,12 +61,12 @@
         {
           "icon": "\u2713",
           "cls": "check-pass",
-          "text": "Attractive P/S valuation (1.61x vs sector avg 2.8x)"
+          "text": "Attractive P/S valuation (1.61x vs Sector Average 2.8x)"
         },
         {
           "icon": "\u2717",
           "cls": "check-fail",
-          "text": "Slow revenue growth (13.45% vs sector avg 14.0%)"
+          "text": "Slow revenue growth (13.45% vs Sector Average 14.0%)"
         },
         {
           "icon": "\u2717",
@@ -80,7 +80,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 09:41 PM"
+      "lastFetched": "16 Oct 2026, 09:55 PM"
     },
     {
       "slug": "bonfiglioli-transmissions",
@@ -94,7 +94,7 @@
       "lotSize": 25,
       "minAmount": 14650,
       "issueSize": "TBA",
-      "historicalGain": "18.2% avg listing gain in last 1 yr (3/4 positive)",
+      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
       "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
       "verdict": "Avoid",
       "verdictCls": "verdict-avoid",
@@ -102,12 +102,12 @@
         {
           "icon": "\u2717",
           "cls": "check-fail",
-          "text": "High P/S valuation (5.47x vs sector avg 2.8x)"
+          "text": "High P/S valuation (5.47x vs Sector Average 2.8x)"
         },
         {
           "icon": "\u2717",
           "cls": "check-fail",
-          "text": "Slow revenue growth (9.22% vs sector avg 14.0%)"
+          "text": "Slow revenue growth (9.22% vs Sector Average 14.0%)"
         },
         {
           "icon": "\u2713",
@@ -121,7 +121,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 09:41 PM"
+      "lastFetched": "16 Oct 2026, 09:55 PM"
     },
     {
       "slug": "sahajanand-medical-technologies",
@@ -135,7 +135,7 @@
       "lotSize": 43,
       "minAmount": 14792,
       "issueSize": "TBA",
-      "historicalGain": "21.0% avg listing gain in last 1 yr (3/4 positive)",
+      "historicalGain": "21.0% avg listing gain in last 1 yr (15/18 positive)",
       "summary": "Subpar valuation or growth metrics compared to peers in Health Care.",
       "verdict": "Avoid",
       "verdictCls": "verdict-avoid",
@@ -143,12 +143,12 @@
         {
           "icon": "\u2713",
           "cls": "check-pass",
-          "text": "Attractive P/S valuation (2.89x vs sector avg 4.5x)"
+          "text": "Attractive P/S valuation (2.89x vs Sector Average 4.5x)"
         },
         {
           "icon": "\u2717",
           "cls": "check-fail",
-          "text": "Slow revenue growth (15.87% vs sector avg 20.0%)"
+          "text": "Slow revenue growth (15.87% vs Sector Average 20.0%)"
         },
         {
           "icon": "\u2717",
@@ -162,7 +162,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 09:41 PM"
+      "lastFetched": "16 Oct 2026, 09:55 PM"
     },
     {
       "slug": "shellz-india",
@@ -176,7 +176,7 @@
       "lotSize": 800,
       "minAmount": 286400,
       "issueSize": "TBA",
-      "historicalGain": "12.0% avg listing gain in last 1 yr (3/4 positive)",
+      "historicalGain": "12.0% avg listing gain in last 1 yr (11/15 positive)",
       "summary": "Subpar valuation or growth metrics compared to peers in Consumer Staples.",
       "verdict": "Avoid",
       "verdictCls": "verdict-avoid",
@@ -184,12 +184,12 @@
         {
           "icon": "\u2713",
           "cls": "check-pass",
-          "text": "Attractive P/S valuation (1.12x vs sector avg 3.5x)"
+          "text": "Attractive P/S valuation (1.12x vs Sector Average 3.5x)"
         },
         {
           "icon": "\u2717",
           "cls": "check-fail",
-          "text": "Slow revenue growth (8.9% vs sector avg 12.0%)"
+          "text": "Slow revenue growth (8.9% vs Sector Average 12.0%)"
         },
         {
           "icon": "\u2713",
@@ -203,8 +203,8 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 09:41 PM"
+      "lastFetched": "16 Oct 2026, 09:55 PM"
     }
   ],
-  "lastUpdated": "16 Oct 2026, 09:41 PM"
+  "lastUpdated": "16 Oct 2026, 09:55 PM"
 }
