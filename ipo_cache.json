@@ -33,5 +33,12 @@
     "cagr3Yr": 35.43,
     "proceedsUse": "Debt Repayment / OFS",
     "promoterPct": 81.82
+  },
+  "zetwerk-manufacturing-business": {
+    "sector": "Industrials",
+    "psRatio": 1.61,
+    "cagr3Yr": 13.45,
+    "proceedsUse": "Debt Repayment / OFS",
+    "promoterPct": 11.36
   }
 }
