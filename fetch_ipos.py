@@ -1,6 +1,7 @@
 """
-fetch_ipos.py — Live IPO Intelligence Dashboard Engine
-Restored v2.2 Authentic Issue Size Extraction, 2026 Price Blocker, and 5 PM Expiry.
+fetch_ipos.py — Clean Baseline Engine (v2.2 Base)
+Reliable scraping pipeline for active open IPOs with current-year guards,
+interactive fundamental scoring CLI, and clean JSON exports.
 """
 
 import requests
@@ -16,13 +17,11 @@ from bs4 import BeautifulSoup
 CACHE_FILE = "ipo_cache.json"
 DATA_FILE  = "data.json"
 
-# Force Indian Standard Time (IST = UTC + 5:30)
 IST = timezone(timedelta(hours=5, minutes=30))
 
 def now_ist():
     return datetime.now(IST)
 
-# Accurate 12-Month Indian Market Win Rates
 SECTOR_BENCHMARKS = {
     "Information Technology": {"avgPS": 5.2, "avgCagr": 22.0, "avgListingGain": 24.5, "winRate": "28/32 positive"},
     "Financials": {"avgPS": 3.8, "avgCagr": 18.0, "avgListingGain": 29.4, "winRate": "42/50 positive"},
@@ -45,25 +44,36 @@ def clean_company_name(raw_name):
 
 def canonical_key(name):
     cleaned = clean_company_name(name).lower()
-    noise = {"services", "service", "business", "businesses", "india", "technologies", "technology", "solutions", "system", "systems", "transmissions", "manufacturing", "engineering", "imaging", "medical"}
+    noise = {
+        "services", "service", "business", "businesses", "india",
+        "technologies", "technology", "solutions", "system", "systems",
+        "transmissions", "manufacturing", "engineering", "imaging", "medical"
+    }
     words = [w for w in re.findall(r'[a-z0-9]+', cleaned) if w not in noise]
-    if not words: words = re.findall(r'[a-z0-9]+', cleaned)
+    if not words:
+        words = re.findall(r'[a-z0-9]+', cleaned)
     return "-".join(words[:2]) if len(words) >= 2 else (words[0] if words else cleaned)
 
 def find_in_dict(target_slug, target_name, data_dict):
-    if not data_dict: return None
-    if target_slug in data_dict: return data_dict[target_slug]
+    if not data_dict:
+        return None
+    if target_slug in data_dict:
+        return data_dict[target_slug]
     target_canon = canonical_key(target_name)
     for k, v in data_dict.items():
         k_canon = canonical_key(k.replace("-", " "))
-        if k_canon == target_canon or k.startswith(target_slug) or target_slug.startswith(k): return v
+        if k_canon == target_canon or k.startswith(target_slug) or target_slug.startswith(k):
+            return v
     return None
 
 def load_cache():
     if os.path.exists(CACHE_FILE):
         with open(CACHE_FILE, "r", encoding="utf-8") as f:
-            try: return json.loads(f.read().strip()) or {}
-            except: return {}
+            try:
+                content = f.read().strip()
+                return json.loads(content) if content else {}
+            except json.JSONDecodeError:
+                return {}
     return {}
 
 def save_cache(cache):
@@ -74,81 +84,118 @@ def load_existing_data():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             try:
-                data = json.loads(f.read().strip()) or {}
-                return {item.get("slug") or item.get("name", "").lower().replace(" ", "-"): item for item in data.get("upcoming", [])}
-            except: return {}
+                content = f.read().strip()
+                if not content:
+                    return {}
+                data = json.loads(content)
+                result = {}
+                for item in data.get("upcoming", []):
+                    slug = item.get("slug") or item.get("name", "").lower().replace(" ", "-")
+                    if slug:
+                        result[slug] = item
+                return result
+            except json.JSONDecodeError:
+                return {}
     return {}
 
 def save_data(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
+    print(f"  [Success] Cleaned dashboard data ({len(data.get('upcoming', []))} open IPOs) written to data.json")
 
-def parse_date_string(date_str, current_year):
-    if not date_str or "TBA" in str(date_str).upper(): return None
+def parse_date_string(date_str):
+    if not date_str or "TBA" in str(date_str).upper():
+        return None
     date_str = str(date_str).strip()
-    if not re.search(r'\b20\d{2}\b', date_str): date_str = f"{date_str} {current_year}"
+    current_year = now_ist().year
+    if not re.search(r'\b20\d{2}\b', date_str):
+        date_str = f"{date_str} {current_year}"
     for fmt in ("%d %B %Y", "%d %b %Y", "%d-%b-%Y", "%d/%m/%Y", "%B %d, %Y"):
         try:
             dt = datetime.strptime(date_str, fmt)
-            # STRICT CURRENT YEAR ENFORCEMENT
-            if dt.year != current_year: return None
+            if dt.year != current_year:
+                return None
             return dt
-        except ValueError: continue
+        except ValueError:
+            continue
     return None
 
 def extract_month_num(text):
-    month_map = {"january": 1, "february": 2, "march": 3, "april": 4, "may": 5, "june": 6, "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12, "jan": 1, "feb": 2, "mar": 3, "apr": 4, "jun": 6, "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12}
+    month_map = {
+        "january": 1, "february": 2, "march": 3, "april": 4, "may": 5, "june": 6,
+        "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12,
+        "jan": 1, "feb": 2, "mar": 3, "apr": 4, "jun": 6,
+        "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12
+    }
     text_lower = text.lower()
     for name, num in sorted(month_map.items(), key=lambda x: -len(x[0])):
-        if re.search(rf'\b{name}\b', text_lower): return num
+        if re.search(rf'\b{name}\b', text_lower):
+            return num
     return None
 
-def parse_date_range(dates_str, current_year):
-    if not dates_str or "tba" in dates_str.lower() or "to be announced" in dates_str.lower(): return None, None
+def parse_date_range(dates_str):
+    if not dates_str or "tba" in dates_str.lower() or "to be announced" in dates_str.lower():
+        return None, None
+
     found_years = re.findall(r'\b(20\d{2})\b', dates_str)
-    if found_years and int(found_years[0]) != current_year: return None, None
-    
+    if found_years and int(found_years[0]) != now_ist().year:
+        return None, None
+
     cleaned = re.sub(r'\b20\d{2}-\d{2}-\d{2}\b', '', dates_str)
     cleaned = re.sub(r'(\d+)(?:st|nd|rd|th)\b', r'\1', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\s*(?:to|–|—|-)\s*', ' - ', cleaned, flags=re.IGNORECASE).strip()
-    if " - " not in cleaned: return None, None
-    
+
+    if " - " not in cleaned:
+        return None, None
+
     parts = cleaned.split(" - ")
     open_part, close_part = parts[0].strip(), parts[-1].strip()
+
     end_month = extract_month_num(close_part) or extract_month_num(open_part)
-    if not end_month: return None, None
+    if not end_month:
+        return None, None
     start_month = extract_month_num(open_part) or end_month
-    
+
     open_no_yr = re.sub(r'\b20\d{2}\b', '', open_part)
     close_no_yr = re.sub(r'\b20\d{2}\b', '', close_part)
+
     open_nums = [int(x) for x in re.findall(r'\b\d{1,2}\b', open_no_yr) if 1 <= int(x) <= 31]
     close_nums = [int(x) for x in re.findall(r'\b\d{1,2}\b', close_no_yr) if 1 <= int(x) <= 31]
-    if not open_nums or not close_nums: return None, None
-    
+
+    if not open_nums or not close_nums:
+        return None, None
+
     start_day, end_day = open_nums[0], close_nums[0]
-    if not extract_month_num(open_part) and start_day > end_day: start_month = 12 if end_month == 1 else end_month - 1
-    
-    rev_month_map = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June", 7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"}
+
+    if not extract_month_num(open_part) and start_day > end_day:
+        start_month = 12 if end_month == 1 else end_month - 1
+
+    rev_month_map = {
+        1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June",
+        7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"
+    }
+    current_year = now_ist().year
     return f"{start_day} {rev_month_map[start_month]} {current_year}", f"{end_day} {rev_month_map[end_month]} {current_year}"
 
-def is_currently_open(open_str, close_str, now):
+def is_currently_open(open_str, close_str):
+    now = now_ist()
     today = now.date()
-    open_dt = parse_date_string(open_str, now.year)
-    close_dt = parse_date_string(close_str, now.year)
-    if not open_dt or not close_dt: return False
-    
-    # 5:00 PM MARKET CLOSE EXPIRY: Instantly removes closed IPOs
-    if today == close_dt.date() and now.hour >= 17: return False 
+    open_dt = parse_date_string(open_str)
+    close_dt = parse_date_string(close_str)
+    if not open_dt or not close_dt:
+        return False
+    # 5:00 PM close cutoff on the final day
+    if today == close_dt.date() and now.hour >= 17:
+        return False
     return open_dt.date() <= today <= close_dt.date()
 
-def parse_table_columns(cols, row_text, current_year):
+def parse_table_columns(cols, row_text):
     price = None
     issue_size = "TBA"
     auto_lot = None
+    current_year = now_ist().year
 
-    # =========================================================
-    # EXACT v2.2 ISSUE SIZE LOGIC (AUTHENTIC EXTRACTION)
-    # =========================================================
+    # 1. Row-level regex for Issue Size (matches numbers explicitly marked with Cr/Crore)
     cr_match = re.search(r'₹?\s*([\d,.]+)\s*(?:Cr|crore|Crores)', row_text, re.IGNORECASE)
     issue_val_str = None
     if cr_match:
@@ -161,7 +208,7 @@ def parse_table_columns(cols, row_text, current_year):
         text = col.text.strip()
         text_lower = text.lower()
 
-        # Check explicit issue size column if missing (v2.2 Logic)
+        # Cell-level fallback for Issue Size
         if issue_size == "TBA" and ("cr" in text_lower or "crore" in text_lower):
             m = re.search(r'₹?\s*([\d,.]+)', text)
             if m:
@@ -169,24 +216,23 @@ def parse_table_columns(cols, row_text, current_year):
                 issue_size = f"₹{clean_cr} Cr"
                 issue_val_str = clean_cr.replace(',', '').split('.')[0]
 
-        if idx in (0, 1): continue
+        if idx in (0, 1):
+            continue
 
-        # Auto-detect lot size (WITH 2026 BLOCKER ADDED)
-        if not auto_lot and not any(sym in text for sym in ["₹", "Rs", "to", "-", "–", "%", "Cr"]):
-            nums = re.findall(r'\b\d{1,5}\b', text)
+        # Lot size detection: integer between 1 and 10000, excluding the calendar year
+        if not auto_lot and not any(sym in text for sym in ["₹", "Rs", "to", "-", "–", "%", "Cr", "."]):
+            nums = re.findall(r'\b\d{1,5}\b', text.replace(',', ''))
             for n in nums:
-                val = int(n.replace(',', ''))
-                # Ensures val != 2026 and isn't the Issue Size
+                val = int(n)
                 if 1 <= val <= 10000 and val != current_year and (not issue_val_str or str(val) != issue_val_str):
                     auto_lot = val
                     break
 
-        # Check for share price (WITH 2026 BLOCKER ADDED)
+        # Share price detection: excludes the calendar year to prevent corrupting prices
         if any(sym in text_lower for sym in ["₹", "rs", "-", "–", "to"]):
-            nums = re.findall(r'\d[\d,]*', text)
+            nums = re.findall(r'\b\d{2,4}\b', text.replace(',', ''))
             for n in nums:
-                val = int(n.replace(',', ''))
-                # Ensures val != 2026 and isn't the Issue Size
+                val = int(n)
                 if 10 <= val <= 5000 and val != current_year and (not issue_val_str or str(val) != issue_val_str):
                     all_prices.append(val)
 
@@ -199,7 +245,9 @@ def is_github_actions():
     return os.environ.get("GITHUB_ACTIONS") == "true" or "--headless" in sys.argv
 
 def prompt_user_fundamentals(name):
-    if is_github_actions(): return None
+    if is_github_actions():
+        print(f"  [Headless Cloud] Auto-publishing {name} with 'Data will be updated soon'")
+        return None
 
     print(f"\n" + "="*55)
     print(f" [CLI Input Needed] Configure details for: {name}")
@@ -237,9 +285,9 @@ def prompt_user_fundamentals(name):
             except ValueError: print("  [Error] Please enter a valid decimal number.")
         
         print("\nSelect Use of Proceeds:")
-        print("  1. Capex / Business Expansion / Growth / R&D")
-        print("  2. Working Capital")
-        print("  3. Debt Repayment / OFS (Offer for Sale)")
+        print("  1. Capex / Business Expansion / Growth / R&D (Positive)")
+        print("  2. Working Capital (Neutral/Positive)")
+        print("  3. Debt Repayment / OFS (Offer for Sale) (Negative)")
         proceeds = None
         while not proceeds:
             proc_choice = input("Enter option (1-3): ").strip()
@@ -315,28 +363,25 @@ def evaluate_decision(enrichment, sector_name):
     else:
         return {"verdict": "Avoid", "verdictCls": "verdict-avoid", "summary": f"Subpar valuation or growth metrics compared to peers in {sector_name}.", "checks": checks}
 
-def extract_row_dates(cols, current_year):
+def extract_row_dates(cols):
     for col in cols[1:]:
-        open_d, close_d = parse_date_range(col.text.strip(), current_year)
+        open_d, close_d = parse_date_range(col.text.strip())
         if open_d and close_d:
             return open_d, close_d
     if len(cols) >= 3:
-        d1 = parse_date_string(cols[1].text.strip(), current_year)
-        d2 = parse_date_string(cols[2].text.strip(), current_year)
+        d1 = parse_date_string(cols[1].text.strip())
+        d2 = parse_date_string(cols[2].text.strip())
         if d1 and d2:
             return d1.strftime("%d %B %Y"), d2.strftime("%d %B %Y")
     return None, None
 
-def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
+def scrape_into_merged(session, url, default_cat, headers, merged_ipos):
     response = session.get(url, headers=headers, timeout=20)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'html.parser')
     tables = soup.find_all('table')
 
-    current_year = now.year
-
     for table in tables:
-        
         table_heading = ""
         prev_elem = table.find_previous(['h2', 'h3'])
         if prev_elem:
@@ -354,8 +399,8 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
             if "sse" in raw_name.lower() or "social stock" in raw_name.lower():
                 continue
 
-            open_date, close_date = extract_row_dates(cols, current_year)
-            if not is_currently_open(open_date, close_date, now):
+            open_date, close_date = extract_row_dates(cols)
+            if not is_currently_open(open_date, close_date):
                 continue
 
             if "sme" in raw_name.lower() or "sme" in row_text.lower() or "sme" in table_heading or default_cat == "SME IPO":
@@ -367,7 +412,7 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
             if len(name) < 3:
                 continue
 
-            price, issue_size, auto_lot = parse_table_columns(cols, row_text, current_year)
+            price, issue_size, auto_lot = parse_table_columns(cols, row_text)
             canon = canonical_key(name)
             slug = name.lower().replace(" ", "-")
 
@@ -399,14 +444,13 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
                     existing["category"] = "SME IPO"
 
 def fetch_open_ipos():
-    now = now_ist()
-    print(f"\n[Scraper v2.2 Restored] Fetching OPEN IPOs with strict current-year enforcement ({now.strftime('%I:%M %p')} IST)...")
+    print(f"\n[Scraper v2.2 Base] Scanning data sources ({now_ist().strftime('%I:%M %p')} IST)...")
     ipowatch_urls = [
         ("https://ipowatch.in/upcoming-ipo-calendar-ipo-list/", None),
         ("https://ipowatch.in/upcoming-ipo-list/", None),
         ("https://ipowatch.in/upcoming-sme-ipo-list/", "SME IPO"),
         ("https://ipowatch.in/ipo-list/", None),
-        ("https://ipowatch.in/sme-ipo-list/", "SME IPO")
+        ("https://ipowatch.in/sme-ipo-list/", "SME IPO"),
     ]
     fallback_url = "https://ipo.indiratrade.com/Home"
 
@@ -424,15 +468,16 @@ def fetch_open_ipos():
     merged_ipos = {}
     for url, default_cat in ipowatch_urls:
         try:
-            scrape_into_merged(session, url, default_cat, headers, merged_ipos, now)
+            scrape_into_merged(session, url, default_cat, headers, merged_ipos)
         except Exception as err:
             pass
 
     if not merged_ipos:
+        print("  [Notice] Primary sources returned empty/blocked. Scraping fallback source...")
         try:
-            scrape_into_merged(session, fallback_url, None, headers, merged_ipos, now)
+            scrape_into_merged(session, fallback_url, None, headers, merged_ipos)
         except Exception as err:
-            pass
+            print(f"  [Error] Fallback source failed: {err}")
 
     results = list(merged_ipos.values())
     print(f"  [Scraper] Found {len(results)} active OPEN IPO(s):")
@@ -441,7 +486,6 @@ def fetch_open_ipos():
     return results
 
 def main():
-    now = now_ist()
     print("\n" + "="*50)
     print("  IPO Intelligence Dashboard — Interactive CLI Engine")
     print("="*50)
@@ -450,11 +494,11 @@ def main():
     existing_data = load_existing_data()
     open_ipos = fetch_open_ipos()
 
-    # Aggressive State Retention
+    # Retain active entries across cache
     if existing_data:
         scraped_canons = {canonical_key(ipo["name"]) for ipo in open_ipos}
         for slug, item in existing_data.items():
-            if is_currently_open(item.get("openDate"), item.get("closeDate"), now):
+            if is_currently_open(item.get("openDate"), item.get("closeDate")):
                 canon = canonical_key(item.get("name", slug))
                 if canon not in scraped_canons:
                     cat = "SME IPO" if "SME" in item.get("sector", "") else "Mainboard IPO"
@@ -471,7 +515,7 @@ def main():
 
     if not open_ipos:
         print("\nNo OPEN IPOs found for today.")
-        save_data({"upcoming": [], "lastUpdated": now.strftime("%d %b %Y, %I:%M %p")})
+        save_data({"upcoming": [], "lastUpdated": now_ist().strftime("%d %b %Y, %I:%M %p")})
         return
 
     upcoming = []
@@ -530,12 +574,12 @@ def main():
             "verdictCls": decision["verdictCls"],
             "checks": decision["checks"],
             "score": 1,
-            "lastFetched": now.strftime("%d %b %Y, %I:%M %p"),
+            "lastFetched": now_ist().strftime("%d %b %Y, %I:%M %p"),
         })
 
     data = {
         "upcoming": upcoming,
-        "lastUpdated": now.strftime("%d %b %Y, %I:%M %p")
+        "lastUpdated": now_ist().strftime("%d %b %Y, %I:%M %p")
     }
     save_data(data)
     print(f"\nDone! Processed exactly {len(upcoming)} active OPEN IPO(s).\n")
