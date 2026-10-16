@@ -6,6 +6,13 @@
     "proceedsUse": "Debt Repayment / OFS",
     "promoterPct": 15.72
   },
+  "zetwerk-manufacturing-business": {
+    "sector": "Industrials",
+    "psRatio": 1.61,
+    "cagr3Yr": 13.45,
+    "proceedsUse": "Debt Repayment / OFS",
+    "promoterPct": 11.36
+  },
   "bonfiglioli-transmissions": {
     "sector": "Industrials",
     "psRatio": 5.47,
@@ -24,21 +31,7 @@
     "sector": "Consumer Staples",
     "psRatio": 1.12,
     "cagr3Yr": 8.9,
-    "proceedsUse": "Debt Repayment / OFS",
+    "proceedsUse": "Working Capital",
     "promoterPct": 63.64
-  },
-  "fusion-cx": {
-    "sector": "Information Technology",
-    "psRatio": 2.29,
-    "cagr3Yr": 35.43,
-    "proceedsUse": "Debt Repayment / OFS",
-    "promoterPct": 81.82
-  },
-  "zetwerk-manufacturing-business": {
-    "sector": "Industrials",
-    "psRatio": 1.61,
-    "cagr3Yr": 13.45,
-    "proceedsUse": "Debt Repayment / OFS",
-    "promoterPct": 11.36
   }
 }

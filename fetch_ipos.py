@@ -1,6 +1,6 @@
 """
 fetch_ipos.py — Live IPO Intelligence Dashboard Engine
-Restored Afternoon Authentic Issue Size Regex, 2026 Price Blocker, and 5 PM Expiry.
+Scoring Header Mapper (Permanent Authentic Issue Size Fix), 2026 Blocker, and 5 PM Expiry.
 """
 
 import requests
@@ -61,10 +61,8 @@ def find_in_dict(target_slug, target_name, data_dict):
 def load_cache():
     if os.path.exists(CACHE_FILE):
         with open(CACHE_FILE, "r", encoding="utf-8") as f:
-            try:
-                content = f.read().strip()
-                return json.loads(content) if content else {}
-            except json.JSONDecodeError: return {}
+            try: return json.loads(f.read().strip()) or {}
+            except: return {}
     return {}
 
 def save_cache(cache):
@@ -75,15 +73,9 @@ def load_existing_data():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             try:
-                content = f.read().strip()
-                if not content: return {}
-                data = json.loads(content)
-                result = {}
-                for item in data.get("upcoming", []):
-                    slug = item.get("slug") or item.get("name", "").lower().replace(" ", "-")
-                    if slug: result[slug] = item
-                return result
-            except json.JSONDecodeError: return {}
+                data = json.loads(f.read().strip()) or {}
+                return {item.get("slug") or item.get("name", "").lower().replace(" ", "-"): item for item in data.get("upcoming", [])}
+            except: return {}
     return {}
 
 def save_data(data):
@@ -104,9 +96,8 @@ def parse_date_string(date_str, current_year):
 
 def extract_month_num(text):
     month_map = {"january": 1, "february": 2, "march": 3, "april": 4, "may": 5, "june": 6, "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12, "jan": 1, "feb": 2, "mar": 3, "apr": 4, "jun": 6, "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12}
-    text_lower = text.lower()
     for name, num in sorted(month_map.items(), key=lambda x: -len(x[0])):
-        if re.search(rf'\b{name}\b', text_lower): return num
+        if re.search(rf'\b{name}\b', text.lower()): return num
     return None
 
 def parse_date_range(dates_str, current_year):
@@ -142,51 +133,99 @@ def is_currently_open(open_str, close_str, now):
     if today == close_dt.date() and now.hour >= 17: return False 
     return open_dt.date() <= today <= close_dt.date()
 
-def parse_table_columns(cols, row_text, current_year):
+def get_table_headers(table):
+    """Scoring Header Mapper: Finds the true header row regardless of merged titles."""
+    best_score = 0
+    best_headers = []
+    
+    for tr in table.find_all('tr'):
+        cells = tr.find_all(['th', 'td'])
+        if len(cells) < 3: continue
+            
+        texts = [c.text.strip().lower() for c in cells]
+        joined_texts = " ".join(texts)
+        
+        # Calculate how "header-like" this row is
+        score = sum(1 for kw in ["company", "ipo", "open", "close", "price", "size", "lot", "amount", "cr", "band"] if kw in joined_texts)
+                
+        if score > best_score:
+            best_score = score
+            best_headers = texts
+            
+    return best_headers
+
+def extract_authentic_metrics(cols, headers, current_year):
     price = None
     issue_size = "TBA"
     auto_lot = None
 
-    # 1. AFTERNOON LOGIC FOR ISSUE SIZE (Pure and authentic)
-    # Searches the raw HTML row for the exact number next to "Cr" or "Crore"
-    cr_match = re.search(r'₹?\s*([\d,.]+)\s*(?:Cr|crore|Crores)', row_text, re.IGNORECASE)
-    issue_val_str = None
-    if cr_match:
-        clean_cr = cr_match.group(1).rstrip('.,')
-        issue_size = f"₹{clean_cr} Cr"
-        issue_val_str = clean_cr.replace(',', '').split('.')[0]
+    size_idx, price_idx, lot_idx = -1, -1, -1
 
-    all_prices = []
-    for idx, col in enumerate(cols):
-        if idx in (0, 1): continue
-        text = col.text.strip()
-        text_lower = text.lower()
+    for i, h in enumerate(headers):
+        if "size" in h or "amount" in h or "cr" in h:
+            if "lot" not in h and "price" not in h and "share" not in h:
+                size_idx = i
+        elif "price" in h or "band" in h:
+            price_idx = i
+        elif "lot" in h or "share" in h or "qty" in h:
+            lot_idx = i
 
-        # Prevent cells stating "Issue Size" from corrupting price/lot
-        if any(kw in text_lower for kw in ["cr", "crore", "issue size", "amount"]):
-            continue
+    # 1. Authentic Issue Size Extraction
+    if size_idx != -1 and size_idx < len(cols):
+        text = cols[size_idx].text.strip()
+        m = re.search(r'([\d,]+\.?\d*)', text)
+        if m:
+            val = m.group(1).replace(',', '').rstrip('.')
+            if val not in ("0", "") and val != str(current_year):
+                issue_size = f"₹{val} Cr"
 
-        # 2. AUTHENTIC PRICE (With Strict 2026 Blocker)
-        if any(sym in text_lower for sym in ["₹", "rs", "-", "–", "to"]):
-            nums = re.findall(r'\d[\d,]*', text)
-            for n in nums:
-                val = int(n.replace(',', ''))
-                if 10 <= val <= 5000 and val != current_year:
-                    if not issue_val_str or str(val) != issue_val_str:
-                        all_prices.append(val)
+    # 2. Authentic Price Extraction (Blocks current year)
+    if price_idx != -1 and price_idx < len(cols):
+        text = cols[price_idx].text.strip()
+        nums = re.findall(r'\b(\d{2,4})\b', text.replace(',', ''))
+        valid_prices = [int(n) for n in nums if 10 <= int(n) <= 5000 and int(n) != current_year]
+        if valid_prices:
+            price = max(valid_prices)
 
-        # 3. SAFE LOT SIZE LOGIC (With Strict 2026 Blocker)
-        if not auto_lot and not any(sym in text for sym in ["₹", "Rs", "to", "-", "–", "%", "Cr"]):
-            nums = re.findall(r'\b\d{1,5}\b', text.replace(',', ''))
-            for n in nums:
-                val = int(n)
-                if 1 <= val <= 10000 and val != current_year:
-                    if not issue_val_str or str(val) != issue_val_str:
+    # 3. Authentic Lot Size Extraction (Blocks current year)
+    if lot_idx != -1 and lot_idx < len(cols):
+        text = cols[lot_idx].text.strip()
+        m = re.search(r'\b(\d{1,5})\b', text.replace(',', ''))
+        if m:
+            val = int(m.group(1))
+            if 1 <= val <= 10000 and val != current_year:
+                auto_lot = val
+
+    # Fallbacks in case columns were shifted or completely unmapped
+    if issue_size == "TBA":
+        row_text = " ".join([c.text.strip() for c in cols])
+        cr_match = re.search(r'₹?\s*([\d,.]+)\s*(?:Cr|crore|Crores)', row_text, re.IGNORECASE)
+        if cr_match:
+            val = cr_match.group(1).replace(',', '').rstrip('.')
+            if val not in ("0", "") and val != str(current_year):
+                issue_size = f"₹{val} Cr"
+
+    if not price:
+        valid_prices = []
+        for i, col in enumerate(cols):
+            if i == 0 or i == size_idx or i == lot_idx: continue
+            text = col.text.strip()
+            if any(sym in text.lower() for sym in ["₹", "rs", "-", "to", "–"]):
+                nums = re.findall(r'\b(\d{2,4})\b', text.replace(',', ''))
+                valid_prices.extend([int(n) for n in nums if 10 <= int(n) <= 5000 and int(n) != current_year])
+        if valid_prices: price = max(valid_prices)
+
+    if not auto_lot:
+        for i, col in enumerate(cols):
+            if i == 0 or i == size_idx or i == price_idx: continue
+            text = col.text.strip()
+            if "share" in text.lower() or "lot" in text.lower():
+                m = re.search(r'\b(\d{1,5})\b', text.replace(',', ''))
+                if m:
+                    val = int(m.group(1))
+                    if 1 <= val <= 10000 and val != current_year:
                         auto_lot = val
                         break
-
-    if all_prices:
-        price = max(all_prices)
 
     return price, issue_size, auto_lot
 
@@ -273,12 +312,15 @@ def extract_row_dates(cols, current_year):
         if d1 and d2: return d1.strftime("%d %B %Y"), d2.strftime("%d %B %Y")
     return None, None
 
-def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
+def scrape_into_merged(session, url, default_cat, merged_ipos, now):
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'Accept-Language': 'en-US,en;q=0.9'}
     response = session.get(url, headers=headers, timeout=20)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'html.parser')
     for table in soup.find_all('table'):
         
+        table_headers = get_table_headers(table)
+
         table_heading = ""
         prev_elem = table.find_previous(['h2', 'h3'])
         if prev_elem: table_heading = prev_elem.text.lower()
@@ -299,7 +341,7 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
             name = clean_company_name(raw_name)
             if len(name) < 3: continue
 
-            price, issue_size, auto_lot = parse_table_columns(cols, row_text, now.year)
+            price, issue_size, auto_lot = extract_authentic_metrics(cols, table_headers, now.year)
             canon, slug = canonical_key(name), name.lower().replace(" ", "-")
 
             if canon not in merged_ipos:
@@ -315,11 +357,13 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
 
 def fetch_open_ipos():
     now = now_ist()
-    print(f"\n[Scraper vFinal] Restored Authentic Afternoon Regex ({now.strftime('%I:%M %p')} IST)...")
+    print(f"\n[Scraper vAuthentic] Scoring Header Mapper Enabled ({now.strftime('%I:%M %p')} IST)...")
     ipowatch_urls = [
         ("https://ipowatch.in/upcoming-ipo-calendar-ipo-list/", None), 
         ("https://ipowatch.in/upcoming-ipo-list/", None), 
-        ("https://ipowatch.in/upcoming-sme-ipo-list/", "SME IPO")
+        ("https://ipowatch.in/upcoming-sme-ipo-list/", "SME IPO"), 
+        ("https://ipowatch.in/ipo-list/", None), 
+        ("https://ipowatch.in/sme-ipo-list/", "SME IPO")
     ]
     fallback_url = "https://ipo.indiratrade.com/Home"
 
@@ -328,14 +372,13 @@ def fetch_open_ipos():
     adapter = HTTPAdapter(max_retries=retries)
     session.mount("https://", adapter)
     session.mount("http://", adapter)
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', 'Accept-Language': 'en-US,en;q=0.9'}
 
     merged_ipos = {}
     for url, default_cat in ipowatch_urls:
-        try: scrape_into_merged(session, url, default_cat, headers, merged_ipos, now)
+        try: scrape_into_merged(session, url, default_cat, merged_ipos, now)
         except Exception: pass
     if not merged_ipos:
-        try: scrape_into_merged(session, fallback_url, None, headers, merged_ipos, now)
+        try: scrape_into_merged(session, fallback_url, None, merged_ipos, now)
         except Exception: pass
 
     results = list(merged_ipos.values())

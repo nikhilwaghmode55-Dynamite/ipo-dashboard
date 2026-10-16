@@ -39,7 +39,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 11:56 PM"
+      "lastFetched": "17 Oct 2026, 12:14 AM"
     },
     {
       "slug": "zetwerk-manufacturing-business",
@@ -80,7 +80,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 11:56 PM"
+      "lastFetched": "17 Oct 2026, 12:14 AM"
     },
     {
       "slug": "bonfiglioli-transmissions",
@@ -121,7 +121,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 11:56 PM"
+      "lastFetched": "17 Oct 2026, 12:14 AM"
     },
     {
       "slug": "sahajanand-medical-technologies",
@@ -162,7 +162,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 11:56 PM"
+      "lastFetched": "17 Oct 2026, 12:14 AM"
     },
     {
       "slug": "shellz-india",
@@ -177,9 +177,9 @@
       "minAmount": 286400,
       "issueSize": "TBA",
       "historicalGain": "12.0% avg listing gain in last 1 yr (11/15 positive)",
-      "summary": "Subpar valuation or growth metrics compared to peers in Consumer Staples.",
-      "verdict": "Avoid",
-      "verdictCls": "verdict-avoid",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Consumer Staples.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
           "icon": "\u2713",
@@ -197,14 +197,14 @@
           "text": "High promoter confidence (63.64% holding)"
         },
         {
-          "icon": "\u2717",
-          "cls": "check-fail",
-          "text": "Major chunk of issue goes to Debt Repayment / OFS"
+          "icon": "\u2713",
+          "cls": "check-pass",
+          "text": "Major chunk of issue allocated to Working Capital"
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 11:56 PM"
+      "lastFetched": "17 Oct 2026, 12:14 AM"
     }
   ],
-  "lastUpdated": "16 Oct 2026, 11:56 PM"
+  "lastUpdated": "17 Oct 2026, 12:14 AM"
 }
