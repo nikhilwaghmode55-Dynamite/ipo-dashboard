@@ -1,588 +1,460 @@
-"""
-fetch_ipos.py — Clean Baseline Engine (v2.2 Base)
-Reliable scraping pipeline for active open IPOs with current-year guards,
-interactive fundamental scoring CLI, and clean JSON exports.
-"""
 
-import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
 import json
-import os
 import re
 import sys
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, date
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+import requests
 from bs4 import BeautifulSoup
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
-CACHE_FILE = "ipo_cache.json"
-DATA_FILE  = "data.json"
+ROOT = Path(__file__).resolve().parent
+DATA_FILE = ROOT / "data.json"
+IST = ZoneInfo("Asia/Kolkata")
 
-IST = timezone(timedelta(hours=5, minutes=30))
+SOURCES = [
+    "https://ipowatch.in/upcoming-ipo-list/",
+    "https://ipowatch.in/upcoming-ipo-this-week/",
+    "https://ipowatch.in/mainboard-ipo-2026/",
+    "https://ipowatch.in/sme-ipo-2026/",
+    "https://www.ipoinfo.ai/ipo-calendar",
+]
 
-def now_ist():
-    return datetime.now(IST)
-
-SECTOR_BENCHMARKS = {
-    "Information Technology": {"avgPS": 5.2, "avgCagr": 22.0, "avgListingGain": 24.5, "winRate": "28/32 positive"},
-    "Financials": {"avgPS": 3.8, "avgCagr": 18.0, "avgListingGain": 29.4, "winRate": "42/50 positive"},
-    "Health Care": {"avgPS": 4.5, "avgCagr": 20.0, "avgListingGain": 21.0, "winRate": "15/18 positive"},
-    "Consumer Discretionary": {"avgPS": 4.0, "avgCagr": 16.0, "avgListingGain": 16.5, "winRate": "18/24 positive"},
-    "Consumer Staples": {"avgPS": 3.5, "avgCagr": 12.0, "avgListingGain": 12.0, "winRate": "11/15 positive"},
-    "Communication Services": {"avgPS": 4.2, "avgCagr": 15.0, "avgListingGain": 19.0, "winRate": "8/10 positive"},
-    "Industrials": {"avgPS": 2.8, "avgCagr": 14.0, "avgListingGain": 18.2, "winRate": "41/48 positive"},
-    "Energy": {"avgPS": 2.2, "avgCagr": 10.0, "avgListingGain": 14.0, "winRate": "9/11 positive"},
-    "Utilities": {"avgPS": 2.0, "avgCagr": 8.0, "avgListingGain": 10.5, "winRate": "6/8 positive"},
-    "Materials": {"avgPS": 2.5, "avgCagr": 13.0, "avgListingGain": 17.0, "winRate": "22/28 positive"},
-    "Real Estate": {"avgPS": 3.0, "avgCagr": 15.0, "avgListingGain": 22.0, "winRate": "14/16 positive"}
+HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/131.0.0.0 Safari/537.36"
+    ),
+    "Accept-Language": "en-IN,en;q=0.9",
 }
 
-def clean_company_name(raw_name):
-    name = raw_name.split("(")[0].strip()
-    name = re.sub(r'\b(?:Ltd\.?|Limited|Pvt\.?|Private|IPO)\b', '', name, flags=re.IGNORECASE).strip()
-    name = re.sub(r'\s+', ' ', name).strip(" -–.,")
-    return name
 
-def canonical_key(name):
-    cleaned = clean_company_name(name).lower()
-    noise = {
-        "services", "service", "business", "businesses", "india",
-        "technologies", "technology", "solutions", "system", "systems",
-        "transmissions", "manufacturing", "engineering", "imaging", "medical"
-    }
-    words = [w for w in re.findall(r'[a-z0-9]+', cleaned) if w not in noise]
-    if not words:
-        words = re.findall(r'[a-z0-9]+', cleaned)
-    return "-".join(words[:2]) if len(words) >= 2 else (words[0] if words else cleaned)
+def session():
+    s = requests.Session()
+    retry = Retry(
+        total=3,
+        backoff_factor=1,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["GET"],
+    )
+    s.mount("https://", HTTPAdapter(max_retries=retry))
+    return s
 
-def find_in_dict(target_slug, target_name, data_dict):
-    if not data_dict:
+
+def clean(value):
+    return re.sub(r"\s+", " ", str(value).replace("\xa0", " ")).strip()
+
+
+def key(value):
+    return re.sub(r"[^a-z0-9]", "", value.lower())
+
+
+def numeric_values(text):
+    return [
+        float(x.replace(",", ""))
+        for x in re.findall(r"\d[\d,]*(?:\.\d+)?", text)
+    ]
+
+
+def price_band(text):
+    nums = [n for n in numeric_values(text) if 1 <= n <= 100000]
+    return max(nums) if nums else None
+
+
+def issue_size(text, heading=""):
+    """Return issue size in crore only when its unit is identifiable."""
+    raw = clean(text)
+    if not raw or raw.lower() in {"tba", "na", "n/a", "-", "—"}:
         return None
-    if target_slug in data_dict:
-        return data_dict[target_slug]
-    target_canon = canonical_key(target_name)
-    for k, v in data_dict.items():
-        k_canon = canonical_key(k.replace("-", " "))
-        if k_canon == target_canon or k.startswith(target_slug) or target_slug.startswith(k):
-            return v
-    return None
 
-def load_cache():
-    if os.path.exists(CACHE_FILE):
-        with open(CACHE_FILE, "r", encoding="utf-8") as f:
-            try:
-                content = f.read().strip()
-                return json.loads(content) if content else {}
-            except json.JSONDecodeError:
-                return {}
-    return {}
-
-def save_cache(cache):
-    with open(CACHE_FILE, "w", encoding="utf-8") as f:
-        json.dump(cache, f, indent=2)
-
-def load_existing_data():
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            try:
-                content = f.read().strip()
-                if not content:
-                    return {}
-                data = json.loads(content)
-                result = {}
-                for item in data.get("upcoming", []):
-                    slug = item.get("slug") or item.get("name", "").lower().replace(" ", "-")
-                    if slug:
-                        result[slug] = item
-                return result
-            except json.JSONDecodeError:
-                return {}
-    return {}
-
-def save_data(data):
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2)
-    print(f"  [Success] Cleaned dashboard data ({len(data.get('upcoming', []))} open IPOs) written to data.json")
-
-def parse_date_string(date_str):
-    if not date_str or "TBA" in str(date_str).upper():
+    nums = numeric_values(raw)
+    if not nums:
         return None
-    date_str = str(date_str).strip()
-    current_year = now_ist().year
-    if not re.search(r'\b20\d{2}\b', date_str):
-        date_str = f"{date_str} {current_year}"
-    for fmt in ("%d %B %Y", "%d %b %Y", "%d-%b-%Y", "%d/%m/%Y", "%B %d, %Y"):
+
+    amount = nums[0]
+    unit_text = (heading + " " + raw).lower()
+
+    if "billion" in unit_text:
+        amount *= 100
+    elif "million" in unit_text:
+        amount /= 10
+    elif "lakh" in unit_text:
+        amount /= 1000
+    elif "crore" in unit_text or re.search(r"\bcr\b", unit_text):
+        pass
+    else:
+        # Never assume a bare number is already in crore.
+        return None
+
+    return f"₹{amount:,.2f}".rstrip("0").rstrip(".") + " Cr"
+
+
+def parse_one_date(text, year=None):
+    text = clean(text)
+    text = re.sub(r"(\d+)(st|nd|rd|th)\b", r"\1", text, flags=re.I)
+    year = year or datetime.now(IST).year
+
+    formats = [
+        "%d %B %Y", "%d %b %Y",
+        "%d-%m-%Y", "%d/%m/%Y",
+        "%d-%b-%Y", "%Y-%m-%d",
+        "%d %B", "%d %b",
+    ]
+
+    for fmt in formats:
+        candidate = text if "%Y" in fmt else f"{text} {year}"
         try:
-            dt = datetime.strptime(date_str, fmt)
-            if dt.year != current_year:
-                return None
-            return dt
+            result = datetime.strptime(candidate, fmt).date()
+            return result
         except ValueError:
             continue
+
     return None
 
-def extract_month_num(text):
-    month_map = {
-        "january": 1, "february": 2, "march": 3, "april": 4, "may": 5, "june": 6,
-        "july": 7, "august": 8, "september": 9, "october": 10, "november": 11, "december": 12,
-        "jan": 1, "feb": 2, "mar": 3, "apr": 4, "jun": 6,
-        "jul": 7, "aug": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12
-    }
-    text_lower = text.lower()
-    for name, num in sorted(month_map.items(), key=lambda x: -len(x[0])):
-        if re.search(rf'\b{name}\b', text_lower):
-            return num
-    return None
 
-def parse_date_range(dates_str):
-    if not dates_str or "tba" in dates_str.lower() or "to be announced" in dates_str.lower():
-        return None, None
+def parse_dates(text):
+    """Parse date ranges such as 15-19 October or 15-19 October 2026."""
+    text = clean(text)
+    text = re.sub(r"(\d+)(st|nd|rd|th)\b", r"\1", text, flags=re.I)
+    text = text.replace(" to ", " - ").replace("–", "-").replace("—", "-")
+    year = datetime.now(IST).year
 
-    found_years = re.findall(r'\b(20\d{2})\b', dates_str)
-    if found_years and int(found_years[0]) != now_ist().year:
-        return None, None
+    patterns = [
+        r"(\d{1,2})\s*([A-Za-z]{3,9})?\s*-\s*"
+        r"(\d{1,2})\s*([A-Za-z]{3,9})\s*(20\d{2})?",
+    ]
 
-    cleaned = re.sub(r'\b20\d{2}-\d{2}-\d{2}\b', '', dates_str)
-    cleaned = re.sub(r'(\d+)(?:st|nd|rd|th)\b', r'\1', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\s*(?:to|–|—|-)\s*', ' - ', cleaned, flags=re.IGNORECASE).strip()
-
-    if " - " not in cleaned:
-        return None, None
-
-    parts = cleaned.split(" - ")
-    open_part, close_part = parts[0].strip(), parts[-1].strip()
-
-    end_month = extract_month_num(close_part) or extract_month_num(open_part)
-    if not end_month:
-        return None, None
-    start_month = extract_month_num(open_part) or end_month
-
-    open_no_yr = re.sub(r'\b20\d{2}\b', '', open_part)
-    close_no_yr = re.sub(r'\b20\d{2}\b', '', close_part)
-
-    open_nums = [int(x) for x in re.findall(r'\b\d{1,2}\b', open_no_yr) if 1 <= int(x) <= 31]
-    close_nums = [int(x) for x in re.findall(r'\b\d{1,2}\b', close_no_yr) if 1 <= int(x) <= 31]
-
-    if not open_nums or not close_nums:
-        return None, None
-
-    start_day, end_day = open_nums[0], close_nums[0]
-
-    if not extract_month_num(open_part) and start_day > end_day:
-        start_month = 12 if end_month == 1 else end_month - 1
-
-    rev_month_map = {
-        1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June",
-        7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"
-    }
-    current_year = now_ist().year
-    return f"{start_day} {rev_month_map[start_month]} {current_year}", f"{end_day} {rev_month_map[end_month]} {current_year}"
-
-def is_currently_open(open_str, close_str):
-    now = now_ist()
-    today = now.date()
-    open_dt = parse_date_string(open_str)
-    close_dt = parse_date_string(close_str)
-    if not open_dt or not close_dt:
-        return False
-    # 5:00 PM close cutoff on the final day
-    if today == close_dt.date() and now.hour >= 17:
-        return False
-    return open_dt.date() <= today <= close_dt.date()
-
-def parse_table_columns(cols, row_text):
-    price = None
-    issue_size = "TBA"
-    auto_lot = None
-    current_year = now_ist().year
-
-    # 1. Row-level regex for Issue Size (matches numbers explicitly marked with Cr/Crore)
-    cr_match = re.search(r'₹?\s*([\d,.]+)\s*(?:Cr|crore|Crores)', row_text, re.IGNORECASE)
-    issue_val_str = None
-    if cr_match:
-        clean_cr = cr_match.group(1).rstrip('.,')
-        issue_size = f"₹{clean_cr} Cr"
-        issue_val_str = clean_cr.replace(',', '').split('.')[0]
-
-    all_prices = []
-    for idx, col in enumerate(cols):
-        text = col.text.strip()
-        text_lower = text.lower()
-
-        # Cell-level fallback for Issue Size
-        if issue_size == "TBA" and ("cr" in text_lower or "crore" in text_lower):
-            m = re.search(r'₹?\s*([\d,.]+)', text)
-            if m:
-                clean_cr = m.group(1).rstrip('.,')
-                issue_size = f"₹{clean_cr} Cr"
-                issue_val_str = clean_cr.replace(',', '').split('.')[0]
-
-        if idx in (0, 1):
+    for pattern in patterns:
+        match = re.search(pattern, text)
+        if not match:
             continue
 
-        # Lot size detection: integer between 1 and 10000, excluding the calendar year
-        if not auto_lot and not any(sym in text for sym in ["₹", "Rs", "to", "-", "–", "%", "Cr", "."]):
-            nums = re.findall(r'\b\d{1,5}\b', text.replace(',', ''))
-            for n in nums:
-                val = int(n)
-                if 1 <= val <= 10000 and val != current_year and (not issue_val_str or str(val) != issue_val_str):
-                    auto_lot = val
-                    break
+        d1, m1, d2, m2, yr = match.groups()
+        month_names = {
+            "jan": 1, "feb": 2, "mar": 3, "apr": 4,
+            "may": 5, "jun": 6, "jul": 7, "aug": 8,
+            "sep": 9, "oct": 10, "nov": 11, "dec": 12,
+        }
 
-        # Share price detection: excludes the calendar year to prevent corrupting prices
-        if any(sym in text_lower for sym in ["₹", "rs", "-", "–", "to"]):
-            nums = re.findall(r'\b\d{2,4}\b', text.replace(',', ''))
-            for n in nums:
-                val = int(n)
-                if 10 <= val <= 5000 and val != current_year and (not issue_val_str or str(val) != issue_val_str):
-                    all_prices.append(val)
-
-    if all_prices:
-        price = max(all_prices)
-
-    return price, issue_size, auto_lot
-
-def is_github_actions():
-    return os.environ.get("GITHUB_ACTIONS") == "true" or "--headless" in sys.argv
-
-def prompt_user_fundamentals(name):
-    if is_github_actions():
-        print(f"  [Headless Cloud] Auto-publishing {name} with 'Data will be updated soon'")
-        return None
-
-    print(f"\n" + "="*55)
-    print(f" [CLI Input Needed] Configure details for: {name}")
-    print("="*55)
-    print("Select Sector (Displayed Horizontally):")
-    sectors = list(SECTOR_BENCHMARKS.keys())
-    
-    for i in range(0, len(sectors), 2):
-        item1 = f"{i+1:2d}. {sectors[i]:<26}"
-        item2 = f"{i+2:2d}. {sectors[i+1]}" if i+1 < len(sectors) else ""
-        print(f"  {item1}   {item2}")
-    
-    try:
-        sector = None
-        while not sector:
-            sec_choice = input(f"\nEnter sector choice (1-{len(sectors)}) or press Enter to skip: ").strip()
-            if not sec_choice:
-                print(f"  [Skipped] Left {name} as 'Data will be updated soon'.")
+        def month_number(value):
+            if not value:
                 return None
-            if sec_choice.isdigit() and 1 <= int(sec_choice) <= len(sectors):
-                sector = sectors[int(sec_choice) - 1]
-            else:
-                print(f"  [Error] Please enter a whole number between 1 and {len(sectors)}.")
-        
-        ps_ratio = None
-        while ps_ratio is None:
-            val = input("Current FY P/S Ratio (e.g., 4.5): ").strip()
-            try: ps_ratio = float(val)
-            except ValueError: print("  [Error] Please enter a valid decimal number.")
-            
-        cagr = None
-        while cagr is None:
-            val = input("3-Year Revenue CAGR % (e.g., 20): ").strip()
-            try: cagr = float(val)
-            except ValueError: print("  [Error] Please enter a valid decimal number.")
-        
-        print("\nSelect Use of Proceeds:")
-        print("  1. Capex / Business Expansion / Growth / R&D (Positive)")
-        print("  2. Working Capital (Neutral/Positive)")
-        print("  3. Debt Repayment / OFS (Offer for Sale) (Negative)")
-        proceeds = None
-        while not proceeds:
-            proc_choice = input("Enter option (1-3): ").strip()
-            if proc_choice in ["1", "2", "3"]:
-                proceeds_map = {
-                    "1": "Capex and Business Expansion",
-                    "2": "Working Capital",
-                    "3": "Debt Repayment / OFS"
-                }
-                proceeds = proceeds_map[proc_choice]
-            else:
-                print("  [Error] Please enter 1, 2, or 3.")
+            return next(
+                (v for k, v in month_names.items()
+                 if value.lower().startswith(k)),
+                None,
+            )
 
-        promoter = None
-        while promoter is None:
-            val = input("Post-IPO Promoter Holding % (e.g., 65): ").strip()
-            try: promoter = float(val)
-            except ValueError: print("  [Error] Please enter a valid decimal number.")
-        
-        return {
-            "sector": sector, 
-            "psRatio": ps_ratio, 
-            "cagr3Yr": cagr, 
-            "proceedsUse": proceeds, 
-            "promoterPct": promoter
-        }
-    except (EOFError, KeyboardInterrupt):
-        return None
+        m_end = month_number(m2)
+        m_start = month_number(m1) or m_end
 
-def evaluate_decision(enrichment, sector_name):
-    if not enrichment:
-        return {
-            "verdict": "Data will be updated soon", "verdictCls": "verdict-caution",
-            "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
-            "checks": [{"icon": "ℹ", "cls": "check-warn", "text": "Fundamental metrics pending entry"}]
-        }
+        if m_start and m_end:
+            try:
+                y = int(yr or year)
+                return (
+                    date(y, m_start, int(d1)),
+                    date(y, m_end, int(d2)),
+                )
+            except ValueError:
+                pass
 
-    bench = SECTOR_BENCHMARKS.get(sector_name, {"avgPS": 3.5, "avgCagr": 15.0})
-    ps, cagr, promoter = enrichment["psRatio"], enrichment["cagr3Yr"], enrichment["promoterPct"]
-    proceeds = enrichment["proceedsUse"]
-    score, checks = 0, []
+    # Fallback for two full dates separated by a hyphen.
+    parts = re.split(r"\s+-\s+", text, maxsplit=1)
+    if len(parts) == 2:
+        start = parse_one_date(parts[0], year)
+        end = parse_one_date(parts[1], year)
+        if start and end:
+            return start, end
 
-    if ps <= bench["avgPS"]:
-        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Attractive P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"})
-        score += 2
-    else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"High P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"})
-        score -= 1
-
-    if cagr >= bench["avgCagr"]:
-        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Robust growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"})
-        score += 2
-    else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Slow revenue growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"})
-        score -= 1
-
-    if promoter >= 50:
-        checks.append({"icon": "✓", "cls": "check-pass", "text": f"High promoter confidence ({promoter}% holding)"})
-        score += 1
-    else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Low promoter holding ({promoter}%)"})
-        score -= 1
-
-    if any(k in proceeds.lower() for k in ["capex", "growth", "working capital", "expansion"]):
-        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Major chunk of issue allocated to {proceeds}"})
-        score += 1
-    else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Major chunk of issue goes to {proceeds}"})
-        score -= 1
-
-    if score >= 3:
-        return {"verdict": "Apply", "verdictCls": "verdict-apply", "summary": f"Strong fundamentals outperforming historical benchmarks in {sector_name}.", "checks": checks}
-    else:
-        return {"verdict": "Avoid", "verdictCls": "verdict-avoid", "summary": f"Subpar valuation or growth metrics compared to peers in {sector_name}.", "checks": checks}
-
-def extract_row_dates(cols):
-    for col in cols[1:]:
-        open_d, close_d = parse_date_range(col.text.strip())
-        if open_d and close_d:
-            return open_d, close_d
-    if len(cols) >= 3:
-        d1 = parse_date_string(cols[1].text.strip())
-        d2 = parse_date_string(cols[2].text.strip())
-        if d1 and d2:
-            return d1.strftime("%d %B %Y"), d2.strftime("%d %B %Y")
+    # A single date is not sufficient to infer an opening and closing date.
     return None, None
 
-def scrape_into_merged(session, url, default_cat, headers, merged_ipos):
-    response = session.get(url, headers=headers, timeout=20)
-    response.raise_for_status()
-    soup = BeautifulSoup(response.text, 'html.parser')
-    tables = soup.find_all('table')
 
-    for table in tables:
-        table_heading = ""
-        prev_elem = table.find_previous(['h2', 'h3'])
-        if prev_elem:
-            table_heading = prev_elem.text.lower()
+def get_category(name, row_text, url):
+    text = f"{name} {row_text} {url}".lower()
+    if "sme" in text or "sme-ipo" in url.lower():
+        return "SME IPO"
+    return "Mainboard IPO"
 
-        for row in table.find_all('tr'):
-            cols = row.find_all('td')
-            if len(cols) < 2:
+
+def extract_tables(soup, url):
+    records = []
+
+    for table in soup.find_all("table"):
+        rows = table.find_all("tr")
+        if len(rows) < 2:
+            continue
+
+        header_row = None
+        headers = []
+
+        for row in rows[:3]:
+            cells = row.find_all(["th", "td"], recursive=False)
+            labels = [clean(c.get_text(" ", strip=True)).lower()
+                      for c in cells]
+
+            if any(
+                term in label
+                for label in labels
+                for term in (
+                    "company", "ipo name", "ipo date",
+                    "opening date", "closing date", "close date",
+                    "issue size", "ipo size", "price band",
+                    "lot size", "bidding dates",
+                )
+            ):
+                header_row = row
+                headers = labels
+                break
+
+        if not header_row:
+            continue
+
+        for row in rows:
+            if row is header_row:
                 continue
-            row_text = row.text.strip()
-            raw_name = cols[0].text.strip()
 
-            if not raw_name or raw_name.lower() in {"company", "ipo", "ipo name", "company name", "issuer"}:
-                continue
-            if "sse" in raw_name.lower() or "social stock" in raw_name.lower():
+            cells = row.find_all(["td", "th"], recursive=False)
+            if not cells:
                 continue
 
-            open_date, close_date = extract_row_dates(cols)
-            if not is_currently_open(open_date, close_date):
+            values = [clean(c.get_text(" ", strip=True)) for c in cells]
+            if not values or len(values) < 2:
                 continue
 
-            if "sme" in raw_name.lower() or "sme" in row_text.lower() or "sme" in table_heading or default_cat == "SME IPO":
-                ipo_category = "SME IPO"
-            else:
-                ipo_category = "Mainboard IPO"
+            # Match each value to its heading.
+            mapped = {}
+            for i, value in enumerate(values):
+                heading = headers[i] if i < len(headers) else ""
+                mapped[heading] = value
 
-            name = clean_company_name(raw_name)
-            if len(name) < 3:
+            name = values[0]
+            if name.lower() in {
+                "company", "company name", "ipo name", "ipo",
+                "company ipo",
+            }:
                 continue
 
-            price, issue_size, auto_lot = parse_table_columns(cols, row_text)
-            canon = canonical_key(name)
-            slug = name.lower().replace(" ", "-")
+            row_text = " ".join(values)
+            low = row_text.lower()
 
-            if canon not in merged_ipos:
-                merged_ipos[canon] = {
-                    "slug": slug,
-                    "name": name,
-                    "category": ipo_category,
-                    "openDate": open_date,
-                    "closeDate": close_date,
-                    "autoPrice": price,
-                    "autoIssue": issue_size,
-                    "autoLot": auto_lot
-                }
-            else:
-                existing = merged_ipos[canon]
-                existing["openDate"] = open_date
-                existing["closeDate"] = close_date
-                if len(name) > len(existing["name"]):
-                    existing["name"] = name
-                    existing["slug"] = slug
-                if not existing["autoPrice"] and price:
-                    existing["autoPrice"] = price
-                if existing["autoIssue"] == "TBA" and issue_size != "TBA":
-                    existing["autoIssue"] = issue_size
-                if not existing.get("autoLot") and auto_lot:
-                    existing["autoLot"] = auto_lot
-                if ipo_category == "SME IPO":
-                    existing["category"] = "SME IPO"
+            # Find the date range, preferring date-labelled cells.
+            start_date = end_date = None
+            for heading, value in mapped.items():
+                if any(x in heading for x in (
+                    "ipo date", "bidding dates", "open date",
+                    "opening date", "date",
+                )):
+                    start_date, end_date = parse_dates(value)
+                    if start_date and end_date:
+                        break
 
-def fetch_open_ipos():
-    print(f"\n[Scraper v2.2 Base] Scanning data sources ({now_ist().strftime('%I:%M %p')} IST)...")
-    ipowatch_urls = [
-        ("https://ipowatch.in/upcoming-ipo-calendar-ipo-list/", None),
-        ("https://ipowatch.in/upcoming-ipo-list/", None),
-        ("https://ipowatch.in/upcoming-sme-ipo-list/", "SME IPO"),
-        ("https://ipowatch.in/ipo-list/", None),
-        ("https://ipowatch.in/sme-ipo-list/", "SME IPO"),
-    ]
-    fallback_url = "https://ipo.indiratrade.com/Home"
+            if not start_date or not end_date:
+                for value in values:
+                    a, b = parse_dates(value)
+                    if a and b:
+                        start_date, end_date = a, b
+                        break
 
-    session = requests.Session()
-    retries = Retry(total=3, backoff_factor=1.5, status_forcelist=[500, 502, 503, 504], raise_on_status=False)
-    adapter = HTTPAdapter(max_retries=retries)
-    session.mount("https://", adapter)
-    session.mount("http://", adapter)
+            # Find price band from the correctly labelled column.
+            price = None
+            for heading, value in mapped.items():
+                if "price band" in heading or "price range" in heading:
+                    price = price_band(value)
+                    if price:
+                        break
 
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-        'Accept-Language': 'en-US,en;q=0.9',
-    }
+            if price is None:
+                for value in values:
+                    if re.search(
+                        r"(?:₹|Rs\.?)\s*[\d,]+\s*(?:to|-|–)\s*"
+                        r"(?:₹|Rs\.?)?\s*[\d,]+",
+                        value,
+                        re.I,
+                    ):
+                        price = price_band(value)
+                        if price:
+                            break
 
-    merged_ipos = {}
-    for url, default_cat in ipowatch_urls:
+            # Extract issue size only from a clearly labelled column.
+            size = None
+            for heading, value in mapped.items():
+                if "issue size" in heading or "ipo size" in heading:
+                    size = issue_size(value, heading)
+                    if size:
+                        break
+
+            # Lot size is generally available on detailed IPO calendar pages.
+            lot = None
+            for heading, value in mapped.items():
+                if "lot size" in heading or "market lot" in heading:
+                    nums = numeric_values(value)
+                    if nums and nums[0].is_integer() and 1 <= nums[0] <= 100000:
+                        lot = int(nums[0])
+                        break
+
+            records.append({
+                "name": name,
+                "category": get_category(name, low, url),
+                "open": start_date,
+                "close": end_date,
+                "price": price,
+                "lot": lot,
+                "issueSize": size,
+                "source": url,
+            })
+
+    return records
+
+
+def currently_open(item, today):
+    return (
+        item["open"] is not None
+        and item["close"] is not None
+        and item["open"] <= today <= item["close"]
+    )
+
+
+def scrape():
+    s = session()
+    merged = {}
+    errors = []
+
+    for url in SOURCES:
         try:
-            scrape_into_merged(session, url, default_cat, headers, merged_ipos)
-        except Exception as err:
-            pass
+            response = s.get(url, headers=HEADERS, timeout=25)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, "html.parser")
+            found = extract_tables(soup, url)
+            print(f"[SOURCE] {url}: extracted {len(found)} table rows")
 
-    if not merged_ipos:
-        print("  [Notice] Primary sources returned empty/blocked. Scraping fallback source...")
-        try:
-            scrape_into_merged(session, fallback_url, None, headers, merged_ipos)
-        except Exception as err:
-            print(f"  [Error] Fallback source failed: {err}")
+            for item in found:
+                k = key(item["name"])
+                if not k:
+                    continue
 
-    results = list(merged_ipos.values())
-    print(f"  [Scraper] Found {len(results)} active OPEN IPO(s):")
-    for idx, ipo in enumerate(results, 1):
-        print(f"    {idx}. {ipo['name']} ({ipo['category']}) | Closes: {ipo['closeDate']} | Cut-off: ₹{ipo['autoPrice']} | Issue: {ipo['autoIssue']} | Lot: {ipo['autoLot']}")
-    return results
+                if k not in merged:
+                    merged[k] = item
+                    continue
+
+                old = merged[k]
+                # Merge non-empty fields from multiple sources.
+                for field in ("price", "lot", "issueSize", "open", "close"):
+                    if old.get(field) is None and item.get(field) is not None:
+                        old[field] = item[field]
+
+                if item["category"] == "SME IPO":
+                    old["category"] = "SME IPO"
+
+        except Exception as exc:
+            errors.append(f"{url}: {type(exc).__name__}: {exc}")
+            print(f"[WARN] Could not scrape {url}: {exc}")
+
+    if not merged and errors:
+        raise RuntimeError("All IPO sources failed. Existing data.json was preserved.")
+
+    today = datetime.now(IST).date()
+    return [x for x in merged.values() if currently_open(x, today)], errors
+
+
+def display_date(value):
+    return value.strftime("%d %B %Y") if value else "TBA"
+
 
 def main():
-    print("\n" + "="*50)
-    print("  IPO Intelligence Dashboard — Interactive CLI Engine")
-    print("="*50)
+    now = datetime.now(IST)
+    print(f"\nIPO scraper started: {now:%d %b %Y %I:%M %p} IST")
 
-    cache = load_cache()
-    existing_data = load_existing_data()
-    open_ipos = fetch_open_ipos()
+    try:
+        items, errors = scrape()
+    except Exception as exc:
+        print(f"[ERROR] {exc}")
+        sys.exit(1)
 
-    # Retain active entries across cache
-    if existing_data:
-        scraped_canons = {canonical_key(ipo["name"]) for ipo in open_ipos}
-        for slug, item in existing_data.items():
-            if is_currently_open(item.get("openDate"), item.get("closeDate")):
-                canon = canonical_key(item.get("name", slug))
-                if canon not in scraped_canons:
-                    cat = "SME IPO" if "SME" in item.get("sector", "") else "Mainboard IPO"
-                    open_ipos.append({
-                        "slug": slug,
-                        "name": item.get("name", slug),
-                        "category": cat,
-                        "openDate": item.get("openDate"),
-                        "closeDate": item.get("closeDate"),
-                        "autoPrice": item.get("issuePrice"),
-                        "autoIssue": item.get("issueSize", "TBA"),
-                        "autoLot": item.get("lotSize")
-                    })
+    # Load old data only to retain optional fields not supplied by the scraper.
+    try:
+        previous = json.loads(DATA_FILE.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        previous = {}
 
-    if not open_ipos:
-        print("\nNo OPEN IPOs found for today.")
-        save_data({"upcoming": [], "lastUpdated": now_ist().strftime("%d %b %Y, %I:%M %p")})
-        return
+    old_items = {
+        key(x.get("name", "")): x
+        for x in previous.get("upcoming", [])
+    }
 
-    upcoming = []
-    for ipo in open_ipos:
-        slug, name = ipo["slug"], ipo["name"]
-        ipo_cat = ipo["category"]
-        multiplier = 2 if ipo_cat == "SME IPO" else 1
+    output = []
 
-        enrichment = find_in_dict(slug, name, cache)
-        if enrichment and enrichment.get("sector"):
-            print(f"  [Cached] Loaded saved fundamentals for: {name}")
-        else:
-            enrichment = prompt_user_fundamentals(name)
-            if enrichment:
-                cache[slug] = enrichment
-                save_cache(cache)
+    for item in items:
+        old = old_items.get(key(item["name"]), {})
 
-        price = ipo["autoPrice"]
-        lot = (enrichment.get("lotSize") if enrichment else None) or ipo.get("autoLot")
-        issue_sz = ipo["autoIssue"]
-        sector_name = enrichment.get("sector", "Pending Entry") if enrichment else "Pending Entry"
+        price = item["price"] or old.get("issuePrice")
+        lot = item["lot"] or old.get("lotSize")
+        size = item["issueSize"] or old.get("issueSize") or "TBA"
 
-        cached_item = find_in_dict(slug, name, existing_data)
-        if cached_item:
-            if not price and cached_item.get("issuePrice"):
-                price = cached_item["issuePrice"]
-            if not lot and cached_item.get("lotSize"):
-                lot = cached_item["lotSize"]
-            if issue_sz == "TBA" and cached_item.get("issueSize") and cached_item.get("issueSize") != "TBA":
-                issue_sz = cached_item["issueSize"]
+        is_sme = item["category"] == "SME IPO"
+        multiplier = 2 if is_sme else 1
+        investment = round(price * lot * multiplier) if price and lot else None
 
-        min_amt = (price * lot * multiplier) if (price and lot is not None) else None
-        decision = evaluate_decision(enrichment, sector_name)
-        
-        if enrichment:
-            bench = SECTOR_BENCHMARKS.get(sector_name, {"avgListingGain": 20.0, "winRate": "40/50 positive"})
-            historical_gain = f"{bench['avgListingGain']}% avg listing gain in last 1 yr ({bench['winRate']})"
-        else:
-            historical_gain = "Fundamental data pending entry for sector benchmarking"
-
-        upcoming.append({
-            "slug": slug,
-            "name": name,
-            "symbol": name[:5].upper(),
-            "sector": f"{sector_name} ({ipo_cat})",
+        output.append({
+            "slug": re.sub(r"[^a-z0-9]+", "-", item["name"].lower()).strip("-"),
+            "name": item["name"],
+            "symbol": old.get("symbol", ""),
+            "sector": f"Pending Entry ({item['category']})",
+            "category": item["category"],
             "status": "Open",
-            "openDate": ipo["openDate"],
-            "closeDate": ipo["closeDate"],
+            "openDate": display_date(item["open"]),
+            "closeDate": display_date(item["close"]),
             "issuePrice": price,
             "lotSize": lot,
-            "minAmount": min_amt,
-            "issueSize": issue_sz,
-            "historicalGain": historical_gain,
-            "summary": decision["summary"],
-            "verdict": decision["verdict"],
-            "verdictCls": decision["verdictCls"],
-            "checks": decision["checks"],
-            "score": 1,
-            "lastFetched": now_ist().strftime("%d %b %Y, %I:%M %p"),
+            "minAmount": investment,
+            "issueSize": size,
+            "historicalGain": old.get(
+                "historicalGain",
+                "Fundamental data pending entry for sector benchmarking",
+            ),
+            "summary": old.get(
+                "summary",
+                "Live issue details scraped automatically; fundamentals require separate verification.",
+            ),
+            "verdict": old.get("verdict", "Data will be updated soon"),
+            "verdictCls": old.get("verdictCls", "verdict-caution"),
+            "checks": old.get("checks", []),
+            "score": old.get("score"),
+            "lastFetched": now.strftime("%d %b %Y, %I:%M %p"),
         })
 
     data = {
-        "upcoming": upcoming,
-        "lastUpdated": now_ist().strftime("%d %b %Y, %I:%M %p")
+        "upcoming": sorted(
+            output,
+            key=lambda x: x["closeDate"],
+        ),
+        "lastUpdated": now.strftime("%d %b %Y, %I:%M %p"),
+        "scrapeWarnings": errors,
     }
-    save_data(data)
-    print(f"\nDone! Processed exactly {len(upcoming)} active OPEN IPO(s).\n")
+
+    temp_file = DATA_FILE.with_suffix(".tmp")
+    temp_file.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    temp_file.replace(DATA_FILE)
+
+    print(f"\n[OK] {len(output)} currently open IPO(s) written to data.json")
+    for x in output:
+        print(
+            f"{x['name']} | {x['category']} | "
+            f"Price: {x['issuePrice']} | Lot: {x['lotSize']} | "
+            f"Investment: {x['minAmount']} | "
+            f"Issue size: {x['issueSize']} | Closes: {x['closeDate']}"
+        )
+
+    if errors:
+        print(f"\n[WARN] {len(errors)} source(s) failed. Review logs above.")
+
 
 if __name__ == "__main__":
     main()

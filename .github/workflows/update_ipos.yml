@@ -1,39 +1,54 @@
-name: Auto-Fetch Latest IPOs
+
+name: Auto-Fetch Live IPOs
 
 on:
   schedule:
-    - cron: '17 2,4,5,7,9,11 * * *'
+    - cron: "*/30 * * * *"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
+concurrency:
+  group: ipo-dashboard-refresh
+  cancel-in-progress: false
+
 jobs:
-  run-scraper:
+  update-ipos:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Configure Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.12"
+          cache: pip
 
       - name: Install dependencies
         run: |
-          pip install requests beautifulsoup4 urllib3
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
 
-      - name: Run fetch script in unattended cloud mode
-        env:
-          GITHUB_ACTIONS: "true"
-        run: |
-          python fetch_ipos.py --headless
+      - name: Validate Python syntax
+        run: python -m py_compile fetch_ipos.py
 
-      - name: Commit and push changes if data updated
+      - name: Fetch current open IPOs
+        run: python fetch_ipos.py
+
+      - name: Commit updated data
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git add data.json
-          if [ -f ipo_cache.json ]; then git add ipo_cache.json; fi
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Automated IPO decision engine refresh [skip ci]" && git pull --rebase origin main && git push origin main)
+
+          if git diff --cached --quiet; then
+            echo "No changes to publish."
+          else
+            git commit -m "Refresh live IPO data [skip ci]"
+            git push origin main
+          fi

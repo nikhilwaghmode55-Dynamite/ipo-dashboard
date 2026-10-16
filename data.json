@@ -1,135 +1,125 @@
 {
   "upcoming": [
     {
-      "slug": "tonbo-imaging-india",
-      "name": "Tonbo Imaging India",
-      "symbol": "TONBO",
-      "sector": "Pending Entry (Mainboard IPO)",
-      "status": "Open",
-      "openDate": "15 October 2026",
-      "closeDate": "19 October 2026",
-      "issuePrice": 700,
-      "lotSize": 21,
-      "minAmount": 14700,
-      "issueSize": "TBA",
-      "historicalGain": "Fundamental data pending entry for sector benchmarking",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
-      "checks": [
-        {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "17 Oct 2026, 01:11 AM"
-    },
-    {
-      "slug": "zetwerk-manufacturing-business",
-      "name": "Zetwerk Manufacturing Business",
-      "symbol": "ZETWE",
-      "sector": "Pending Entry (Mainboard IPO)",
-      "status": "Open",
-      "openDate": "15 October 2026",
-      "closeDate": "19 October 2026",
-      "issuePrice": 151,
-      "lotSize": 99,
-      "minAmount": 14949,
-      "issueSize": "TBA",
-      "historicalGain": "Fundamental data pending entry for sector benchmarking",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
-      "checks": [
-        {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "17 Oct 2026, 01:11 AM"
-    },
-    {
       "slug": "bonfiglioli-transmissions",
       "name": "Bonfiglioli Transmissions",
       "symbol": "BONFI",
       "sector": "Pending Entry (Mainboard IPO)",
+      "category": "Mainboard IPO",
       "status": "Open",
       "openDate": "15 October 2026",
       "closeDate": "19 October 2026",
-      "issuePrice": 586,
+      "issuePrice": 586.0,
       "lotSize": 25,
       "minAmount": 14650,
-      "issueSize": "TBA",
+      "issueSize": "₹2,533.7 Cr",
       "historicalGain": "Fundamental data pending entry for sector benchmarking",
       "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
       "verdict": "Data will be updated soon",
       "verdictCls": "verdict-caution",
       "checks": [
         {
-          "icon": "\u2139",
+          "icon": "ℹ",
           "cls": "check-warn",
           "text": "Fundamental metrics pending entry"
         }
       ],
       "score": 1,
-      "lastFetched": "17 Oct 2026, 01:11 AM"
+      "lastFetched": "17 Oct 2026, 01:21 AM"
     },
     {
-      "slug": "sahajanand-medical-technologies",
-      "name": "Sahajanand Medical Technologies",
-      "symbol": "SAHAJ",
+      "slug": "tonbo-imaging",
+      "name": "Tonbo Imaging",
+      "symbol": "",
       "sector": "Pending Entry (Mainboard IPO)",
+      "category": "Mainboard IPO",
       "status": "Open",
       "openDate": "15 October 2026",
       "closeDate": "19 October 2026",
-      "issuePrice": 344,
-      "lotSize": 43,
-      "minAmount": 14792,
-      "issueSize": "TBA",
+      "issuePrice": 700.0,
+      "lotSize": null,
+      "minAmount": null,
+      "issueSize": "₹852.2 Cr",
       "historicalGain": "Fundamental data pending entry for sector benchmarking",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+      "summary": "Live issue details scraped automatically; fundamentals require separate verification.",
       "verdict": "Data will be updated soon",
       "verdictCls": "verdict-caution",
-      "checks": [
-        {
-          "icon": "\u2139",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "17 Oct 2026, 01:11 AM"
+      "checks": [],
+      "score": null,
+      "lastFetched": "17 Oct 2026, 01:21 AM"
+    },
+    {
+      "slug": "zetwerk",
+      "name": "Zetwerk",
+      "symbol": "",
+      "sector": "Pending Entry (Mainboard IPO)",
+      "category": "Mainboard IPO",
+      "status": "Open",
+      "openDate": "15 October 2026",
+      "closeDate": "19 October 2026",
+      "issuePrice": 151.0,
+      "lotSize": null,
+      "minAmount": null,
+      "issueSize": "₹5,012.3 Cr",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Live issue details scraped automatically; fundamentals require separate verification.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [],
+      "score": null,
+      "lastFetched": "17 Oct 2026, 01:21 AM"
+    },
+    {
+      "slug": "sahajanand-medical",
+      "name": "Sahajanand Medical",
+      "symbol": "",
+      "sector": "Pending Entry (Mainboard IPO)",
+      "category": "Mainboard IPO",
+      "status": "Open",
+      "openDate": "15 October 2026",
+      "closeDate": "19 October 2026",
+      "issuePrice": 344.0,
+      "lotSize": null,
+      "minAmount": null,
+      "issueSize": "₹475.5 Cr",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Live issue details scraped automatically; fundamentals require separate verification.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [],
+      "score": null,
+      "lastFetched": "17 Oct 2026, 01:21 AM"
     },
     {
       "slug": "shellz-india",
       "name": "Shellz India",
       "symbol": "SHELL",
       "sector": "Pending Entry (SME IPO)",
+      "category": "SME IPO",
       "status": "Open",
       "openDate": "15 October 2026",
       "closeDate": "19 October 2026",
-      "issuePrice": 179,
+      "issuePrice": 179.0,
       "lotSize": 800,
       "minAmount": 286400,
-      "issueSize": "TBA",
+      "issueSize": "₹60 Cr",
       "historicalGain": "Fundamental data pending entry for sector benchmarking",
       "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
       "verdict": "Data will be updated soon",
       "verdictCls": "verdict-caution",
       "checks": [
         {
-          "icon": "\u2139",
+          "icon": "ℹ",
           "cls": "check-warn",
           "text": "Fundamental metrics pending entry"
         }
       ],
       "score": 1,
-      "lastFetched": "17 Oct 2026, 01:11 AM"
+      "lastFetched": "17 Oct 2026, 01:21 AM"
     }
   ],
-  "lastUpdated": "17 Oct 2026, 01:11 AM"
+  "lastUpdated": "17 Oct 2026, 01:21 AM",
+  "scrapeWarnings": [
+    "https://ipowatch.in/sme-ipo-2026/: HTTPError: 404 Client Error: Not Found for url: https://ipowatch.in/sme-ipo-2026/"
+  ]
 }
