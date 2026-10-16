@@ -1,6 +1,6 @@
 """
 fetch_ipos.py — Live IPO Intelligence Dashboard Engine
-Ultimate Number Deduction Extraction (Permanent Issue Size Fix), 2026 Blocker, and 5 PM Expiry.
+Strict Header-Mapped Parser (Zero Guessing), 2026 Blocker, and 5 PM Expiry.
 """
 
 import requests
@@ -133,105 +133,60 @@ def is_currently_open(open_str, close_str, now):
     if today == close_dt.date() and now.hour >= 17: return False 
     return open_dt.date() <= today <= close_dt.date()
 
-def parse_table_columns_ultimate(cols, headers, current_year):
-    """The Ultimate Number Deduction Engine. Ignores HTML formatting and uses pure logic."""
+def parse_table_columns_strict(cols, headers, current_year):
     price = None
     issue_size = "TBA"
-    lot = None
+    auto_lot = None
 
-    all_numbers = []
-    
-    # Extract every number from the row and tag it with its context
-    for idx, col in enumerate(cols):
-        if idx == 0: continue
+    price_idx, size_idx, lot_idx = -1, -1, -1
+    for i, h in enumerate(headers):
+        if i >= len(cols): break 
+        hl = h.lower()
+        if "price" in hl: price_idx = i
+        elif "size" in hl or "cr" in hl or "crore" in hl or "amount" in hl:
+            if "lot" not in hl and "share" not in hl:
+                size_idx = i
+        elif "lot" in hl or "share" in hl:
+            lot_idx = i
+
+    for i, col in enumerate(cols):
+        if i == 0: continue
         text = col.text.strip()
         if not text: continue
-        
-        # Skip dates completely so 19 or 2026 never bleed into numbers
-        if re.search(r'(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)', text, re.IGNORECASE): 
-            continue
-            
-        header_text = headers[idx].lower() if headers and idx < len(headers) else ""
-        
-        # Find integers and decimals
-        matches = re.finditer(r'([\d,]+(?:\.\d+)?)', text)
-        for m in matches:
-            val_str = m.group(1).replace(',', '')
-            try:
-                val_float = float(val_str)
-                # HARD BLOCK on current year being processed as a value
-                if val_float > 0 and val_float != current_year:
-                    all_numbers.append({
-                        "raw": val_str,
-                        "val": val_float,
-                        "is_dec": '.' in val_str,
-                        "has_cr": "cr" in text.lower(),
-                        "has_shares": "share" in text.lower() or "lot" in text.lower(),
-                        "has_rupee": "₹" in text or "rs" in text.lower(),
-                        "is_range": "-" in text or "to" in text.lower(),
-                        "in_price_col": "price" in header_text,
-                        "in_size_col": ("size" in header_text or "cr" in header_text or "amount" in header_text) and "lot" not in header_text,
-                        "in_lot_col": "lot" in header_text or "share" in header_text,
-                        "assigned": False
-                    })
-            except ValueError: pass
+        text_lower = text.lower()
 
-    # PASS 1: Explicit Context (Cr, Size column, Shares)
-    for n in all_numbers:
-        if n["has_cr"] or n["in_size_col"]:
-            if issue_size == "TBA": 
-                issue_size = f"₹{n['raw'].rstrip('.')} Cr"
-            n["assigned"] = True
+        # 1. Price Extraction
+        if (i == price_idx) or any(sym in text_lower for sym in ["₹", "rs", "-", "to", "–"]):
+            nums = re.findall(r'\b(\d{2,4})\b', text.replace(',', ''))
+            valid_prices = [int(n) for n in nums if 10 <= int(n) <= 5000 and int(n) != current_year]
+            if valid_prices:
+                new_price = max(valid_prices)
+                if not price or new_price > price:
+                    price = new_price
 
-    for n in all_numbers:
-        if n["assigned"]: continue
-        if n["has_shares"] or n["in_lot_col"]:
-            if not lot and n["val"] == int(n["val"]): 
-                lot = int(n["val"])
-            n["assigned"] = True
+        # 2. Lot Extraction
+        if not auto_lot:
+            if (i == lot_idx) or ("share" in text_lower or "lot" in text_lower):
+                m = re.search(r'\b(\d{1,5})\b', text.replace(',', ''))
+                if m:
+                    val = int(m.group(1))
+                    if 1 <= val <= 10000 and val != current_year:
+                        auto_lot = val
 
-    for n in all_numbers:
-        if n["assigned"]: continue
-        if n["has_rupee"] or n["is_range"] or n["in_price_col"]:
-            if 10 <= n["val"] <= 5000:
-                if not price or n["val"] > price: 
-                    price = int(n["val"])
-            n["assigned"] = True
+        # 3. Issue Size Extraction
+        if issue_size == "TBA":
+            # Either explicitly the size column, OR contains "Cr"
+            if (i == size_idx) or ("cr" in text_lower or "crore" in text_lower):
+                # ABSOLUTE LOCK: Do NOT grab from cells that look like price bands or lot sizes
+                if "-" not in text and "to" not in text_lower and "–" not in text:
+                    if "share" not in text_lower and "lot" not in text_lower:
+                        m = re.search(r'([\d,]+\.?\d*)', text)
+                        if m:
+                            val = m.group(1).replace(',', '').rstrip('.')
+                            if val not in ("0", "") and val != str(current_year):
+                                issue_size = f"₹{val} Cr"
 
-    # PASS 2: Decimals are almost always Issue Sizes
-    if issue_size == "TBA":
-        for n in all_numbers:
-            if not n["assigned"] and n["is_dec"]:
-                issue_size = f"₹{n['raw'].rstrip('.')} Cr"
-                n["assigned"] = True
-                break
-
-    # PASS 3: Process any remaining unassigned numbers based on logical constraints
-    unassigned = [n for n in all_numbers if not n["assigned"]]
-    
-    if not lot:
-        for n in unassigned:
-            if n["val"] == int(n["val"]) and 1 <= n["val"] <= 10000:
-                lot = int(n["val"])
-                n["assigned"] = True
-                break
-                
-    if not price:
-        for n in unassigned:
-            if n["val"] == int(n["val"]) and 10 <= n["val"] <= 5000:
-                price = int(n["val"])
-                n["assigned"] = True
-                break
-                
-    # If Issue Size is STILL TBA, take the largest unassigned number left
-    if issue_size == "TBA":
-        unassigned = [n for n in all_numbers if not n["assigned"]]
-        if unassigned:
-            unassigned.sort(key=lambda x: x["val"], reverse=True)
-            issue_size = f"₹{unassigned[0]['raw'].rstrip('.')} Cr"
-            unassigned[0]["assigned"] = True
-
-    return price, issue_size, lot
+    return price, issue_size, auto_lot
 
 def is_github_actions():
     return os.environ.get("GITHUB_ACTIONS") == "true" or "--headless" in sys.argv
@@ -321,14 +276,12 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'html.parser')
     for table in soup.find_all('table'):
-        
-        # Grab headers reliably, skipping merged title rows
         table_headers = []
         for tr in table.find_all('tr'):
             cells = tr.find_all(['th', 'td'])
             if len(cells) >= 3:
                 texts = [c.text.strip().lower() for c in cells]
-                if any("company" in x or "ipo" in x for x in texts) and any("price" in x or "size" in x for x in texts):
+                if any("company" in x or "ipo" in x for x in texts):
                     table_headers = texts
                     break
 
@@ -352,7 +305,7 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
             name = clean_company_name(raw_name)
             if len(name) < 3: continue
 
-            price, issue_size, auto_lot = parse_table_columns_ultimate(cols, table_headers, now.year)
+            price, issue_size, auto_lot = parse_table_columns_strict(cols, table_headers, now.year)
             canon, slug = canonical_key(name), name.lower().replace(" ", "-")
 
             if canon not in merged_ipos:
@@ -368,7 +321,7 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
 
 def fetch_open_ipos():
     now = now_ist()
-    print(f"\n[Scraper Engine] Ultimate Deduction Parser Active ({now.strftime('%I:%M %p')} IST)...")
+    print(f"\n[Scraper vStrict] True Null Validation Engine Enabled ({now.strftime('%I:%M %p')} IST)...")
     ipowatch_urls = [
         ("https://ipowatch.in/upcoming-ipo-calendar-ipo-list/", None), 
         ("https://ipowatch.in/upcoming-ipo-list/", None), 
