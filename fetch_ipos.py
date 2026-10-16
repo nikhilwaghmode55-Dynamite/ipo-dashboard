@@ -1,6 +1,6 @@
 """
-fetch_ipos.py — Live IPO Intelligence Dashboard Engine (v6.0 Final)
-Triple-Lock Issue Size Extraction (Decimal Format Fallback), 5 PM Expiry, and Unbreakable CLI.
+fetch_ipos.py — Live IPO Intelligence Dashboard Engine (Final Fix)
+Explicit Header Mapping, Hard Year-Blocker (Fixes ₹2026 bug), and Unbreakable CLI.
 """
 
 import requests
@@ -90,10 +90,9 @@ def save_data(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
-def parse_date_string(date_str):
+def parse_date_string(date_str, current_year):
     if not date_str or "TBA" in str(date_str).upper(): return None
     date_str = str(date_str).strip()
-    current_year = now_ist().year
     if not re.search(r'\b20\d{2}\b', date_str): date_str = f"{date_str} {current_year}"
     for fmt in ("%d %B %Y", "%d %b %Y", "%d-%b-%Y", "%d/%m/%Y", "%B %d, %Y"):
         try:
@@ -110,10 +109,10 @@ def extract_month_num(text):
         if re.search(rf'\b{name}\b', text_lower): return num
     return None
 
-def parse_date_range(dates_str):
+def parse_date_range(dates_str, current_year):
     if not dates_str or "tba" in dates_str.lower() or "to be announced" in dates_str.lower(): return None, None
     found_years = re.findall(r'\b(20\d{2})\b', dates_str)
-    if found_years and int(found_years[0]) != now_ist().year: return None, None
+    if found_years and int(found_years[0]) != current_year: return None, None
     cleaned = re.sub(r'\b20\d{2}-\d{2}-\d{2}\b', '', dates_str)
     cleaned = re.sub(r'(\d+)(?:st|nd|rd|th)\b', r'\1', cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r'\s*(?:to|–|—|-)\s*', ' - ', cleaned, flags=re.IGNORECASE).strip()
@@ -131,95 +130,102 @@ def parse_date_range(dates_str):
     start_day, end_day = open_nums[0], close_nums[0]
     if not extract_month_num(open_part) and start_day > end_day: start_month = 12 if end_month == 1 else end_month - 1
     rev_month_map = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June", 7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"}
-    current_year = now_ist().year
     return f"{start_day} {rev_month_map[start_month]} {current_year}", f"{end_day} {rev_month_map[end_month]} {current_year}"
 
-def is_currently_open(open_str, close_str):
-    now = now_ist()
+def is_currently_open(open_str, close_str, now):
     today = now.date()
-    open_dt = parse_date_string(open_str)
-    close_dt = parse_date_string(close_str)
+    open_dt = parse_date_string(open_str, now.year)
+    close_dt = parse_date_string(close_str, now.year)
     if not open_dt or not close_dt: return False
-    
-    # Expiration Rule: If it's the closing date AND it is past 5:00 PM IST (17:00), mark as closed
     if today == close_dt.date() and now.hour >= 17: return False 
-    
     return open_dt.date() <= today <= close_dt.date()
 
-def parse_table_columns(cols, row_text, headers):
-    price, issue_size, auto_lot = None, "TBA", None
-    issue_val_str = None
+def parse_table_columns_mapped(cols, headers, current_year):
+    price = None
+    issue_size = "TBA"
+    auto_lot = None
 
-    # 1. TRIPLE-LOCK ISSUE SIZE EXTRACTION
-    
-    # Method A: Look for explicit 'Cr' in the row
-    cr_match = re.search(r'₹?\s*([\d,.]+)\s*(?:Cr|crore|Crores)', row_text, re.IGNORECASE)
-    if cr_match:
-        clean_cr = cr_match.group(1).rstrip('.,')
-        issue_size = f"₹{clean_cr} Cr"
-        issue_val_str = clean_cr.replace(',', '').split('.')[0]
-        
-    for idx, col in enumerate(cols):
-        text = col.text.strip()
-        text_lower = text.lower()
-        header_text = headers[idx].lower() if headers and idx < len(headers) else ""
-        if idx == 0 or not text: continue
+    # Map Header Indexes
+    price_idx, size_idx, lot_idx = -1, -1, -1
+    for i, h in enumerate(headers):
+        hl = h.lower()
+        if "price" in hl: price_idx = i
+        elif "size" in hl or "cr" in hl or "amount" in hl: size_idx = i
+        elif "lot" in hl or "shares" in hl: lot_idx = i
 
-        # Method B: Header Mapping
-        if issue_size == "TBA":
-            if ("size" in header_text or "cr" in header_text or "amount" in header_text) and "lot" not in header_text and "share" not in header_text:
-                m = re.search(r'^₹?\s*([\d,.]+)', text)
-                if m and m.group(1) not in ("0", "0.00", "."):
-                    clean_cr = m.group(1).rstrip('.,')
-                    issue_size = f"₹{clean_cr} Cr"
-                    issue_val_str = clean_cr.replace(',', '').split('.')[0]
+    # Extract Exact Issue Size
+    if size_idx != -1 and size_idx < len(cols):
+        text = cols[size_idx].text.strip()
+        m = re.search(r'([\d,]+\.?\d*)', text)
+        if m and m.group(1) not in ("0", "0.00", "."):
+            issue_size = f"₹{m.group(1).rstrip('.')} Cr"
 
-        # Method C: Format Fallback (Matches pure decimal numbers like 702.00 or 151.50)
-        if issue_size == "TBA":
-            if re.fullmatch(r'₹?\s*[\d,]+\.\d{1,2}', text):
-                clean_cr = re.sub(r'[^\d,.]', '', text).rstrip('.')
-                issue_size = f"₹{clean_cr} Cr"
-                issue_val_str = clean_cr.replace(',', '').split('.')[0]
+    # Extract Exact Lot Size (BLOCKING CURRENT YEAR)
+    if lot_idx != -1 and lot_idx < len(cols):
+        text = cols[lot_idx].text.strip()
+        m = re.search(r'(\d[\d,]*)', text)
+        if m:
+            val = int(m.group(1).replace(',', ''))
+            if 1 <= val <= 10000 and val != current_year:
+                auto_lot = val
 
-        # 2. Lot Size Auto-Detect (Strict 1-10000 integer, no Rs/₹ symbols, no decimals)
-        if not auto_lot and not any(sym in text for sym in ["₹", "Rs", "to", "-", "–", "%", "Cr", "."]):
-            if "price" not in header_text and "size" not in header_text:
-                clean_num = text.replace(',', '')
-                if re.fullmatch(r'\d{1,5}', clean_num):
-                    val = int(clean_num)
-                    if 1 <= val <= 10000 and (not issue_val_str or str(val) != issue_val_str):
-                        auto_lot = val
+    # Extract Exact Share Price (BLOCKING CURRENT YEAR)
+    if price_idx != -1 and price_idx < len(cols):
+        text = cols[price_idx].text.strip()
+        matches = re.findall(r'(\d[\d,]*)', text)
+        valid = []
+        for p in matches:
+            val = int(p.replace(',', ''))
+            if val != current_year and 10 <= val <= 5000:
+                valid.append(val)
+        if valid: price = max(valid)
 
-    # 3. Share Price Detection
-    all_prices = []
-    for idx, col in enumerate(cols):
-        text = col.text.strip()
-        text_lower = text.lower()
-        header_text = headers[idx].lower() if headers and idx < len(headers) else ""
-        if idx == 0: continue
+    # Fallbacks for poorly formatted tables
+    if issue_size == "TBA":
+        for col in cols:
+            text = col.text.strip()
+            if "cr" in text.lower() or "crore" in text.lower():
+                m = re.search(r'([\d,]+\.?\d*)', text)
+                if m: issue_size = f"₹{m.group(1).rstrip('.')} Cr"; break
 
-        if any(sym in text_lower for sym in ["₹", "rs", "-", "–", "to"]):
-            nums = re.findall(r'\d[\d,]*', text)
-            for n in nums:
-                val = int(n.replace(',', ''))
-                if 10 <= val <= 5000 and (not issue_val_str or str(val) != issue_val_str):
-                    all_prices.append(val)
-        elif "price" in header_text:
-            nums = re.findall(r'\d[\d,]*', text)
-            for n in nums:
-                val = int(n.replace(',', ''))
-                if 10 <= val <= 5000 and (not issue_val_str or str(val) != issue_val_str):
-                    all_prices.append(val)
+    if not price:
+        all_p = []
+        for col in cols[1:]:
+            matches = re.findall(r'(\d[\d,]*)', col.text.strip())
+            for p in matches:
+                val = int(p.replace(',', ''))
+                if val != current_year and 10 <= val <= 5000: all_p.append(val)
+        if all_p: price = max(all_p)
 
-    if all_prices: price = max(all_prices)
+    if not auto_lot:
+        for col in cols[1:]:
+            text = col.text.strip()
+            m = re.search(r'(\d[\d,]*)\s*shares?', text, re.IGNORECASE)
+            if m:
+                val = int(m.group(1).replace(',', ''))
+                if val != current_year and 1 <= val <= 10000: auto_lot = val; break
+            elif not any(s in text.lower() for s in ['₹', 'rs', 'cr', 'price', '-']):
+                m2 = re.search(r'^(\d[\d,]*)$', text)
+                if m2:
+                    val = int(m2.group(1).replace(',', ''))
+                    if val != current_year and 1 <= val <= 10000: auto_lot = val; break
+
     return price, issue_size, auto_lot
+
+def extract_row_dates(cols, current_year):
+    for col in cols[1:]:
+        open_d, close_d = parse_date_range(col.text.strip(), current_year)
+        if open_d and close_d: return open_d, close_d
+    if len(cols) >= 3:
+        d1, d2 = parse_date_string(cols[1].text.strip(), current_year), parse_date_string(cols[2].text.strip(), current_year)
+        if d1 and d2: return d1.strftime("%d %B %Y"), d2.strftime("%d %B %Y")
+    return None, None
 
 def is_github_actions():
     return os.environ.get("GITHUB_ACTIONS") == "true" or "--headless" in sys.argv
 
 def prompt_user_fundamentals(name):
     if is_github_actions():
-        print(f"  [Headless Cloud] Auto-publishing {name} with 'Data will be updated soon'")
         return None
 
     print(f"\n" + "="*55)
@@ -282,49 +288,22 @@ def evaluate_decision(enrichment, sector_name):
     proceeds = enrichment["proceedsUse"]
     score, checks = 0, []
 
-    if ps <= bench["avgPS"]:
-        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Attractive P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"})
-        score += 2
-    else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"High P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"})
-        score -= 1
+    if ps <= bench["avgPS"]: checks.append({"icon": "✓", "cls": "check-pass", "text": f"Attractive P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"}); score += 2
+    else: checks.append({"icon": "✗", "cls": "check-fail", "text": f"High P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"}); score -= 1
 
-    if cagr >= bench["avgCagr"]:
-        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Robust growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"})
-        score += 2
-    else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Slow revenue growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"})
-        score -= 1
+    if cagr >= bench["avgCagr"]: checks.append({"icon": "✓", "cls": "check-pass", "text": f"Robust growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"}); score += 2
+    else: checks.append({"icon": "✗", "cls": "check-fail", "text": f"Slow revenue growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"}); score -= 1
 
-    if promoter >= 50:
-        checks.append({"icon": "✓", "cls": "check-pass", "text": f"High promoter confidence ({promoter}% holding)"})
-        score += 1
-    else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Low promoter holding ({promoter}%)"})
-        score -= 1
+    if promoter >= 50: checks.append({"icon": "✓", "cls": "check-pass", "text": f"High promoter confidence ({promoter}% holding)"}); score += 1
+    else: checks.append({"icon": "✗", "cls": "check-fail", "text": f"Low promoter holding ({promoter}%)"}); score -= 1
 
-    if any(k in proceeds.lower() for k in ["capex", "growth", "working capital", "expansion"]):
-        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Major chunk of issue allocated to {proceeds}"})
-        score += 1
-    else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Major chunk of issue goes to {proceeds}"})
-        score -= 1
+    if any(k in proceeds.lower() for k in ["capex", "growth", "working capital", "expansion"]): checks.append({"icon": "✓", "cls": "check-pass", "text": f"Major chunk of issue allocated to {proceeds}"}); score += 1
+    else: checks.append({"icon": "✗", "cls": "check-fail", "text": f"Major chunk of issue goes to {proceeds}"}); score -= 1
 
-    if score >= 3:
-        return {"verdict": "Apply", "verdictCls": "verdict-apply", "summary": f"Strong fundamentals outperforming historical benchmarks in {sector_name}.", "checks": checks}
-    else:
-        return {"verdict": "Avoid", "verdictCls": "verdict-avoid", "summary": f"Subpar valuation or growth metrics compared to peers in {sector_name}.", "checks": checks}
+    if score >= 3: return {"verdict": "Apply", "verdictCls": "verdict-apply", "summary": f"Strong fundamentals outperforming historical benchmarks in {sector_name}.", "checks": checks}
+    else: return {"verdict": "Avoid", "verdictCls": "verdict-avoid", "summary": f"Subpar valuation or growth metrics compared to peers in {sector_name}.", "checks": checks}
 
-def extract_row_dates(cols):
-    for col in cols[1:]:
-        open_d, close_d = parse_date_range(col.text.strip())
-        if open_d and close_d: return open_d, close_d
-    if len(cols) >= 3:
-        d1, d2 = parse_date_string(cols[1].text.strip()), parse_date_string(cols[2].text.strip())
-        if d1 and d2: return d1.strftime("%d %B %Y"), d2.strftime("%d %B %Y")
-    return None, None
-
-def scrape_into_merged(session, url, default_cat, headers, merged_ipos):
+def scrape_into_merged(session, url, default_cat, headers, merged_ipos, now):
     response = session.get(url, headers=headers, timeout=20)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -349,14 +328,14 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos):
 
             if not raw_name or raw_name.lower() in {"company", "ipo", "ipo name", "company name", "issuer"} or "sse" in raw_name.lower() or "social stock" in raw_name.lower(): continue
 
-            open_date, close_date = extract_row_dates(cols)
-            if not is_currently_open(open_date, close_date): continue
+            open_date, close_date = extract_row_dates(cols, now.year)
+            if not is_currently_open(open_date, close_date, now): continue
 
             ipo_category = "SME IPO" if "sme" in raw_name.lower() or "sme" in row_text.lower() or "sme" in table_heading or default_cat == "SME IPO" else "Mainboard IPO"
             name = clean_company_name(raw_name)
             if len(name) < 3: continue
 
-            price, issue_size, auto_lot = parse_table_columns(cols, row_text, table_headers)
+            price, issue_size, auto_lot = parse_table_columns_mapped(cols, table_headers, now.year)
             canon, slug = canonical_key(name), name.lower().replace(" ", "-")
 
             if canon not in merged_ipos:
@@ -371,14 +350,8 @@ def scrape_into_merged(session, url, default_cat, headers, merged_ipos):
                 if ipo_category == "SME IPO": existing["category"] = "SME IPO"
 
 def fetch_open_ipos():
-    print("\n[Scraper v6.0] Triple-Lock Issue Size Extraction & Unbreakable Prompts...")
-    ipowatch_urls = [
-        ("https://ipowatch.in/upcoming-ipo-calendar-ipo-list/", None), 
-        ("https://ipowatch.in/upcoming-ipo-list/", None), 
-        ("https://ipowatch.in/upcoming-sme-ipo-list/", "SME IPO"), 
-        ("https://ipowatch.in/ipo-list/", None), 
-        ("https://ipowatch.in/sme-ipo-list/", "SME IPO")
-    ]
+    now = now_ist()
+    ipowatch_urls = [("https://ipowatch.in/upcoming-ipo-calendar-ipo-list/", None), ("https://ipowatch.in/upcoming-ipo-list/", None), ("https://ipowatch.in/upcoming-sme-ipo-list/", "SME IPO"), ("https://ipowatch.in/ipo-list/", None), ("https://ipowatch.in/sme-ipo-list/", "SME IPO")]
     fallback_url = "https://ipo.indiratrade.com/Home"
 
     session = requests.Session()
@@ -390,30 +363,31 @@ def fetch_open_ipos():
 
     merged_ipos = {}
     for url, default_cat in ipowatch_urls:
-        try: scrape_into_merged(session, url, default_cat, headers, merged_ipos)
+        try: scrape_into_merged(session, url, default_cat, headers, merged_ipos, now)
         except Exception: pass
     if not merged_ipos:
-        try: scrape_into_merged(session, fallback_url, None, headers, merged_ipos)
+        try: scrape_into_merged(session, fallback_url, None, headers, merged_ipos, now)
         except Exception: pass
 
     results = list(merged_ipos.values())
     return results
 
 def main():
+    now = now_ist()
     print("\n" + "="*50 + "\n  IPO Intelligence Dashboard — Interactive CLI Engine\n" + "="*50)
     cache, existing_data, open_ipos = load_cache(), load_existing_data(), fetch_open_ipos()
 
     if existing_data:
         scraped_canons = {canonical_key(ipo["name"]) for ipo in open_ipos}
         for slug, item in existing_data.items():
-            if is_currently_open(item.get("openDate"), item.get("closeDate")):
+            if is_currently_open(item.get("openDate"), item.get("closeDate"), now):
                 canon = canonical_key(item.get("name", slug))
                 if canon not in scraped_canons:
                     open_ipos.append({"slug": slug, "name": item.get("name", slug), "category": "SME IPO" if "SME" in item.get("sector", "") else "Mainboard IPO", "openDate": item.get("openDate"), "closeDate": item.get("closeDate"), "autoPrice": item.get("issuePrice"), "autoIssue": item.get("issueSize", "TBA"), "autoLot": item.get("lotSize")})
 
     if not open_ipos:
         print("\nNo OPEN IPOs found for today.")
-        save_data({"upcoming": [], "lastUpdated": now_ist().strftime("%d %b %Y, %I:%M %p")})
+        save_data({"upcoming": [], "lastUpdated": now.strftime("%d %b %Y, %I:%M %p")})
         return
 
     upcoming = []
@@ -422,8 +396,7 @@ def main():
         multiplier = 2 if ipo_cat == "SME IPO" else 1
 
         enrichment = find_in_dict(slug, name, cache)
-        if enrichment and enrichment.get("sector"): print(f"  [Cached] Loaded saved fundamentals for: {name}")
-        else:
+        if not enrichment or not enrichment.get("sector"):
             enrichment = prompt_user_fundamentals(name)
             if enrichment: cache[slug] = enrichment; save_cache(cache)
 
@@ -446,9 +419,9 @@ def main():
             historical_gain = f"{bench['avgListingGain']}% avg listing gain in last 1 yr ({bench['winRate']})"
         else: historical_gain = "Fundamental data pending entry for sector benchmarking"
 
-        upcoming.append({"slug": slug, "name": name, "symbol": name[:5].upper(), "sector": f"{sector_name} ({ipo_cat})", "status": "Open", "openDate": ipo["openDate"], "closeDate": ipo["closeDate"], "issuePrice": price, "lotSize": lot, "minAmount": min_amt, "issueSize": issue_sz, "historicalGain": historical_gain, "summary": decision["summary"], "verdict": decision["verdict"], "verdictCls": decision["verdictCls"], "checks": decision["checks"], "score": 1, "lastFetched": now_ist().strftime("%d %b %Y, %I:%M %p")})
+        upcoming.append({"slug": slug, "name": name, "symbol": name[:5].upper(), "sector": f"{sector_name} ({ipo_cat})", "status": "Open", "openDate": ipo["openDate"], "closeDate": ipo["closeDate"], "issuePrice": price, "lotSize": lot, "minAmount": min_amt, "issueSize": issue_sz, "historicalGain": historical_gain, "summary": decision["summary"], "verdict": decision["verdict"], "verdictCls": decision["verdictCls"], "checks": decision["checks"], "score": 1, "lastFetched": now.strftime("%d %b %Y, %I:%M %p")})
 
-    save_data({"upcoming": upcoming, "lastUpdated": now_ist().strftime("%d %b %Y, %I:%M %p")})
+    save_data({"upcoming": upcoming, "lastUpdated": now.strftime("%d %b %Y, %I:%M %p")})
     print(f"\nDone! Processed exactly {len(upcoming)} active OPEN IPO(s).\n")
 
 if __name__ == "__main__":

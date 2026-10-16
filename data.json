@@ -8,9 +8,9 @@
       "status": "Open",
       "openDate": "15 October 2026",
       "closeDate": "19 October 2026",
-      "issuePrice": 2026,
+      "issuePrice": 700,
       "lotSize": 21,
-      "minAmount": 42546,
+      "minAmount": 14700,
       "issueSize": "TBA",
       "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
       "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
@@ -39,7 +39,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 10:04 PM"
+      "lastFetched": "16 Oct 2026, 10:11 PM"
     },
     {
       "slug": "zetwerk-manufacturing-business",
@@ -49,9 +49,9 @@
       "status": "Open",
       "openDate": "15 October 2026",
       "closeDate": "19 October 2026",
-      "issuePrice": 2026,
+      "issuePrice": 151,
       "lotSize": 99,
-      "minAmount": 200574,
+      "minAmount": 14949,
       "issueSize": "TBA",
       "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
       "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
@@ -80,7 +80,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 10:04 PM"
+      "lastFetched": "16 Oct 2026, 10:11 PM"
     },
     {
       "slug": "bonfiglioli-transmissions",
@@ -90,9 +90,9 @@
       "status": "Open",
       "openDate": "15 October 2026",
       "closeDate": "19 October 2026",
-      "issuePrice": 2026,
+      "issuePrice": 586,
       "lotSize": 25,
-      "minAmount": 50650,
+      "minAmount": 14650,
       "issueSize": "TBA",
       "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
       "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
@@ -121,7 +121,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 10:04 PM"
+      "lastFetched": "16 Oct 2026, 10:11 PM"
     },
     {
       "slug": "sahajanand-medical-technologies",
@@ -131,9 +131,9 @@
       "status": "Open",
       "openDate": "15 October 2026",
       "closeDate": "19 October 2026",
-      "issuePrice": 2026,
+      "issuePrice": 344,
       "lotSize": 43,
-      "minAmount": 87118,
+      "minAmount": 14792,
       "issueSize": "TBA",
       "historicalGain": "21.0% avg listing gain in last 1 yr (15/18 positive)",
       "summary": "Subpar valuation or growth metrics compared to peers in Health Care.",
@@ -162,7 +162,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 10:04 PM"
+      "lastFetched": "16 Oct 2026, 10:11 PM"
     },
     {
       "slug": "shellz-india",
@@ -172,9 +172,9 @@
       "status": "Open",
       "openDate": "15 October 2026",
       "closeDate": "19 October 2026",
-      "issuePrice": 2026,
+      "issuePrice": 179,
       "lotSize": 800,
-      "minAmount": 3241600,
+      "minAmount": 286400,
       "issueSize": "TBA",
       "historicalGain": "12.0% avg listing gain in last 1 yr (11/15 positive)",
       "summary": "Subpar valuation or growth metrics compared to peers in Consumer Staples.",
@@ -203,8 +203,8 @@
         }
       ],
       "score": 1,
-      "lastFetched": "16 Oct 2026, 10:04 PM"
+      "lastFetched": "16 Oct 2026, 10:11 PM"
     }
   ],
-  "lastUpdated": "16 Oct 2026, 10:04 PM"
+  "lastUpdated": "16 Oct 2026, 10:11 PM"
 }
