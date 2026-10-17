@@ -4,7 +4,7 @@
       "slug": "bonfiglioli-transmissions",
       "name": "Bonfiglioli Transmissions",
       "symbol": "BONFI",
-      "sector": "Pending Entry (Mainboard IPO)",
+      "sector": "Industrials (Mainboard IPO)",
       "category": "Mainboard IPO",
       "status": "Open",
       "openDate": "15 October 2026",
@@ -13,25 +13,40 @@
       "lotSize": 25,
       "minAmount": 14650,
       "issueSize": "₹2,533.7 Cr",
-      "historicalGain": "Fundamental data pending entry for sector benchmarking",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
+      "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
+      "verdict": "Avoid",
+      "verdictCls": "verdict-avoid",
       "checks": [
         {
-          "icon": "ℹ",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "High P/S valuation (5.47x vs Sector Average 2.8x)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Slow revenue growth (9.22% vs Sector Average 14.0%)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "High promoter confidence (77.0% holding)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Major chunk of issue goes to Debt Repayment / OFS"
         }
       ],
       "score": 1,
-      "lastFetched": "17 Oct 2026, 01:21 AM"
+      "lastFetched": "17 Oct 2026, 05:34 PM"
     },
     {
       "slug": "tonbo-imaging",
       "name": "Tonbo Imaging",
       "symbol": "",
-      "sector": "Pending Entry (Mainboard IPO)",
+      "sector": "Industrials (Mainboard IPO)",
       "category": "Mainboard IPO",
       "status": "Open",
       "openDate": "15 October 2026",
@@ -40,19 +55,40 @@
       "lotSize": null,
       "minAmount": null,
       "issueSize": "₹852.2 Cr",
-      "historicalGain": "Fundamental data pending entry for sector benchmarking",
-      "summary": "Live issue details scraped automatically; fundamentals require separate verification.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
-      "checks": [],
-      "score": null,
-      "lastFetched": "17 Oct 2026, 01:21 AM"
+      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
+      "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
+      "verdict": "Avoid",
+      "verdictCls": "verdict-avoid",
+      "checks": [
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "High P/S valuation (11.06x vs Sector Average 2.8x)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Robust growth (55.3% vs Sector Average 14.0%)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Low promoter holding (15.72%)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Major chunk of issue goes to Debt Repayment / OFS"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "17 Oct 2026, 05:34 PM"
     },
     {
       "slug": "zetwerk",
       "name": "Zetwerk",
       "symbol": "",
-      "sector": "Pending Entry (Mainboard IPO)",
+      "sector": "Industrials (Mainboard IPO)",
       "category": "Mainboard IPO",
       "status": "Open",
       "openDate": "15 October 2026",
@@ -61,19 +97,40 @@
       "lotSize": null,
       "minAmount": null,
       "issueSize": "₹5,012.3 Cr",
-      "historicalGain": "Fundamental data pending entry for sector benchmarking",
-      "summary": "Live issue details scraped automatically; fundamentals require separate verification.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
-      "checks": [],
-      "score": null,
-      "lastFetched": "17 Oct 2026, 01:21 AM"
+      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
+      "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
+      "verdict": "Avoid",
+      "verdictCls": "verdict-avoid",
+      "checks": [
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (1.61x vs Sector Average 2.8x)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Slow revenue growth (13.45% vs Sector Average 14.0%)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Low promoter holding (11.36%)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Major chunk of issue goes to Debt Repayment / OFS"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "17 Oct 2026, 05:34 PM"
     },
     {
       "slug": "sahajanand-medical",
       "name": "Sahajanand Medical",
       "symbol": "",
-      "sector": "Pending Entry (Mainboard IPO)",
+      "sector": "Health Care (Mainboard IPO)",
       "category": "Mainboard IPO",
       "status": "Open",
       "openDate": "15 October 2026",
@@ -82,19 +139,40 @@
       "lotSize": null,
       "minAmount": null,
       "issueSize": "₹475.5 Cr",
-      "historicalGain": "Fundamental data pending entry for sector benchmarking",
-      "summary": "Live issue details scraped automatically; fundamentals require separate verification.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
-      "checks": [],
-      "score": null,
-      "lastFetched": "17 Oct 2026, 01:21 AM"
+      "historicalGain": "21.0% avg listing gain in last 1 yr (15/18 positive)",
+      "summary": "Subpar valuation or growth metrics compared to peers in Health Care.",
+      "verdict": "Avoid",
+      "verdictCls": "verdict-avoid",
+      "checks": [
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (2.89x vs Sector Average 4.5x)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Slow revenue growth (15.87% vs Sector Average 20.0%)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Low promoter holding (36.2%)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Major chunk of issue goes to Debt Repayment / OFS"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "17 Oct 2026, 05:34 PM"
     },
     {
       "slug": "shellz-india",
       "name": "Shellz India",
       "symbol": "SHELL",
-      "sector": "Pending Entry (SME IPO)",
+      "sector": "Consumer Staples (SME IPO)",
       "category": "SME IPO",
       "status": "Open",
       "openDate": "15 October 2026",
@@ -103,23 +181,36 @@
       "lotSize": 800,
       "minAmount": 286400,
       "issueSize": "₹60 Cr",
-      "historicalGain": "Fundamental data pending entry for sector benchmarking",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "12.0% avg listing gain in last 1 yr (11/15 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Consumer Staples.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "ℹ",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (1.12x vs Sector Average 3.5x)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Slow revenue growth (8.9% vs Sector Average 12.0%)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "High promoter confidence (63.64% holding)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Major chunk of issue allocated to Working Capital"
         }
       ],
       "score": 1,
-      "lastFetched": "17 Oct 2026, 01:21 AM"
+      "lastFetched": "17 Oct 2026, 05:34 PM"
     }
   ],
-  "lastUpdated": "17 Oct 2026, 01:21 AM",
-  "scrapeWarnings": [
-    "https://ipowatch.in/sme-ipo-2026/: HTTPError: 404 Client Error: Not Found for url: https://ipowatch.in/sme-ipo-2026/"
-  ]
+  "lastUpdated": "17 Oct 2026, 05:34 PM",
+  "scrapeWarnings": []
 }
