@@ -211,7 +211,7 @@
       "lastFetched": "17 Oct 2026, 07:36 PM"
     }
   ],
-  "lastUpdated": "18 Oct 2026, 04:59 PM",
+  "lastUpdated": "18 Oct 2026, 08:15 PM",
   "scrapeWarnings": [
     "https://ipowatch.in/upcoming-ipo-list/: HTTPError: 403 Client Error: Forbidden for url: https://ipowatch.in/upcoming-ipo-list/",
     "https://ipowatch.in/upcoming-ipo-this-week/: HTTPError: 403 Client Error: Forbidden for url: https://ipowatch.in/upcoming-ipo-this-week/",
