@@ -518,6 +518,7 @@ def evaluate_decision(enrichment, sector_name):
             "verdictCls": "verdict-caution",
             "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
             "checks": [{"icon": "ℹ", "cls": "check-warn", "text": "Fundamental metrics pending entry"}],
+            "score": 0,
         }
 
     bench = SECTOR_BENCHMARKS.get(sector_name, {"avgPS": 3.5, "avgCagr": 15.0})
@@ -525,33 +526,33 @@ def evaluate_decision(enrichment, sector_name):
     proceeds = enrichment["proceedsUse"]
     score, checks = 0, []
 
+    # 1. Valuation: +2 if passed, 0 if failed
     if ps <= bench["avgPS"]:
         checks.append({"icon": "✓", "cls": "check-pass", "text": f"Attractive P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"})
         score += 2
     else:
         checks.append({"icon": "✗", "cls": "check-fail", "text": f"High P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"})
-        score -= 1
 
+    # 2. Growth: +2 if passed, 0 if failed
     if cagr >= bench["avgCagr"]:
         checks.append({"icon": "✓", "cls": "check-pass", "text": f"Robust growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"})
         score += 2
     else:
         checks.append({"icon": "✗", "cls": "check-fail", "text": f"Slow revenue growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"})
-        score -= 1
 
+    # 3. Promoter Confidence: +1 if passed, 0 if failed
     if promoter >= 50:
         checks.append({"icon": "✓", "cls": "check-pass", "text": f"High promoter confidence ({promoter}% holding)"})
         score += 1
     else:
         checks.append({"icon": "✗", "cls": "check-fail", "text": f"Low promoter holding ({promoter}%)"})
-        score -= 1
 
+    # 4. Use of Proceeds: +1 if passed, 0 if failed
     if any(k in proceeds.lower() for k in ["capex", "growth", "working capital", "expansion"]):
         checks.append({"icon": "✓", "cls": "check-pass", "text": f"Major chunk of issue allocated to {proceeds}"})
         score += 1
     else:
         checks.append({"icon": "✗", "cls": "check-fail", "text": f"Major chunk of issue goes to {proceeds}"})
-        score -= 1
 
     if score >= 3:
         return {
@@ -559,12 +560,14 @@ def evaluate_decision(enrichment, sector_name):
             "verdictCls": "verdict-apply",
             "summary": f"Strong fundamentals outperforming historical benchmarks in {sector_name}.",
             "checks": checks,
+            "score": score,
         }
     return {
         "verdict": "Avoid",
         "verdictCls": "verdict-avoid",
         "summary": f"Subpar valuation or growth metrics compared to peers in {sector_name}.",
         "checks": checks,
+        "score": score,
     }
 
 
