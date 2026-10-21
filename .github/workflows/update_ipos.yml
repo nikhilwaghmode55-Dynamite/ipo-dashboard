@@ -1,54 +1,51 @@
-
-name: Auto-Fetch Live IPOs
+name: Update Live IPO Data
 
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    # 10:00 AM IST (04:30 UTC) — Lists new IPOs opening today
+    - cron: '30 4 * * *'
+    # 10:15 AM IST (04:45 UTC) — Backup morning sync
+    - cron: '45 4 * * *'
+    # 05:00 PM IST (11:30 UTC) — Removes closed IPOs at 5 PM sharp
+    - cron: '30 11 * * *'
+    # 05:15 PM IST (11:45 UTC) — Backup evening cleanup
+    - cron: '45 11 * * *'
   workflow_dispatch:
 
 permissions:
   contents: write
 
-concurrency:
-  group: ipo-dashboard-refresh
-  cancel-in-progress: false
-
 jobs:
   update-ipos:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Configure Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-          cache: pip
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          pip install -r requirements.txt
 
-      - name: Validate Python syntax
-        run: python -m py_compile fetch_ipos.py
+      - name: Run IPO Scraper Engine (Headless)
+        env:
+          GITHUB_ACTIONS: "true"
+        run: python fetch_ipos.py --headless
 
-      - name: Fetch current open IPOs
-        run: python fetch_ipos.py
-
-      - name: Commit updated data
+      - name: Commit and Push updated data.json
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data.json
-
-          if git diff --cached --quiet; then
-            echo "No changes to publish."
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
           else
-            git commit -m "Refresh live IPO data [skip ci]"
+            git commit -m "Auto-update IPO dashboard data ($(date -u +'%Y-%m-%d %H:%M UTC'))"
+            git pull --rebase origin main
             git push origin main
           fi

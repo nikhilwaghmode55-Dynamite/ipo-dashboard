@@ -33,5 +33,19 @@
     "cagr3Yr": 8.9,
     "proceedsUse": "Working Capital",
     "promoterPct": 63.64
+  },
+  "jioplatforms": {
+    "sector": "Communication Services",
+    "psRatio": 7.02,
+    "cagr3Yr": 15.42,
+    "proceedsUse": "Debt Repayment / OFS",
+    "promoterPct": 64.48
+  },
+  "parashealthcare": {
+    "sector": "Health Care",
+    "psRatio": 4.67,
+    "cagr3Yr": 19.26,
+    "proceedsUse": "Debt Repayment / OFS",
+    "promoterPct": 60.5
   }
 }
