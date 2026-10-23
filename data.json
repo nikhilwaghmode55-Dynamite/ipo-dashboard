@@ -40,7 +40,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "22 Oct 2026, 09:33 PM"
+      "lastFetched": "23 Oct 2026, 02:59 PM"
     },
     {
       "slug": "paras-healthcare",
@@ -82,10 +82,10 @@
         }
       ],
       "score": 1,
-      "lastFetched": "22 Oct 2026, 09:33 PM"
+      "lastFetched": "23 Oct 2026, 02:59 PM"
     }
   ],
-  "lastUpdated": "22 Oct 2026, 09:33 PM",
+  "lastUpdated": "23 Oct 2026, 02:59 PM",
   "scrapeWarnings": [
     "https://ipowatch.in/upcoming-ipo-list/: HTTPError: 403 Client Error: Forbidden for url: https://ipowatch.in/upcoming-ipo-list/",
     "https://ipowatch.in/upcoming-ipo-this-week/: HTTPError: 403 Client Error: Forbidden for url: https://ipowatch.in/upcoming-ipo-this-week/",
