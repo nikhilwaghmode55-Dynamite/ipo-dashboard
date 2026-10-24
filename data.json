@@ -1,10 +1,33 @@
 {
-  "upcoming": [],
-  "lastUpdated": "24 Oct 2026, 02:39 PM",
-  "scrapeWarnings": [
-    "https://ipowatch.in/upcoming-ipo-list/: HTTPError: 403 Client Error: Forbidden for url: https://ipowatch.in/upcoming-ipo-list/",
-    "https://ipowatch.in/upcoming-ipo-this-week/: HTTPError: 403 Client Error: Forbidden for url: https://ipowatch.in/upcoming-ipo-this-week/",
-    "https://ipowatch.in/mainboard-ipo-2026/: HTTPError: 403 Client Error: Forbidden for url: https://ipowatch.in/mainboard-ipo-2026/",
-    "https://ipowatch.in/upcoming-sme-ipo-list/: HTTPError: 403 Client Error: Forbidden for url: https://ipowatch.in/upcoming-sme-ipo-list/"
-  ]
+  "upcoming": [
+    {
+      "slug": "core4-engineers",
+      "name": "Core4 Engineers",
+      "symbol": "",
+      "sector": "Pending Entry (SME IPO)",
+      "category": "SME IPO",
+      "status": "Open",
+      "openDate": "23 October 2026",
+      "closeDate": "27 October 2026",
+      "issuePrice": 93.0,
+      "lotSize": null,
+      "minAmount": null,
+      "issueSize": "₹54.82 Cr",
+      "historicalGain": "Fundamental data pending entry for sector benchmarking",
+      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "ℹ",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending entry"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "24 Oct 2026, 08:10 PM"
+    }
+  ],
+  "lastUpdated": "24 Oct 2026, 08:10 PM",
+  "scrapeWarnings": []
 }
