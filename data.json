@@ -1,6 +1,6 @@
 {
   "upcoming": [],
-  "lastUpdated": "23 Oct 2026, 09:26 PM",
+  "lastUpdated": "24 Oct 2026, 02:31 PM",
   "scrapeWarnings": [
     "https://ipowatch.in/upcoming-ipo-list/: HTTPError: 403 Client Error: Forbidden for url: https://ipowatch.in/upcoming-ipo-list/",
     "https://ipowatch.in/upcoming-ipo-this-week/: HTTPError: 403 Client Error: Forbidden for url: https://ipowatch.in/upcoming-ipo-this-week/",
