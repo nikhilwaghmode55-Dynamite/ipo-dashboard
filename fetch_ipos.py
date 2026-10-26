@@ -1,8 +1,9 @@
 """
 fetch_ipos.py — Automated IPO Decision Engine
 - Brand-token entity deduplication
-- Strictly drops future/closed IPOs outside the 10:00 AM to 5:00 PM active window
+- Strictly drops future/closed IPOs outside the active window using pure calendar date
 - Dynamic SEBI Mainboard lot calculation
+- Ghost-cache resurrection eliminated
 """
 
 import json
@@ -189,12 +190,8 @@ def parse_dates(value):
                 1,
             )
         }
-
         def month_num(val):
-            return next(
-                (num for prefix, num in months.items() if val and val.lower().startswith(prefix)),
-                None,
-            )
+            return next((num for prefix, num in months.items() if val and val.lower().startswith(prefix)), None)
 
         end_month = month_num(m2)
         start_month = month_num(m1) or end_month
@@ -202,7 +199,6 @@ def parse_dates(value):
         if start_month and end_month:
             try:
                 y = int(yr or year)
-                # Handle year crossover dates correctly
                 if start_month == 12 and end_month == 1:
                      return date(y-1, start_month, int(d1)), date(y, end_month, int(d2))
                 return date(y, start_month, int(d1)), date(y, end_month, int(d2))
@@ -221,9 +217,8 @@ def parse_dates(value):
 def is_within_active_window(open_dt, close_dt, now):
     if not open_dt or not close_dt:
         return False
-    open_cutoff = datetime(open_dt.year, open_dt.month, open_dt.day, 10, 0, 0, tzinfo=IST)
-    close_cutoff = datetime(close_dt.year, close_dt.month, close_dt.day, 17, 0, 0, tzinfo=IST)
-    return open_cutoff <= now < close_cutoff
+    today_date = now.date()
+    return open_dt <= today_date <= close_dt
 
 def category_for(name, row_text, url):
     if "sme" in f"{name} {row_text} {url}".lower():
@@ -245,15 +240,12 @@ def extract_tables(soup, url):
                 clean(cell.get_text(" ", strip=True)).lower()
                 for cell in row.find_all(["th", "td"], recursive=False)
             ]
-            if any(
-                term in label
-                for label in labels
-                for term in (
-                    "company", "ipo name", "ipo date", "opening date", "open",
-                    "closing date", "close date", "close", "issue size",
-                    "ipo size", "price band", "price", "lot size", "bidding dates",
-                )
-            ):
+            
+            # STRICT FILTER: Ignore any table or row related to Anchor Investors
+            if any("anchor" in label for label in labels):
+                continue
+                
+            if any(term in label for label in labels for term in ("company", "ipo name", "ipo date", "opening date", "open", "closing date", "close date", "close", "issue size", "ipo size", "price band", "price", "lot size", "bidding dates")):
                 headers, header_row = labels, row
                 break
 
@@ -263,11 +255,12 @@ def extract_tables(soup, url):
         for row in rows:
             if row is header_row:
                 continue
-            values = [
-                clean(cell.get_text(" ", strip=True))
-                for cell in row.find_all(["td", "th"], recursive=False)
-            ]
+            values = [clean(cell.get_text(" ", strip=True)) for cell in row.find_all(["td", "th"], recursive=False)]
             if len(values) < 2:
+                continue
+            
+            # STRICT FILTER: Ignore any cell value related to Anchor Investors
+            if any("anchor" in val.lower() for val in values):
                 continue
 
             mapped = {headers[i]: value for i, value in enumerate(values) if i < len(headers)}
@@ -285,23 +278,20 @@ def extract_tables(soup, url):
             start = end = None
 
             for heading, value in mapped.items():
+                # Ignore Anchor bidding dates
+                if "anchor" in heading.lower():
+                    continue
                 if any(t in heading for t in ("ipo date", "bidding dates", "date")):
                     start, end = parse_dates(value)
                     if start and end:
                         break
 
             if not start or not end:
-                open_col = next((v for h, v in mapped.items() if "open" in h), None)
-                close_col = next((v for h, v in mapped.items() if "close" in h or "closing" in h), None)
+                open_col = next((v for h, v in mapped.items() if "open" in h and "anchor" not in h.lower()), None)
+                close_col = next((v for h, v in mapped.items() if ("close" in h or "closing" in h) and "anchor" not in h.lower()), None)
                 if open_col and close_col:
                     start = parse_one_date(open_col, current_year)
                     end = parse_one_date(close_col, current_year)
-
-            if not start or not end:
-                for value in values:
-                    start, end = parse_dates(value)
-                    if start and end:
-                        break
 
             price = None
             for heading, value in mapped.items():
@@ -379,10 +369,10 @@ def scrape(now):
             response.raise_for_status()
             records = extract_tables(BeautifulSoup(response.text, "html.parser"), url)
             for item in records:
-                # Strictly enforce date existence and active window logic
                 open_dt, close_dt = item.get("open"), item.get("close")
                 if not open_dt or not close_dt:
                     continue
+                # Strictly evaluate using date format
                 if not is_within_active_window(open_dt, close_dt, now):
                     continue
 
@@ -561,23 +551,6 @@ def main():
         for item in previous.get("upcoming", [])
         if item.get("name")
     }
-
-    for k, old in old_items.items():
-        if any(is_same_company(old.get("name"), x["name"]) for x in items):
-            continue
-        open_dt = parse_one_date(old.get("openDate"), now.year)
-        close_dt = parse_one_date(old.get("closeDate"), now.year)
-        if is_within_active_window(open_dt, close_dt, now):
-            print(f"  [Retention] Retaining active open IPO from cache: {old.get('name')}")
-            items.append({
-                "name": old.get("name"),
-                "category": old.get("category") or ("SME IPO" if "SME" in old.get("sector", "") else "Mainboard IPO"),
-                "open": open_dt,
-                "close": close_dt,
-                "price": old.get("issuePrice"),
-                "lot": old.get("lotSize"),
-                "issueSize": old.get("issueSize", "TBA"),
-            })
 
     output = []
     for item in items:

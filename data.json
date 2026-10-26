@@ -4,34 +4,49 @@
       "slug": "core4-engineers",
       "name": "Core4 Engineers",
       "symbol": "",
-      "sector": "Pending Entry (SME IPO)",
+      "sector": "Industrials (SME IPO)",
       "category": "SME IPO",
       "status": "Open",
       "openDate": "23 October 2026",
       "closeDate": "27 October 2026",
       "issuePrice": 93.0,
       "lotSize": 1200,
-      "minAmount": 223200,
+      "minAmount": 111600,
       "issueSize": "₹54.82 Cr",
-      "historicalGain": "Fundamental data pending entry for sector benchmarking",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Industrials.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "ℹ",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (2.11x vs Sector Average 2.8x)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Robust growth (90.95% vs Sector Average 14.0%)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "High promoter confidence (58.69% holding)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Major chunk of issue allocated to Working Capital"
         }
       ],
       "score": 1,
-      "lastFetched": "26 Oct 2026, 04:03 PM"
+      "lastFetched": "26 Oct 2026, 09:05 PM"
     },
     {
       "slug": "eaaa-india-alternatives",
       "name": "EAAA India Alternatives",
       "symbol": "",
-      "sector": "Pending Entry (Mainboard IPO)",
+      "sector": "Financials (Mainboard IPO)",
       "category": "Mainboard IPO",
       "status": "Open",
       "openDate": "26 October 2026",
@@ -40,19 +55,34 @@
       "lotSize": 9,
       "minAmount": 14985,
       "issueSize": "₹1,200 Cr",
-      "historicalGain": "Fundamental data pending entry for sector benchmarking",
-      "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "29.4% avg listing gain in last 1 yr (42/50 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Financials.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "ℹ",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending entry"
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "High P/S valuation (12.38x vs Sector Average 3.8x)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Robust growth (32.86% vs Sector Average 18.0%)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "High promoter confidence (88.85% holding)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Major chunk of issue goes to Debt Repayment / OFS"
         }
       ],
       "score": 1,
-      "lastFetched": "26 Oct 2026, 04:03 PM"
+      "lastFetched": "26 Oct 2026, 09:05 PM"
     },
     {
       "slug": "bls-polymers",
@@ -66,7 +96,7 @@
       "issuePrice": 150.0,
       "lotSize": 100,
       "minAmount": 15000,
-      "issueSize": "TBA",
+      "issueSize": "₹27 Cr",
       "historicalGain": "Fundamental data pending entry for sector benchmarking",
       "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
       "verdict": "Data will be updated soon",
@@ -79,7 +109,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Oct 2026, 04:03 PM"
+      "lastFetched": "26 Oct 2026, 09:05 PM"
     },
     {
       "slug": "sfc-environmental-technologies",
@@ -93,7 +123,7 @@
       "issuePrice": 330.0,
       "lotSize": 45,
       "minAmount": 14850,
-      "issueSize": "TBA",
+      "issueSize": "₹27 Cr",
       "historicalGain": "Fundamental data pending entry for sector benchmarking",
       "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
       "verdict": "Data will be updated soon",
@@ -106,7 +136,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Oct 2026, 04:03 PM"
+      "lastFetched": "26 Oct 2026, 09:05 PM"
     },
     {
       "slug": "wiscon-industries",
@@ -120,7 +150,7 @@
       "issuePrice": 204.0,
       "lotSize": 600,
       "minAmount": 122400,
-      "issueSize": "TBA",
+      "issueSize": "₹27 Cr",
       "historicalGain": "Fundamental data pending entry for sector benchmarking",
       "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
       "verdict": "Data will be updated soon",
@@ -133,7 +163,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Oct 2026, 04:03 PM"
+      "lastFetched": "26 Oct 2026, 09:05 PM"
     },
     {
       "slug": "ajwa-projects",
@@ -147,7 +177,7 @@
       "issuePrice": 203.0,
       "lotSize": 600,
       "minAmount": 121800,
-      "issueSize": "TBA",
+      "issueSize": "₹28 Cr",
       "historicalGain": "Fundamental data pending entry for sector benchmarking",
       "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
       "verdict": "Data will be updated soon",
@@ -160,7 +190,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Oct 2026, 04:03 PM"
+      "lastFetched": "26 Oct 2026, 09:05 PM"
     },
     {
       "slug": "carver-roboweld",
@@ -174,7 +204,7 @@
       "issuePrice": 80.0,
       "lotSize": 1600,
       "minAmount": 128000,
-      "issueSize": "TBA",
+      "issueSize": "₹28 Cr",
       "historicalGain": "Fundamental data pending entry for sector benchmarking",
       "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
       "verdict": "Data will be updated soon",
@@ -187,7 +217,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Oct 2026, 04:03 PM"
+      "lastFetched": "26 Oct 2026, 09:05 PM"
     },
     {
       "slug": "m-k-sons-fine-jewels",
@@ -201,7 +231,7 @@
       "issuePrice": 162.0,
       "lotSize": 91,
       "minAmount": 14742,
-      "issueSize": "TBA",
+      "issueSize": "₹28 Cr",
       "historicalGain": "Fundamental data pending entry for sector benchmarking",
       "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
       "verdict": "Data will be updated soon",
@@ -214,9 +244,9 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Oct 2026, 04:03 PM"
+      "lastFetched": "26 Oct 2026, 09:05 PM"
     }
   ],
-  "lastUpdated": "26 Oct 2026, 04:03 PM",
+  "lastUpdated": "26 Oct 2026, 09:05 PM",
   "scrapeWarnings": []
 }

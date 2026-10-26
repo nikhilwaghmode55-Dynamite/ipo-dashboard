@@ -47,5 +47,19 @@
     "cagr3Yr": 19.26,
     "proceedsUse": "Debt Repayment / OFS",
     "promoterPct": 60.5
+  },
+  "eaaaindiaalternatives": {
+    "sector": "Financials",
+    "psRatio": 12.38,
+    "cagr3Yr": 32.86,
+    "proceedsUse": "Debt Repayment / OFS",
+    "promoterPct": 88.85
+  },
+  "core4engineers": {
+    "sector": "Industrials",
+    "psRatio": 2.11,
+    "cagr3Yr": 90.95,
+    "proceedsUse": "Working Capital",
+    "promoterPct": 58.69
   }
 }
