@@ -1,16 +1,15 @@
 """
 fetch_ipos.py — Automated IPO Decision Engine
-- Brand-token entity deduplication (merges "Jio Platforms" & "Reliance Jio" automatically)
-- Lists new IPOs starting at 10:00 AM IST on Open Date
-- Removes closed IPOs at 5:00 PM IST on Close Date
-- Dynamic SEBI Mainboard lot calculation when portals omit the Lot column
+- Brand-token entity deduplication
+- Strictly drops future/closed IPOs outside the 10:00 AM to 5:00 PM active window
+- Dynamic SEBI Mainboard lot calculation
 """
 
 import json
 import os
 import re
 import sys
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -55,7 +54,6 @@ HEADERS = {
     "Accept-Language": "en-IN,en;q=0.9",
 }
 
-# Generic words stripped when comparing whether two portal names refer to the same company
 NOISE_WORDS = {
     "limited", "ltd", "pvt", "private", "ipo", "sme", "bse", "nse",
     "india", "indian", "global", "international", "group", "holdings",
@@ -71,7 +69,6 @@ NOISE_WORDS = {
     "chemicals", "textiles", "exports", "traders", "trading",
 }
 
-
 def session():
     client = requests.Session()
     retry = Retry(
@@ -83,10 +80,8 @@ def session():
     client.mount("https://", HTTPAdapter(max_retries=retry))
     return client
 
-
 def clean(value):
     return re.sub(r"\s+", " ", str(value).replace("\xa0", " ")).strip()
-
 
 def clean_company_name(raw_name):
     name = str(raw_name).split("(")[0].strip()
@@ -98,17 +93,13 @@ def clean_company_name(raw_name):
     ).strip()
     return re.sub(r"\s+", " ", name).strip(" -–.,")
 
-
 def key(value):
     return re.sub(r"[^a-z0-9]", "", clean_company_name(value).lower())
 
-
 def brand_tokens(name):
-    """Extract distinctive brand words so 'Jio Platforms' and 'Reliance Jio' match on 'jio'."""
     words = [w for w in re.findall(r"[a-z0-9]+", clean_company_name(name).lower()) if len(w) >= 3]
     distinctive = {w for w in words if w not in NOISE_WORDS}
     return distinctive if distinctive else set(words)
-
 
 def is_same_company(name_a, name_b):
     if not name_a or not name_b:
@@ -119,9 +110,7 @@ def is_same_company(name_a, name_b):
     ta, tb = brand_tokens(name_a), brand_tokens(name_b)
     return bool(ta and tb and (ta & tb))
 
-
 def find_matching_key(name, dictionary):
-    """Find an existing key in a dict that refers to the same company."""
     target_k = key(name)
     if target_k in dictionary:
         return target_k
@@ -131,19 +120,16 @@ def find_matching_key(name, dictionary):
             return existing_k
     return None
 
-
 def numbers(value):
     return [
         float(x.replace(",", ""))
         for x in re.findall(r"\d[\d,]*(?:\.\d+)?", str(value))
     ]
 
-
 def price_band(value):
     year = datetime.now(IST).year
     values = [n for n in numbers(value) if 1 <= n <= 100000 and int(n) != year]
     return max(values) if values else None
-
 
 def issue_size(value, heading=""):
     raw = clean(value)
@@ -161,11 +147,8 @@ def issue_size(value, heading=""):
         amount /= 10
     elif "lakh" in units:
         amount /= 1000
-    elif "crore" not in units and not re.search(r"\bcr\b", units):
-        return None
 
     return f"₹{amount:,.2f}".rstrip("0").rstrip(".") + " Cr"
-
 
 def parse_one_date(value, year=None):
     if not value or str(value).strip().upper() == "TBA":
@@ -188,7 +171,6 @@ def parse_one_date(value, year=None):
             pass
 
     return None
-
 
 def parse_dates(value):
     text = clean(value)
@@ -220,6 +202,9 @@ def parse_dates(value):
         if start_month and end_month:
             try:
                 y = int(yr or year)
+                # Handle year crossover dates correctly
+                if start_month == 12 and end_month == 1:
+                     return date(y-1, start_month, int(d1)), date(y, end_month, int(d2))
                 return date(y, start_month, int(d1)), date(y, end_month, int(d2))
             except ValueError:
                 pass
@@ -233,7 +218,6 @@ def parse_dates(value):
 
     return None, None
 
-
 def is_within_active_window(open_dt, close_dt, now):
     if not open_dt or not close_dt:
         return False
@@ -241,12 +225,10 @@ def is_within_active_window(open_dt, close_dt, now):
     close_cutoff = datetime(close_dt.year, close_dt.month, close_dt.day, 17, 0, 0, tzinfo=IST)
     return open_cutoff <= now < close_cutoff
 
-
 def category_for(name, row_text, url):
     if "sme" in f"{name} {row_text} {url}".lower():
         return "SME IPO"
     return "Mainboard IPO"
-
 
 def extract_tables(soup, url):
     records = []
@@ -388,7 +370,6 @@ def extract_tables(soup, url):
 
     return records
 
-
 def scrape(now):
     client = session()
     merged, errors = {}, []
@@ -398,7 +379,11 @@ def scrape(now):
             response.raise_for_status()
             records = extract_tables(BeautifulSoup(response.text, "html.parser"), url)
             for item in records:
-                if not is_within_active_window(item.get("open"), item.get("close"), now):
+                # Strictly enforce date existence and active window logic
+                open_dt, close_dt = item.get("open"), item.get("close")
+                if not open_dt or not close_dt:
+                    continue
+                if not is_within_active_window(open_dt, close_dt, now):
                     continue
 
                 match_k = find_matching_key(item["name"], merged)
@@ -417,10 +402,8 @@ def scrape(now):
         except Exception as exc:
             errors.append(f"{url}: {type(exc).__name__}: {exc}")
 
-    # Filter out unconfirmed rumor rows that have no price band
     opened = [item for item in merged.values() if item.get("price") is not None]
     return opened, errors
-
 
 def load_json(path, default):
     try:
@@ -428,16 +411,13 @@ def load_json(path, default):
     except (OSError, json.JSONDecodeError):
         return default
 
-
 def save_json(path, data):
     temp = path.with_suffix(".tmp")
     temp.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     temp.replace(path)
 
-
 def is_github_actions():
     return os.environ.get("GITHUB_ACTIONS") == "true" or "--headless" in sys.argv
-
 
 def prompt_user_fundamentals(name):
     if is_github_actions():
@@ -510,7 +490,6 @@ def prompt_user_fundamentals(name):
     except (EOFError, KeyboardInterrupt):
         return None
 
-
 def evaluate_decision(enrichment, sector_name):
     if not enrichment:
         return {
@@ -526,28 +505,24 @@ def evaluate_decision(enrichment, sector_name):
     proceeds = enrichment["proceedsUse"]
     score, checks = 0, []
 
-    # 1. Valuation: +2 if passed, 0 if failed
     if ps <= bench["avgPS"]:
         checks.append({"icon": "✓", "cls": "check-pass", "text": f"Attractive P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"})
         score += 2
     else:
         checks.append({"icon": "✗", "cls": "check-fail", "text": f"High P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"})
 
-    # 2. Growth: +2 if passed, 0 if failed
     if cagr >= bench["avgCagr"]:
         checks.append({"icon": "✓", "cls": "check-pass", "text": f"Robust growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"})
         score += 2
     else:
         checks.append({"icon": "✗", "cls": "check-fail", "text": f"Slow revenue growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"})
 
-    # 3. Promoter Confidence: +1 if passed, 0 if failed
     if promoter >= 50:
         checks.append({"icon": "✓", "cls": "check-pass", "text": f"High promoter confidence ({promoter}% holding)"})
         score += 1
     else:
         checks.append({"icon": "✗", "cls": "check-fail", "text": f"Low promoter holding ({promoter}%)"})
 
-    # 4. Use of Proceeds: +1 if passed, 0 if failed
     if any(k in proceeds.lower() for k in ["capex", "growth", "working capital", "expansion"]):
         checks.append({"icon": "✓", "cls": "check-pass", "text": f"Major chunk of issue allocated to {proceeds}"})
         score += 1
@@ -570,10 +545,8 @@ def evaluate_decision(enrichment, sector_name):
         "score": score,
     }
 
-
 def display_date(value):
     return value.strftime("%d %B %Y") if value else "TBA"
-
 
 def main():
     now = datetime.now(IST)
@@ -589,7 +562,6 @@ def main():
         if item.get("name")
     }
 
-    # Retain unexpired active IPOs if a source was temporarily blocked
     for k, old in old_items.items():
         if any(is_same_company(old.get("name"), x["name"]) for x in items):
             continue
@@ -628,11 +600,10 @@ def main():
         size = item.get("issueSize") or old.get("issueSize") or "TBA"
 
         is_sme = item["category"] == "SME IPO"
-        # SEBI Mainboard Retail Lot fallback (~Rs 15,000 cap) if portal omits Lot column
         if not lot and not is_sme and price and price > 0:
             lot = max(1, int(15000 // price))
 
-        lots_required = 2 if is_sme else 1
+        lots_required = 1
         investment = round(price * lot * lots_required) if price and lot else None
 
         sector_name = enrichment.get("sector", "Pending Entry") if enrichment else "Pending Entry"
@@ -690,7 +661,6 @@ def main():
 
     if errors:
         print(f"\n[WARN] {len(errors)} source(s) failed.")
-
 
 if __name__ == "__main__":
     main()

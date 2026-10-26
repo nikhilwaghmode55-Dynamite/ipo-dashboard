@@ -1,0 +1,35 @@
+name: Auto-Fetch Live IPOs
+
+on:
+  schedule:
+    # 04:30 UTC is exactly 10:00 AM IST. 11:30 UTC is 5:00 PM IST. 1-5 runs it Monday to Friday.
+    - cron: '30 4,11 * * 1-5'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  fetch-ipos:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run IPO scraper (Headless)
+      run: python fetch_ipos.py --headless
+
+    - name: Commit and push updated data
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data.json ipo_cache.json
+        git diff --quiet && git diff --staged --quiet || git commit -m "Auto-updated open IPOs"
+        git push
