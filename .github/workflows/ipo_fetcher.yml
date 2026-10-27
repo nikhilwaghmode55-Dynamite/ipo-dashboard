@@ -2,8 +2,9 @@ name: Auto-Fetch Live IPOs
 
 on:
   schedule:
-    # 04:30 UTC is exactly 10:00 AM IST. 11:30 UTC is 5:00 PM IST. 1-5 runs it Monday to Friday.
-    - cron: '30 4,11 * * 1-5'
+    # Runs at 4:00, 6:00, 8:00, 10:00, and 12:00 UTC (Mon-Fri)
+    # This translates to 9:30 AM, 11:30 AM, 1:30 PM, 3:30 PM, and 5:30 PM IST
+    - cron: '0 4,6,8,10,12 * * 1-5'
   workflow_dispatch: # Allows manual trigger from GitHub UI
 
 jobs:
