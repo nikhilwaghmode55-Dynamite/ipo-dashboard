@@ -1,8 +1,8 @@
 """
 fetch_ipos.py — Automated IPO Decision Engine
-- Strict entity deduplication (Fuzzy token-matching removed)
-- Strictly drops future/closed IPOs outside the active window using pure calendar date
-- Resolves Anchor-date false positives by cross-referencing sources and forcing the latest Open Date
+- Strict entity deduplication
+- Strictly enforces 10:00 AM Open and 5:00 PM Close cutoffs
+- Surgical Anchor-date filtering (no longer drops entire IPO rows)
 - Accurate SME multiplier logic (2 lots for SME)
 """
 
@@ -10,7 +10,7 @@ import json
 import os
 import re
 import sys
-from datetime import datetime, date
+from datetime import datetime, date, time
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -203,7 +203,10 @@ def parse_dates(value):
 def is_within_active_window(open_dt, close_dt, now):
     if not open_dt or not close_dt:
         return False
-    return open_dt <= now.date() <= close_dt
+    # Strictly enforces 10:00 AM on Open Date and 5:00 PM on Close Date
+    open_cutoff = datetime.combine(open_dt, time(10, 0, 0), tzinfo=IST)
+    close_cutoff = datetime.combine(close_dt, time(17, 0, 0), tzinfo=IST)
+    return open_cutoff <= now < close_cutoff
 
 def category_for(name, row_text, url):
     if "sme" in f"{name} {row_text} {url}".lower():
@@ -222,8 +225,6 @@ def extract_tables(soup, url):
         headers, header_row = None, None
         for row in rows[:3]:
             labels = [clean(cell.get_text(" ", strip=True)).lower() for cell in row.find_all(["th", "td"], recursive=False)]
-            if any("anchor" in label for label in labels): continue
-                
             if any(term in label for label in labels for term in ("company", "ipo name", "ipo date", "opening date", "open", "closing date", "close date", "close", "issue size", "ipo size", "price band", "price", "lot size", "bidding dates")):
                 headers, header_row = labels, row
                 break
@@ -235,11 +236,12 @@ def extract_tables(soup, url):
             values = [clean(cell.get_text(" ", strip=True)) for cell in row.find_all(["td", "th"], recursive=False)]
             if len(values) < 2: continue
             
-            if any("anchor" in val.lower() for val in values): continue
-
             mapped = {headers[i]: value for i, value in enumerate(values) if i < len(headers)}
             raw_name = values[0]
             if raw_name.lower() in {"company", "company name", "ipo name", "ipo", "company ipo", "issuer"}: continue
+            
+            # Surgically drop only specific Anchor-named rows, not rows where "anchor" is merely mentioned in a value cell
+            if "anchor" in raw_name.lower(): continue
             if "sse" in raw_name.lower() or "social stock" in raw_name.lower() or "apply" in raw_name.lower(): continue
 
             name = clean_company_name(raw_name)
@@ -346,6 +348,7 @@ def scrape(now):
                     if old.get(field) is None and item.get(field) is not None:
                         old[field] = item[field]
                 
+                # Forces alignment to latest date to override Anchor discrepancies
                 if item.get("open"):
                     if not old.get("open") or item["open"] > old["open"]:
                         old["open"] = item["open"]
@@ -361,6 +364,7 @@ def scrape(now):
     opened = []
     for item in merged.values():
         if item.get("price") is not None:
+            # Active window evaluated here against precise 10 AM / 5 PM bounds
             if is_within_active_window(item.get("open"), item.get("close"), now):
                 opened.append(item)
                 
@@ -451,7 +455,7 @@ def evaluate_decision(enrichment, sector_name):
         checks.append({"icon": "✓", "cls": "check-pass", "text": f"Attractive P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"})
         score += 2
     else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"High P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"})
+        checks.append({"icon": "✗", "cls": "check-pass", "text": f"High P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"})
 
     if cagr >= bench["avgCagr"]:
         checks.append({"icon": "✓", "cls": "check-pass", "text": f"Robust growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"})
@@ -524,7 +528,6 @@ def main():
         if not lot and not is_sme and price and price > 0:
             lot = max(1, int(15000 // price))
 
-        # Reverted back to 2 lots for SME requirement
         lots_required = 2 if is_sme else 1
         investment = round(price * lot * lots_required) if price and lot else None
 

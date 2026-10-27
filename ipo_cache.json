@@ -61,5 +61,26 @@
     "cagr3Yr": 90.95,
     "proceedsUse": "Working Capital",
     "promoterPct": 58.69
+  },
+  "sfc": {
+    "sector": "Industrials",
+    "psRatio": 4.02,
+    "cagr3Yr": 10.56,
+    "proceedsUse": "Debt Repayment / OFS",
+    "promoterPct": 41.0
+  },
+  "bls": {
+    "sector": "Industrials",
+    "psRatio": 2.66,
+    "cagr3Yr": 8.59,
+    "proceedsUse": "Working Capital",
+    "promoterPct": 71.53
+  },
+  "wiscon": {
+    "sector": "Consumer Discretionary",
+    "psRatio": 2.07,
+    "cagr3Yr": 683.0,
+    "proceedsUse": "Working Capital",
+    "promoterPct": 73.0
   }
 }

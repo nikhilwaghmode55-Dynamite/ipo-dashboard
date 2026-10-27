@@ -1,48 +1,6 @@
 {
   "upcoming": [
     {
-      "slug": "core4-engineers",
-      "name": "Core4 Engineers",
-      "symbol": "",
-      "sector": "Industrials (SME IPO)",
-      "category": "SME IPO",
-      "status": "Open",
-      "openDate": "26 October 2026",
-      "closeDate": "27 October 2026",
-      "issuePrice": 93.0,
-      "lotSize": 1200,
-      "minAmount": 223200,
-      "issueSize": "₹54.82 Cr",
-      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
-      "summary": "Strong fundamentals outperforming historical benchmarks in Industrials.",
-      "verdict": "Apply",
-      "verdictCls": "verdict-apply",
-      "checks": [
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Attractive P/S valuation (2.11x vs Sector Average 2.8x)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Robust growth (90.95% vs Sector Average 14.0%)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "High promoter confidence (58.69% holding)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Major chunk of issue allocated to Working Capital"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "26 Oct 2026, 09:27 PM"
-    },
-    {
       "slug": "eaaa-india-alternatives",
       "name": "EAAA India Alternatives",
       "symbol": "",
@@ -62,7 +20,7 @@
       "checks": [
         {
           "icon": "✗",
-          "cls": "check-fail",
+          "cls": "check-pass",
           "text": "High P/S valuation (12.38x vs Sector Average 3.8x)"
         },
         {
@@ -82,9 +40,135 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Oct 2026, 09:27 PM"
+      "lastFetched": "27 Oct 2026, 08:03 PM"
+    },
+    {
+      "slug": "bls-polymers",
+      "name": "BLS Polymers",
+      "symbol": "",
+      "sector": "Industrials (Mainboard IPO)",
+      "category": "Mainboard IPO",
+      "status": "Open",
+      "openDate": "27 October 2026",
+      "closeDate": "29 October 2026",
+      "issuePrice": 150.0,
+      "lotSize": 100,
+      "minAmount": 15000,
+      "issueSize": "₹255 Cr",
+      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Industrials.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
+      "checks": [
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (2.66x vs Sector Average 2.8x)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Slow revenue growth (8.59% vs Sector Average 14.0%)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "High promoter confidence (71.53% holding)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Major chunk of issue allocated to Working Capital"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "27 Oct 2026, 08:03 PM"
+    },
+    {
+      "slug": "sfc-environmental",
+      "name": "SFC Environmental",
+      "symbol": "",
+      "sector": "Industrials (Mainboard IPO)",
+      "category": "Mainboard IPO",
+      "status": "Open",
+      "openDate": "27 October 2026",
+      "closeDate": "29 October 2026",
+      "issuePrice": 330.0,
+      "lotSize": 45,
+      "minAmount": 14850,
+      "issueSize": "₹668 Cr",
+      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
+      "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
+      "verdict": "Avoid",
+      "verdictCls": "verdict-avoid",
+      "checks": [
+        {
+          "icon": "✗",
+          "cls": "check-pass",
+          "text": "High P/S valuation (4.02x vs Sector Average 2.8x)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Slow revenue growth (10.56% vs Sector Average 14.0%)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Low promoter holding (41.0%)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Major chunk of issue goes to Debt Repayment / OFS"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "27 Oct 2026, 08:03 PM"
+    },
+    {
+      "slug": "wiscon-industries",
+      "name": "Wiscon Industries",
+      "symbol": "",
+      "sector": "Consumer Discretionary (SME IPO)",
+      "category": "SME IPO",
+      "status": "Open",
+      "openDate": "27 October 2026",
+      "closeDate": "29 October 2026",
+      "issuePrice": 204.0,
+      "lotSize": 600,
+      "minAmount": 244800,
+      "issueSize": "₹110 Cr",
+      "historicalGain": "16.5% avg listing gain in last 1 yr (18/24 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Consumer Discretionary.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
+      "checks": [
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (2.07x vs Sector Average 4.0x)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Robust growth (683.0% vs Sector Average 16.0%)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "High promoter confidence (73.0% holding)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Major chunk of issue allocated to Working Capital"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "27 Oct 2026, 08:03 PM"
     }
   ],
-  "lastUpdated": "26 Oct 2026, 09:27 PM",
+  "lastUpdated": "27 Oct 2026, 08:03 PM",
   "scrapeWarnings": []
 }
