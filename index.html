@@ -148,9 +148,8 @@
 
     async function loadData() {
       try {
-        // STRICT CACHE BUSTING: Forces the browser to ignore saved files and fetch live data
-        const cacheBuster = new Date().getTime() + Math.random();
-        const response = await fetch('data.json?v=' + cacheBuster, { cache: "no-store" });
+        const cacheBuster = new Date().getTime();
+        const response = await fetch(`data.json?v=${cacheBuster}`, { cache: "no-store" });
         const data = await response.json();
         
         document.getElementById('last-updated').textContent = `Last Updated: ${data.lastUpdated || 'Just Now'}`;
