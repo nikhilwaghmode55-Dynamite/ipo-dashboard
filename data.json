@@ -1,48 +1,6 @@
 {
   "upcoming": [
     {
-      "slug": "eaaa-india-alternatives",
-      "name": "EAAA India Alternatives",
-      "symbol": "",
-      "sector": "Financials (Mainboard IPO)",
-      "category": "Mainboard IPO",
-      "status": "Open",
-      "openDate": "26 October 2026",
-      "closeDate": "28 October 2026",
-      "issuePrice": 1665.0,
-      "lotSize": 9,
-      "minAmount": 14985,
-      "issueSize": "₹1,200 Cr",
-      "historicalGain": "29.4% avg listing gain in last 1 yr (42/50 positive)",
-      "summary": "Strong fundamentals outperforming historical benchmarks in Financials.",
-      "verdict": "Apply",
-      "verdictCls": "verdict-apply",
-      "checks": [
-        {
-          "icon": "✗",
-          "cls": "check-pass",
-          "text": "High P/S valuation (12.38x vs Sector Average 3.8x)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Robust growth (32.86% vs Sector Average 18.0%)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "High promoter confidence (88.85% holding)"
-        },
-        {
-          "icon": "✗",
-          "cls": "check-fail",
-          "text": "Major chunk of issue goes to Debt Repayment / OFS"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "27 Oct 2026, 08:03 PM"
-    },
-    {
       "slug": "bls-polymers",
       "name": "BLS Polymers",
       "symbol": "",
@@ -82,7 +40,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "27 Oct 2026, 08:03 PM"
+      "lastFetched": "28 Oct 2026, 05:38 PM"
     },
     {
       "slug": "sfc-environmental",
@@ -124,7 +82,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "27 Oct 2026, 08:03 PM"
+      "lastFetched": "28 Oct 2026, 05:38 PM"
     },
     {
       "slug": "wiscon-industries",
@@ -166,9 +124,135 @@
         }
       ],
       "score": 1,
-      "lastFetched": "27 Oct 2026, 08:03 PM"
+      "lastFetched": "28 Oct 2026, 05:38 PM"
+    },
+    {
+      "slug": "ajwa-projects",
+      "name": "Ajwa Projects",
+      "symbol": "",
+      "sector": "Industrials (SME IPO)",
+      "category": "SME IPO",
+      "status": "Open",
+      "openDate": "28 October 2026",
+      "closeDate": "30 October 2026",
+      "issuePrice": 203.0,
+      "lotSize": 600,
+      "minAmount": 243600,
+      "issueSize": "₹38.05 Cr",
+      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Industrials.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
+      "checks": [
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (2.31x vs Sector Average 2.8x)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Robust growth (18.88% vs Sector Average 14.0%)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "High promoter confidence (72.36% holding)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Major chunk of issue goes to Debt Repayment / OFS"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "28 Oct 2026, 05:38 PM"
+    },
+    {
+      "slug": "carver-roboweld",
+      "name": "Carver Roboweld",
+      "symbol": "",
+      "sector": "Industrials (SME IPO)",
+      "category": "SME IPO",
+      "status": "Open",
+      "openDate": "28 October 2026",
+      "closeDate": "30 October 2026",
+      "issuePrice": 80.0,
+      "lotSize": 1600,
+      "minAmount": 256000,
+      "issueSize": "₹28.29 Cr",
+      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
+      "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
+      "verdict": "Avoid",
+      "verdictCls": "verdict-avoid",
+      "checks": [
+        {
+          "icon": "✗",
+          "cls": "check-pass",
+          "text": "High P/S valuation (3.88x vs Sector Average 2.8x)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Slow revenue growth (11.73% vs Sector Average 14.0%)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "High promoter confidence (65.77% holding)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Major chunk of issue allocated to Capex and Business Expansion"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "28 Oct 2026, 05:38 PM"
+    },
+    {
+      "slug": "m-k-sons-fine-jewels",
+      "name": "M.K.Sons Fine Jewels",
+      "symbol": "",
+      "sector": "Industrials (Mainboard IPO)",
+      "category": "Mainboard IPO",
+      "status": "Open",
+      "openDate": "28 October 2026",
+      "closeDate": "30 October 2026",
+      "issuePrice": 162.0,
+      "lotSize": 91,
+      "minAmount": 14742,
+      "issueSize": "₹275.4 Cr",
+      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
+      "summary": "Strong fundamentals outperforming historical benchmarks in Industrials.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
+      "checks": [
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (2.31x vs Sector Average 2.8x)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Robust growth (18.88% vs Sector Average 14.0%)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "High promoter confidence (72.36% holding)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Major chunk of issue goes to Debt Repayment / OFS"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "28 Oct 2026, 05:38 PM"
     }
   ],
-  "lastUpdated": "27 Oct 2026, 08:03 PM",
+  "lastUpdated": "28 Oct 2026, 05:38 PM",
   "scrapeWarnings": []
 }

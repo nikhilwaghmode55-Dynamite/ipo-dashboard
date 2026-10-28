@@ -82,5 +82,26 @@
     "cagr3Yr": 683.0,
     "proceedsUse": "Working Capital",
     "promoterPct": 73.0
+  },
+  "mksonsfine": {
+    "sector": "Industrials",
+    "psRatio": 2.31,
+    "cagr3Yr": 18.88,
+    "proceedsUse": "Debt Repayment / OFS",
+    "promoterPct": 72.36
+  },
+  "ajwa": {
+    "sector": "Industrials",
+    "psRatio": 2.31,
+    "cagr3Yr": 18.88,
+    "proceedsUse": "Debt Repayment / OFS",
+    "promoterPct": 72.36
+  },
+  "carverroboweld": {
+    "sector": "Industrials",
+    "psRatio": 3.88,
+    "cagr3Yr": 11.73,
+    "proceedsUse": "Capex and Business Expansion",
+    "promoterPct": 65.77
   }
 }
