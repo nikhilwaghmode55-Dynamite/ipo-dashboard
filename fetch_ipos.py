@@ -1,15 +1,15 @@
 """
 fetch_ipos.py — Automated IPO Decision Engine
 - Strict entity deduplication
-- Strictly enforces 10:00 AM Open and 5:00 PM Close cutoffs
-- FAULT TOLERANT: Allows IPOs with "TBA" prices/lots to pass through
+- FUTURE-ONLY FILTER: Fetches all Open and Upcoming IPOs
+- CLI BYPASS: Only prompts for fundamentals if the IPO is actively Open today
 """
 
 import json
 import os
 import re
 import sys
-from datetime import datetime, date, time
+from datetime import datetime, date
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -125,8 +125,9 @@ def issue_size(value, heading=""):
     return f"₹{amount:,.2f}".rstrip("0").rstrip(".") + " Cr"
 
 def parse_one_date(value, year=None):
-    if not value or str(value).strip().upper() == "TBA": return None
-    text = clean(value)
+    if not value or str(value).strip().upper() in ["TBA", "NA", "-", "—", ""]: return None
+    # Aggressively strip commas to prevent parsing failures
+    text = clean(value).replace(",", "").replace(".", "").strip()
     text = re.sub(r"(\d+)(st|nd|rd|th)\b", r"\1", text, flags=re.I)
     year = int(year or datetime.now(IST).year)
     for fmt in ("%d %B %Y", "%d %b %Y", "%d-%m-%Y", "%d/%m/%Y", "%d-%b-%Y", "%Y-%m-%d"):
@@ -140,7 +141,7 @@ def parse_one_date(value, year=None):
     return None
 
 def parse_dates(value):
-    text = clean(value)
+    text = clean(value).replace(",", "").replace(".", "").strip()
     text = re.sub(r"(\d+)(st|nd|rd|th)\b", r"\1", text, flags=re.I)
     text = text.replace(" to ", " - ").replace("–", "-").replace("—", "-")
     year = datetime.now(IST).year
@@ -164,12 +165,6 @@ def parse_dates(value):
         end = parse_one_date(parts[1], year)
         if start and end: return start, end
     return None, None
-
-def is_within_active_window(open_dt, close_dt, now):
-    if not open_dt or not close_dt: return False
-    open_cutoff = datetime.combine(open_dt, time(10, 0, 0), tzinfo=IST)
-    close_cutoff = datetime.combine(close_dt, time(17, 0, 0), tzinfo=IST)
-    return open_cutoff <= now < close_cutoff
 
 def category_for(name, row_text, url):
     if "sme" in f"{name} {row_text} {url}".lower(): return "SME IPO"
@@ -202,7 +197,8 @@ def extract_tables(soup, url):
             start = end = None
             for heading, value in mapped.items():
                 if "anchor" in heading.lower(): continue
-                if any(t in heading for t in ("ipo date", "bidding dates", "date")):
+                # More fault-tolerant header checking
+                if any(t in heading for t in ("ipo date", "bidding dates", "date", "subscription")):
                     start, end = parse_dates(value)
                     if start and end: break
             if not start or not end:
@@ -263,6 +259,13 @@ def extract_tables(soup, url):
             })
     return records
 
+def get_status(open_dt, close_dt, now):
+    if not open_dt or not close_dt: return "Upcoming"
+    today = now.date()
+    if open_dt <= today <= close_dt: return "Open"
+    if today < open_dt: return "Upcoming"
+    return "Closed"
+
 def scrape(now):
     client = session()
     merged, errors = {}, []
@@ -272,7 +275,6 @@ def scrape(now):
             response.raise_for_status()
             records = extract_tables(BeautifulSoup(response.text, "html.parser"), url)
             for item in records:
-                if not item.get("open") or not item.get("close"): continue
                 match_k = find_matching_key(item["name"], merged)
                 if not match_k:
                     k = key(item["name"])
@@ -289,8 +291,9 @@ def scrape(now):
     
     opened = []
     for item in merged.values():
-        # REMOVED STRICT PRICE CHECK: Now allows IPOs to be listed even if price is missing
-        if is_within_active_window(item.get("open"), item.get("close"), now):
+        # Keep IPO if it has NOT closed yet (Captures Open + Upcoming)
+        close_dt = item.get("close")
+        if close_dt and close_dt >= now.date():
             opened.append(item)
     return opened, errors
 
@@ -368,12 +371,19 @@ def main():
         match_old_k, match_cache_k = find_matching_key(item["name"], old_items), find_matching_key(item["name"], cache)
         old, enrichment = old_items.get(match_old_k, {}) if match_old_k else {}, cache.get(match_cache_k) if match_cache_k else None
 
-        if enrichment and enrichment.get("sector"): print(f"  [Cached] Loaded fundamentals for: {item['name']}")
+        status = get_status(item.get("open"), item.get("close"), now)
+        
+        # ONLY PROMPT FOR CURRENTLY ACTIVE IPOs. SKIP UPCOMING.
+        if status == "Open":
+            if enrichment and enrichment.get("sector"): print(f"  [Cached] Loaded fundamentals for: {item['name']}")
+            else:
+                enrichment = prompt_user_fundamentals(item["name"])
+                if enrichment:
+                    cache[key(item["name"])] = enrichment
+                    save_json(CACHE_FILE, cache)
         else:
-            enrichment = prompt_user_fundamentals(item["name"])
-            if enrichment:
-                cache[key(item["name"])] = enrichment
-                save_json(CACHE_FILE, cache)
+            enrichment = None
+            print(f"  [{status}] Skipping CLI entry for: {item['name']}")
 
         price = item.get("price") or old.get("issuePrice")
         lot = item.get("lot") or old.get("lotSize")
@@ -393,7 +403,7 @@ def main():
             "symbol": old.get("symbol", ""),
             "sector": f"{sector_name} ({item['category']})",
             "category": item["category"],
-            "status": "Open",
+            "status": status,
             "openDate": display_date(item.get("open")),
             "closeDate": display_date(item.get("close")),
             "issuePrice": price,
@@ -411,8 +421,7 @@ def main():
 
     output.sort(key=lambda item: (parse_one_date(item.get("closeDate", ""), now.year) or date.max, item.get("name", "").lower()))
     save_json(DATA_FILE, {"upcoming": output, "lastUpdated": now.strftime("%d %b %Y, %I:%M %p"), "scrapeWarnings": errors})
-    print(f"\n[OK] {len(output)} currently open IPO(s) written to data.json")
-    for item in output: print(f"{item['name']} | Price: {item['issuePrice']} | Verdict: {item['verdict']}")
+    print(f"\n[OK] {len(output)} total IPO(s) fetched and written to data.json")
 
 if __name__ == "__main__":
     main()

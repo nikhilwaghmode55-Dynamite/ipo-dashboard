@@ -40,7 +40,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:05 AM"
+      "lastFetched": "30 Oct 2026, 07:22 AM"
     },
     {
       "slug": "carver-roboweld",
@@ -82,7 +82,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:05 AM"
+      "lastFetched": "30 Oct 2026, 07:22 AM"
     },
     {
       "slug": "m-k-sons-fine-jewels",
@@ -94,8 +94,8 @@
       "openDate": "28 October 2026",
       "closeDate": "30 October 2026",
       "issuePrice": 162.0,
-      "lotSize": 91,
-      "minAmount": 14742,
+      "lotSize": 4,
+      "minAmount": 648,
       "issueSize": "₹275.4 Cr",
       "historicalGain": "18.2% avg listing gain in last 1 yr",
       "summary": "Strong fundamentals in Industrials.",
@@ -124,9 +124,198 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:05 AM"
+      "lastFetched": "30 Oct 2026, 07:22 AM"
+    },
+    {
+      "slug": "antala-industries",
+      "name": "Antala Industries",
+      "symbol": "",
+      "sector": "Pending Entry (SME IPO)",
+      "category": "SME IPO",
+      "status": "Upcoming",
+      "openDate": "29 November 2026",
+      "closeDate": "02 November 2026",
+      "issuePrice": 67.0,
+      "lotSize": 2000,
+      "minAmount": 268000,
+      "issueSize": "₹23.33 Cr",
+      "historicalGain": "Data pending",
+      "summary": "Awaiting fundamental RHP data entry.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "ℹ",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "30 Oct 2026, 07:22 AM"
+    },
+    {
+      "slug": "bombay-coated-and-special-steels",
+      "name": "Bombay Coated and Special Steels",
+      "symbol": "",
+      "sector": "Pending Entry (Mainboard IPO)",
+      "category": "Mainboard IPO",
+      "status": "Upcoming",
+      "openDate": "29 November 2026",
+      "closeDate": "02 November 2026",
+      "issuePrice": 82.0,
+      "lotSize": 2,
+      "minAmount": 164,
+      "issueSize": "₹183.06 Cr",
+      "historicalGain": "Data pending",
+      "summary": "Awaiting fundamental RHP data entry.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "ℹ",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "30 Oct 2026, 07:22 AM"
+    },
+    {
+      "slug": "hgs",
+      "name": "HGS",
+      "symbol": "",
+      "sector": "Pending Entry (SME IPO)",
+      "category": "SME IPO",
+      "status": "Upcoming",
+      "openDate": "30 November 2026",
+      "closeDate": "03 November 2026",
+      "issuePrice": 120.0,
+      "lotSize": 1200,
+      "minAmount": 288000,
+      "issueSize": "₹34.56 Cr",
+      "historicalGain": "Data pending",
+      "summary": "Awaiting fundamental RHP data entry.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "ℹ",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "30 Oct 2026, 07:22 AM"
+    },
+    {
+      "slug": "johnsoncab-electricals",
+      "name": "Johnsoncab Electricals",
+      "symbol": "",
+      "sector": "Pending Entry (SME IPO)",
+      "category": "SME IPO",
+      "status": "Upcoming",
+      "openDate": "30 November 2026",
+      "closeDate": "03 November 2026",
+      "issuePrice": 200.0,
+      "lotSize": 600,
+      "minAmount": 240000,
+      "issueSize": "₹56.02 Cr",
+      "historicalGain": "Data pending",
+      "summary": "Awaiting fundamental RHP data entry.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "ℹ",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "30 Oct 2026, 07:22 AM"
+    },
+    {
+      "slug": "maxwell-engineering",
+      "name": "Maxwell Engineering",
+      "symbol": "",
+      "sector": "Pending Entry (SME IPO)",
+      "category": "SME IPO",
+      "status": "Upcoming",
+      "openDate": "30 November 2026",
+      "closeDate": "03 November 2026",
+      "issuePrice": 158.0,
+      "lotSize": 800,
+      "minAmount": 252800,
+      "issueSize": "₹57.64 Cr",
+      "historicalGain": "Data pending",
+      "summary": "Awaiting fundamental RHP data entry.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "ℹ",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "30 Oct 2026, 07:22 AM"
+    },
+    {
+      "slug": "vectras-enprocon",
+      "name": "Vectras Enprocon",
+      "symbol": "",
+      "sector": "Pending Entry (SME IPO)",
+      "category": "SME IPO",
+      "status": "Upcoming",
+      "openDate": "30 November 2026",
+      "closeDate": "03 November 2026",
+      "issuePrice": 105.0,
+      "lotSize": 1200,
+      "minAmount": 252000,
+      "issueSize": "₹53.05 Cr",
+      "historicalGain": "Data pending",
+      "summary": "Awaiting fundamental RHP data entry.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "ℹ",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "30 Oct 2026, 07:22 AM"
+    },
+    {
+      "slug": "vedant-poly-fabs",
+      "name": "Vedant Poly Fabs",
+      "symbol": "",
+      "sector": "Pending Entry (SME IPO)",
+      "category": "SME IPO",
+      "status": "Upcoming",
+      "openDate": "26 November 2026",
+      "closeDate": "04 November 2026",
+      "issuePrice": 94.0,
+      "lotSize": 1200,
+      "minAmount": 225600,
+      "issueSize": "₹56.68 Cr",
+      "historicalGain": "Data pending",
+      "summary": "Awaiting fundamental RHP data entry.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "ℹ",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "30 Oct 2026, 07:22 AM"
     }
   ],
-  "lastUpdated": "30 Oct 2026, 07:05 AM",
+  "lastUpdated": "30 Oct 2026, 07:22 AM",
   "scrapeWarnings": []
 }
