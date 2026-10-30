@@ -11,7 +11,7 @@
       "closeDate": "30 October 2026",
       "issuePrice": 203.0,
       "lotSize": 600,
-      "minAmount": 121800,
+      "minAmount": 243600,
       "issueSize": "₹38.05 Cr",
       "historicalGain": "18.2% avg listing gain in last 1 yr",
       "summary": "Strong fundamentals in Industrials.",
@@ -40,7 +40,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 06:17 PM"
+      "lastFetched": "30 Oct 2026, 06:21 PM"
     },
     {
       "slug": "carver-roboweld",
@@ -53,7 +53,7 @@
       "closeDate": "30 October 2026",
       "issuePrice": 80.0,
       "lotSize": 1600,
-      "minAmount": 128000,
+      "minAmount": 256000,
       "issueSize": "₹28.29 Cr",
       "historicalGain": "18.2% avg listing gain in last 1 yr",
       "summary": "Subpar metrics in Industrials.",
@@ -82,7 +82,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 06:17 PM"
+      "lastFetched": "30 Oct 2026, 06:21 PM"
     },
     {
       "slug": "m-k-sons-fine-jewels",
@@ -124,7 +124,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 06:17 PM"
+      "lastFetched": "30 Oct 2026, 06:21 PM"
     },
     {
       "slug": "antala-industries",
@@ -137,7 +137,7 @@
       "closeDate": "02 November 2026",
       "issuePrice": 67.0,
       "lotSize": 2000,
-      "minAmount": 134000,
+      "minAmount": 268000,
       "issueSize": "₹23.33 Cr",
       "historicalGain": "17.0% avg listing gain in last 1 yr",
       "summary": "Strong fundamentals in Materials.",
@@ -166,7 +166,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 06:17 PM"
+      "lastFetched": "30 Oct 2026, 06:21 PM"
     },
     {
       "slug": "bombay-coated-and-special-steels",
@@ -208,7 +208,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 06:17 PM"
+      "lastFetched": "30 Oct 2026, 06:21 PM"
     },
     {
       "slug": "hgs",
@@ -221,7 +221,7 @@
       "closeDate": "03 November 2026",
       "issuePrice": 120.0,
       "lotSize": 1200,
-      "minAmount": 144000,
+      "minAmount": 288000,
       "issueSize": "₹34.56 Cr",
       "historicalGain": "18.2% avg listing gain in last 1 yr",
       "summary": "Subpar metrics in Industrials.",
@@ -250,7 +250,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 06:17 PM"
+      "lastFetched": "30 Oct 2026, 06:21 PM"
     },
     {
       "slug": "johnsoncab-electricals",
@@ -263,7 +263,7 @@
       "closeDate": "03 November 2026",
       "issuePrice": 200.0,
       "lotSize": 600,
-      "minAmount": 120000,
+      "minAmount": 240000,
       "issueSize": "₹56.02 Cr",
       "historicalGain": "18.2% avg listing gain in last 1 yr",
       "summary": "Strong fundamentals in Industrials.",
@@ -292,7 +292,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 06:17 PM"
+      "lastFetched": "30 Oct 2026, 06:21 PM"
     },
     {
       "slug": "maxwell-engineering",
@@ -305,7 +305,7 @@
       "closeDate": "03 November 2026",
       "issuePrice": 158.0,
       "lotSize": 800,
-      "minAmount": 126400,
+      "minAmount": 252800,
       "issueSize": "₹57.64 Cr",
       "historicalGain": "18.2% avg listing gain in last 1 yr",
       "summary": "Strong fundamentals in Industrials.",
@@ -334,7 +334,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 06:17 PM"
+      "lastFetched": "30 Oct 2026, 06:21 PM"
     },
     {
       "slug": "vectras-enprocon",
@@ -347,7 +347,7 @@
       "closeDate": "03 November 2026",
       "issuePrice": 105.0,
       "lotSize": 1200,
-      "minAmount": 126000,
+      "minAmount": 252000,
       "issueSize": "₹53.05 Cr",
       "historicalGain": "18.2% avg listing gain in last 1 yr",
       "summary": "Strong fundamentals in Industrials.",
@@ -376,7 +376,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 06:17 PM"
+      "lastFetched": "30 Oct 2026, 06:21 PM"
     },
     {
       "slug": "vedant-poly-fabs",
@@ -389,7 +389,7 @@
       "closeDate": "04 November 2026",
       "issuePrice": 94.0,
       "lotSize": 1200,
-      "minAmount": 112800,
+      "minAmount": 225600,
       "issueSize": "₹56.68 Cr",
       "historicalGain": "17.0% avg listing gain in last 1 yr",
       "summary": "Strong fundamentals in Materials.",
@@ -418,9 +418,9 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 06:17 PM"
+      "lastFetched": "30 Oct 2026, 06:21 PM"
     }
   ],
-  "lastUpdated": "30 Oct 2026, 06:17 PM",
+  "lastUpdated": "30 Oct 2026, 06:21 PM",
   "scrapeWarnings": []
 }
