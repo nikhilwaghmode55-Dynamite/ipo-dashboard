@@ -1,132 +1,6 @@
 {
   "upcoming": [
     {
-      "slug": "bls-polymers",
-      "name": "BLS Polymers",
-      "symbol": "",
-      "sector": "Industrials (Mainboard IPO)",
-      "category": "Mainboard IPO",
-      "status": "Open",
-      "openDate": "27 October 2026",
-      "closeDate": "29 October 2026",
-      "issuePrice": 150.0,
-      "lotSize": 100,
-      "minAmount": 15000,
-      "issueSize": "₹255 Cr",
-      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
-      "summary": "Strong fundamentals outperforming historical benchmarks in Industrials.",
-      "verdict": "Apply",
-      "verdictCls": "verdict-apply",
-      "checks": [
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Attractive P/S valuation (2.66x vs Sector Average 2.8x)"
-        },
-        {
-          "icon": "✗",
-          "cls": "check-fail",
-          "text": "Slow revenue growth (8.59% vs Sector Average 14.0%)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "High promoter confidence (71.53% holding)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Major chunk of issue allocated to Working Capital"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "29 Oct 2026, 12:31 PM"
-    },
-    {
-      "slug": "sfc-environmental",
-      "name": "SFC Environmental",
-      "symbol": "",
-      "sector": "Industrials (Mainboard IPO)",
-      "category": "Mainboard IPO",
-      "status": "Open",
-      "openDate": "27 October 2026",
-      "closeDate": "29 October 2026",
-      "issuePrice": 330.0,
-      "lotSize": 45,
-      "minAmount": 14850,
-      "issueSize": "₹668 Cr",
-      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
-      "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
-      "verdict": "Avoid",
-      "verdictCls": "verdict-avoid",
-      "checks": [
-        {
-          "icon": "✗",
-          "cls": "check-pass",
-          "text": "High P/S valuation (4.02x vs Sector Average 2.8x)"
-        },
-        {
-          "icon": "✗",
-          "cls": "check-fail",
-          "text": "Slow revenue growth (10.56% vs Sector Average 14.0%)"
-        },
-        {
-          "icon": "✗",
-          "cls": "check-fail",
-          "text": "Low promoter holding (41.0%)"
-        },
-        {
-          "icon": "✗",
-          "cls": "check-fail",
-          "text": "Major chunk of issue goes to Debt Repayment / OFS"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "29 Oct 2026, 12:31 PM"
-    },
-    {
-      "slug": "wiscon-industries",
-      "name": "Wiscon Industries",
-      "symbol": "",
-      "sector": "Consumer Discretionary (SME IPO)",
-      "category": "SME IPO",
-      "status": "Open",
-      "openDate": "27 October 2026",
-      "closeDate": "29 October 2026",
-      "issuePrice": 204.0,
-      "lotSize": 600,
-      "minAmount": 244800,
-      "issueSize": "₹110 Cr",
-      "historicalGain": "16.5% avg listing gain in last 1 yr (18/24 positive)",
-      "summary": "Strong fundamentals outperforming historical benchmarks in Consumer Discretionary.",
-      "verdict": "Apply",
-      "verdictCls": "verdict-apply",
-      "checks": [
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Attractive P/S valuation (2.07x vs Sector Average 4.0x)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Robust growth (683.0% vs Sector Average 16.0%)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "High promoter confidence (73.0% holding)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Major chunk of issue allocated to Working Capital"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "29 Oct 2026, 12:31 PM"
-    },
-    {
       "slug": "ajwa-projects",
       "name": "Ajwa Projects",
       "symbol": "",
@@ -139,8 +13,8 @@
       "lotSize": 600,
       "minAmount": 243600,
       "issueSize": "₹38.05 Cr",
-      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
-      "summary": "Strong fundamentals outperforming historical benchmarks in Industrials.",
+      "historicalGain": "18.2% avg listing gain in last 1 yr",
+      "summary": "Strong fundamentals in Industrials.",
       "verdict": "Apply",
       "verdictCls": "verdict-apply",
       "checks": [
@@ -166,7 +40,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "29 Oct 2026, 12:31 PM"
+      "lastFetched": "30 Oct 2026, 07:05 AM"
     },
     {
       "slug": "carver-roboweld",
@@ -181,14 +55,14 @@
       "lotSize": 1600,
       "minAmount": 256000,
       "issueSize": "₹28.29 Cr",
-      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
-      "summary": "Subpar valuation or growth metrics compared to peers in Industrials.",
+      "historicalGain": "18.2% avg listing gain in last 1 yr",
+      "summary": "Subpar metrics in Industrials.",
       "verdict": "Avoid",
       "verdictCls": "verdict-avoid",
       "checks": [
         {
           "icon": "✗",
-          "cls": "check-pass",
+          "cls": "check-fail",
           "text": "High P/S valuation (3.88x vs Sector Average 2.8x)"
         },
         {
@@ -208,7 +82,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "29 Oct 2026, 12:31 PM"
+      "lastFetched": "30 Oct 2026, 07:05 AM"
     },
     {
       "slug": "m-k-sons-fine-jewels",
@@ -223,8 +97,8 @@
       "lotSize": 91,
       "minAmount": 14742,
       "issueSize": "₹275.4 Cr",
-      "historicalGain": "18.2% avg listing gain in last 1 yr (41/48 positive)",
-      "summary": "Strong fundamentals outperforming historical benchmarks in Industrials.",
+      "historicalGain": "18.2% avg listing gain in last 1 yr",
+      "summary": "Strong fundamentals in Industrials.",
       "verdict": "Apply",
       "verdictCls": "verdict-apply",
       "checks": [
@@ -250,9 +124,9 @@
         }
       ],
       "score": 1,
-      "lastFetched": "29 Oct 2026, 12:31 PM"
+      "lastFetched": "30 Oct 2026, 07:05 AM"
     }
   ],
-  "lastUpdated": "29 Oct 2026, 12:31 PM",
+  "lastUpdated": "30 Oct 2026, 07:05 AM",
   "scrapeWarnings": []
 }

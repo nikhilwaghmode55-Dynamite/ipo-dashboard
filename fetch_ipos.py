@@ -2,8 +2,7 @@
 fetch_ipos.py — Automated IPO Decision Engine
 - Strict entity deduplication
 - Strictly enforces 10:00 AM Open and 5:00 PM Close cutoffs
-- Surgical Anchor-date filtering (no longer drops entire IPO rows)
-- Accurate SME multiplier logic (2 lots for SME)
+- FAULT TOLERANT: Allows IPOs with "TBA" prices/lots to pass through
 """
 
 import json
@@ -73,12 +72,7 @@ NOISE_WORDS = {
 
 def session():
     client = requests.Session()
-    retry = Retry(
-        total=3,
-        backoff_factor=1,
-        status_forcelist=[429, 500, 502, 503, 504],
-        allowed_methods=["GET"],
-    )
+    retry = Retry(total=3, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504], allowed_methods=["GET"])
     client.mount("https://", HTTPAdapter(max_retries=retry))
     return client
 
@@ -87,36 +81,27 @@ def clean(value):
 
 def clean_company_name(raw_name):
     name = str(raw_name).split("(")[0].strip()
-    name = re.sub(
-        r"\b(?:BSE\s+SME[OUCL]?|NSE\s+SME[OUCL]?|SME[OUCL]?|IPO[OUCL]?|Ltd\.?|Limited|Pvt\.?|Private)\b",
-        "",
-        name,
-        flags=re.IGNORECASE,
-    ).strip()
+    name = re.sub(r"\b(?:BSE\s+SME[OUCL]?|NSE\s+SME[OUCL]?|SME[OUCL]?|IPO[OUCL]?|Ltd\.?|Limited|Pvt\.?|Private)\b", "", name, flags=re.IGNORECASE).strip()
     return re.sub(r"\s+", " ", name).strip(" -–.,")
 
 def key(value):
     name = clean_company_name(value).lower()
     words = [w for w in re.findall(r"[a-z0-9]+", name)]
     filtered = [w for w in words if w not in NOISE_WORDS]
-    if not filtered:
-        filtered = words
+    if not filtered: filtered = words
     return "".join(filtered)
 
 def is_same_company(name_a, name_b):
-    if not name_a or not name_b:
-        return False
+    if not name_a or not name_b: return False
     ka, kb = key(name_a), key(name_b)
     return bool(ka and kb and (ka == kb or ka in kb or kb in ka))
 
 def find_matching_key(name, dictionary):
     target_k = key(name)
-    if target_k in dictionary:
-        return target_k
+    if target_k in dictionary: return target_k
     for existing_k, val in dictionary.items():
         existing_name = val.get("name", existing_k) if isinstance(val, dict) else existing_k
-        if is_same_company(name, existing_name) or is_same_company(name, existing_k):
-            return existing_k
+        if is_same_company(name, existing_name) or is_same_company(name, existing_k): return existing_k
     return None
 
 def numbers(value):
@@ -129,41 +114,29 @@ def price_band(value):
 
 def issue_size(value, heading=""):
     raw = clean(value)
-    if not raw or raw.lower() in {"tba", "na", "n/a", "-", "—"}:
-        return None
+    if not raw or raw.lower() in {"tba", "na", "n/a", "-", "—"}: return None
     values = numbers(raw)
-    if not values:
-        return None
+    if not values: return None
     amount = values[0]
     units = (heading + " " + raw).lower()
-
-    if "billion" in units:
-        amount *= 100
-    elif "million" in units:
-        amount /= 10
-    elif "lakh" in units:
-        amount /= 1000
-
+    if "billion" in units: amount *= 100
+    elif "million" in units: amount /= 10
+    elif "lakh" in units: amount /= 1000
     return f"₹{amount:,.2f}".rstrip("0").rstrip(".") + " Cr"
 
 def parse_one_date(value, year=None):
-    if not value or str(value).strip().upper() == "TBA":
-        return None
+    if not value or str(value).strip().upper() == "TBA": return None
     text = clean(value)
     text = re.sub(r"(\d+)(st|nd|rd|th)\b", r"\1", text, flags=re.I)
     year = int(year or datetime.now(IST).year)
-
     for fmt in ("%d %B %Y", "%d %b %Y", "%d-%m-%Y", "%d/%m/%Y", "%d-%b-%Y", "%Y-%m-%d"):
-        try:
-            return datetime.strptime(text, fmt).date()
-        except ValueError:
-            pass
+        try: return datetime.strptime(text, fmt).date()
+        except ValueError: pass
     for fmt in ("%d %B", "%d %b", "%d-%m", "%d/%m"):
         try:
             parsed = datetime.strptime(f"{text} {year}", f"{fmt} %Y")
             return date(year, parsed.month, parsed.day)
-        except ValueError:
-            pass
+        except ValueError: pass
     return None
 
 def parse_dates(value):
@@ -171,132 +144,101 @@ def parse_dates(value):
     text = re.sub(r"(\d+)(st|nd|rd|th)\b", r"\1", text, flags=re.I)
     text = text.replace(" to ", " - ").replace("–", "-").replace("—", "-")
     year = datetime.now(IST).year
-
     pattern = r"(\d{1,2})\s*([A-Za-z]{3,9})?\s*-\s*(\d{1,2})\s*([A-Za-z]{3,9})\s*(20\d{2})?"
     match = re.search(pattern, text)
     if match:
         d1, m1, d2, m2, yr = match.groups()
         months = {name: i for i, name in enumerate(["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"], 1)}
         def month_num(val): return next((num for prefix, num in months.items() if val and val.lower().startswith(prefix)), None)
-
         end_month = month_num(m2)
         start_month = month_num(m1) or end_month
-
         if start_month and end_month:
             try:
                 y = int(yr or year)
-                if start_month == 12 and end_month == 1:
-                     return date(y-1, start_month, int(d1)), date(y, end_month, int(d2))
+                if start_month == 12 and end_month == 1: return date(y-1, start_month, int(d1)), date(y, end_month, int(d2))
                 return date(y, start_month, int(d1)), date(y, end_month, int(d2))
-            except ValueError:
-                pass
-
+            except ValueError: pass
     parts = re.split(r"\s+-\s+", text, maxsplit=1)
     if len(parts) == 2:
         start = parse_one_date(parts[0], year)
         end = parse_one_date(parts[1], year)
-        if start and end:
-            return start, end
-
+        if start and end: return start, end
     return None, None
 
 def is_within_active_window(open_dt, close_dt, now):
-    if not open_dt or not close_dt:
-        return False
-    # Strictly enforces 10:00 AM on Open Date and 5:00 PM on Close Date
+    if not open_dt or not close_dt: return False
     open_cutoff = datetime.combine(open_dt, time(10, 0, 0), tzinfo=IST)
     close_cutoff = datetime.combine(close_dt, time(17, 0, 0), tzinfo=IST)
     return open_cutoff <= now < close_cutoff
 
 def category_for(name, row_text, url):
-    if "sme" in f"{name} {row_text} {url}".lower():
-        return "SME IPO"
+    if "sme" in f"{name} {row_text} {url}".lower(): return "SME IPO"
     return "Mainboard IPO"
 
 def extract_tables(soup, url):
     records = []
     current_year = datetime.now(IST).year
-
     for table in soup.find_all("table"):
         rows = table.find_all("tr")
-        if len(rows) < 2:
-            continue
-
+        if len(rows) < 2: continue
         headers, header_row = None, None
         for row in rows[:3]:
             labels = [clean(cell.get_text(" ", strip=True)).lower() for cell in row.find_all(["th", "td"], recursive=False)]
             if any(term in label for label in labels for term in ("company", "ipo name", "ipo date", "opening date", "open", "closing date", "close date", "close", "issue size", "ipo size", "price band", "price", "lot size", "bidding dates")):
                 headers, header_row = labels, row
                 break
-
         if headers is None: continue
-
         for row in rows:
             if row is header_row: continue
             values = [clean(cell.get_text(" ", strip=True)) for cell in row.find_all(["td", "th"], recursive=False)]
             if len(values) < 2: continue
-            
             mapped = {headers[i]: value for i, value in enumerate(values) if i < len(headers)}
             raw_name = values[0]
             if raw_name.lower() in {"company", "company name", "ipo name", "ipo", "company ipo", "issuer"}: continue
-            
-            # Surgically drop only specific Anchor-named rows, not rows where "anchor" is merely mentioned in a value cell
-            if "anchor" in raw_name.lower(): continue
-            if "sse" in raw_name.lower() or "social stock" in raw_name.lower() or "apply" in raw_name.lower(): continue
-
+            if "anchor" in raw_name.lower() or "sse" in raw_name.lower() or "social stock" in raw_name.lower() or "apply" in raw_name.lower(): continue
             name = clean_company_name(raw_name)
             if len(name) < 3: continue
-
             row_text = " ".join(values)
             start = end = None
-
             for heading, value in mapped.items():
                 if "anchor" in heading.lower(): continue
                 if any(t in heading for t in ("ipo date", "bidding dates", "date")):
                     start, end = parse_dates(value)
                     if start and end: break
-
             if not start or not end:
                 open_col = next((v for h, v in mapped.items() if "open" in h and "anchor" not in h.lower()), None)
                 close_col = next((v for h, v in mapped.items() if ("close" in h or "closing" in h) and "anchor" not in h.lower()), None)
                 if open_col and close_col:
                     start = parse_one_date(open_col, current_year)
                     end = parse_one_date(close_col, current_year)
-
             price = None
             for heading, value in mapped.items():
                 if any(t in heading for t in ("price", "band", "range")):
                     price = price_band(value)
                     if price is not None: break
-
             if price is None:
                 for value in values:
                     if re.search(r"(?:₹|Rs\.?)\s*[\d,]+\s*(?:to|-|–)\s*(?:₹|Rs\.?)?\s*[\d,]+", value, re.I):
                         price = price_band(value)
                         if price is not None: break
-
             size = None
             for heading, value in mapped.items():
                 if any(t in heading for t in ("size", "amount", "cr")):
                     if not any(t in heading for t in ("lot", "share", "price")):
                         size = issue_size(value, heading)
                         if size: break
-
             if size is None:
                 for value in values:
                     size = issue_size(value, "")
                     if size: break
-
             lot = None
             for heading, value in mapped.items():
                 if any(t in heading for t in ("lot", "share", "qty", "quantity")):
                     if value.lower() in {"tba", "na", "n/a", "-", "—", ""}: continue
                     vals = numbers(value)
-                    if vals and vals[0].is_integer() and 1 <= vals[0] <= 100000:
-                        if int(vals[0]) != current_year:
-                            lot = int(vals[0])
-                            break
-
+                    if vals and vals[0].is_integer() and 1 <= vals[0] <= 100000 and int(vals[0]) != current_year:
+                        lot = int(vals[0])
+                        break
             if lot is None:
                 for value in values:
                     low_val = value.lower()
@@ -309,7 +251,6 @@ def extract_tables(soup, url):
                                 lot = v
                                 break
                         if lot: break
-
             records.append({
                 "name": name,
                 "category": category_for(raw_name, row_text, url),
@@ -320,54 +261,37 @@ def extract_tables(soup, url):
                 "issueSize": size,
                 "source": url,
             })
-
     return records
 
 def scrape(now):
     client = session()
     merged, errors = {}, []
-    
     for url in SOURCES:
         try:
             response = client.get(url, headers=HEADERS, timeout=25)
             response.raise_for_status()
             records = extract_tables(BeautifulSoup(response.text, "html.parser"), url)
-            
             for item in records:
-                if not item.get("open") or not item.get("close"):
-                    continue
-
+                if not item.get("open") or not item.get("close"): continue
                 match_k = find_matching_key(item["name"], merged)
                 if not match_k:
                     k = key(item["name"])
                     if k: merged[k] = item
                     continue
-
                 old = merged[match_k]
                 for field in ("price", "lot", "issueSize"):
                     if old.get(field) is None and item.get(field) is not None:
                         old[field] = item[field]
-                
-                # Forces alignment to latest date to override Anchor discrepancies
-                if item.get("open"):
-                    if not old.get("open") or item["open"] > old["open"]:
-                        old["open"] = item["open"]
-                if item.get("close"):
-                    if not old.get("close") or item["close"] > old["close"]:
-                        old["close"] = item["close"]
-                        
-                if item["category"] == "SME IPO":
-                    old["category"] = "SME IPO"
-        except Exception as exc:
-            errors.append(f"{url}: {type(exc).__name__}: {exc}")
-
+                if item.get("open") and (not old.get("open") or item["open"] > old["open"]): old["open"] = item["open"]
+                if item.get("close") and (not old.get("close") or item["close"] > old["close"]): old["close"] = item["close"]
+                if item["category"] == "SME IPO": old["category"] = "SME IPO"
+        except Exception as exc: errors.append(f"{url}: {type(exc).__name__}: {exc}")
+    
     opened = []
     for item in merged.values():
-        if item.get("price") is not None:
-            # Active window evaluated here against precise 10 AM / 5 PM bounds
-            if is_within_active_window(item.get("open"), item.get("close"), now):
-                opened.append(item)
-                
+        # REMOVED STRICT PRICE CHECK: Now allows IPOs to be listed even if price is missing
+        if is_within_active_window(item.get("open"), item.get("close"), now):
+            opened.append(item)
     return opened, errors
 
 def load_json(path, default):
@@ -383,137 +307,68 @@ def is_github_actions():
     return os.environ.get("GITHUB_ACTIONS") == "true" or "--headless" in sys.argv
 
 def prompt_user_fundamentals(name):
-    if is_github_actions():
-        return None
+    if is_github_actions(): return None
     print("\n" + "=" * 55 + f"\n [CLI Input Needed] Configure fundamentals for: {name}\n" + "=" * 55)
     sectors = list(SECTOR_BENCHMARKS.keys())
     for i in range(0, len(sectors), 2):
-        item1 = f"{i+1:2d}. {sectors[i]:<26}"
-        item2 = f"{i+2:2d}. {sectors[i+1]}" if i + 1 < len(sectors) else ""
-        print(f"  {item1}   {item2}")
-
+        print(f"  {i+1:2d}. {sectors[i]:<26}   {f'{i+2:2d}. {sectors[i+1]}' if i+1 < len(sectors) else ''}")
     try:
         sector = None
         while not sector:
-            sec_choice = input(f"\nEnter sector choice (1-{len(sectors)}) or press Enter to skip: ").strip()
+            sec_choice = input(f"\nEnter sector choice (1-{len(sectors)}) or Enter to skip: ").strip()
             if not sec_choice: return None
-            if sec_choice.isdigit() and 1 <= int(sec_choice) <= len(sectors):
-                sector = sectors[int(sec_choice) - 1]
-            else:
-                print(f"  [Error] Please enter a whole number between 1 and {len(sectors)}.")
-
-        ps_ratio = None
-        while ps_ratio is None:
-            val = input("Current FY P/S Ratio (e.g., 4.5): ").strip()
-            try: ps_ratio = float(val)
-            except ValueError: print("  [Error] Please enter a valid decimal number.")
-
-        cagr = None
-        while cagr is None:
-            val = input("3-Year Revenue CAGR % (e.g., 20): ").strip()
-            try: cagr = float(val)
-            except ValueError: print("  [Error] Please enter a valid decimal number.")
-
-        print("\nSelect Use of Proceeds:")
-        print("  1. Capex / Business Expansion / Growth / R&D")
-        print("  2. Working Capital")
-        print("  3. Debt Repayment / OFS (Offer for Sale)")
-        proceeds = None
-        while not proceeds:
-            proc_choice = input("Enter option (1-3): ").strip()
-            if proc_choice in ["1", "2", "3"]:
-                proceeds = {"1": "Capex and Business Expansion", "2": "Working Capital", "3": "Debt Repayment / OFS"}[proc_choice]
-            else:
-                print("  [Error] Please enter 1, 2, or 3.")
-
-        promoter = None
-        while promoter is None:
-            val = input("Post-IPO Promoter Holding % (e.g., 65): ").strip()
-            try: promoter = float(val)
-            except ValueError: print("  [Error] Please enter a valid decimal number.")
-
+            if sec_choice.isdigit() and 1 <= int(sec_choice) <= len(sectors): sector = sectors[int(sec_choice) - 1]
+        
+        ps_ratio = float(input("Current FY P/S Ratio (e.g., 4.5): ").strip())
+        cagr = float(input("3-Year Revenue CAGR % (e.g., 20): ").strip())
+        print("\nSelect Use of Proceeds:\n  1. Capex / Growth\n  2. Working Capital\n  3. Debt Repayment / OFS")
+        proceeds = {"1": "Capex and Business Expansion", "2": "Working Capital", "3": "Debt Repayment / OFS"}[input("Enter option (1-3): ").strip()]
+        promoter = float(input("Post-IPO Promoter Holding % (e.g., 65): ").strip())
         return {"sector": sector, "psRatio": ps_ratio, "cagr3Yr": cagr, "proceedsUse": proceeds, "promoterPct": promoter}
-    except (EOFError, KeyboardInterrupt):
+    except (EOFError, KeyboardInterrupt, ValueError):
         return None
 
 def evaluate_decision(enrichment, sector_name):
     if not enrichment:
-        return {
-            "verdict": "Data will be updated soon",
-            "verdictCls": "verdict-caution",
-            "summary": "Awaiting fundamental RHP data entry for comparative analysis.",
-            "checks": [{"icon": "ℹ", "cls": "check-warn", "text": "Fundamental metrics pending entry"}],
-            "score": 0,
-        }
-
+        return {"verdict": "Data will be updated soon", "verdictCls": "verdict-caution", "summary": "Awaiting fundamental RHP data entry.", "checks": [{"icon": "ℹ", "cls": "check-warn", "text": "Fundamental metrics pending"}], "score": 0}
     bench = SECTOR_BENCHMARKS.get(sector_name, {"avgPS": 3.5, "avgCagr": 15.0})
-    ps, cagr, promoter = enrichment["psRatio"], enrichment["cagr3Yr"], enrichment["promoterPct"]
-    proceeds = enrichment["proceedsUse"]
+    ps, cagr, promoter, proceeds = enrichment["psRatio"], enrichment["cagr3Yr"], enrichment["promoterPct"], enrichment["proceedsUse"]
     score, checks = 0, []
-
+    
     if ps <= bench["avgPS"]:
-        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Attractive P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"})
-        score += 2
-    else:
-        checks.append({"icon": "✗", "cls": "check-pass", "text": f"High P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"})
-
+        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Attractive P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"}); score += 2
+    else: checks.append({"icon": "✗", "cls": "check-fail", "text": f"High P/S valuation ({ps}x vs Sector Average {bench['avgPS']}x)"})
+    
     if cagr >= bench["avgCagr"]:
-        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Robust growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"})
-        score += 2
-    else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Slow revenue growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"})
-
+        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Robust growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"}); score += 2
+    else: checks.append({"icon": "✗", "cls": "check-fail", "text": f"Slow revenue growth ({cagr}% vs Sector Average {bench['avgCagr']}%)"})
+    
     if promoter >= 50:
-        checks.append({"icon": "✓", "cls": "check-pass", "text": f"High promoter confidence ({promoter}% holding)"})
-        score += 1
-    else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Low promoter holding ({promoter}%)"})
-
+        checks.append({"icon": "✓", "cls": "check-pass", "text": f"High promoter confidence ({promoter}% holding)"}); score += 1
+    else: checks.append({"icon": "✗", "cls": "check-fail", "text": f"Low promoter holding ({promoter}%)"})
+    
     if any(k in proceeds.lower() for k in ["capex", "growth", "working capital", "expansion"]):
-        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Major chunk of issue allocated to {proceeds}"})
-        score += 1
-    else:
-        checks.append({"icon": "✗", "cls": "check-fail", "text": f"Major chunk of issue goes to {proceeds}"})
+        checks.append({"icon": "✓", "cls": "check-pass", "text": f"Major chunk of issue allocated to {proceeds}"}); score += 1
+    else: checks.append({"icon": "✗", "cls": "check-fail", "text": f"Major chunk of issue goes to {proceeds}"})
+    
+    if score >= 3: return {"verdict": "Apply", "verdictCls": "verdict-apply", "summary": f"Strong fundamentals in {sector_name}.", "checks": checks, "score": score}
+    return {"verdict": "Avoid", "verdictCls": "verdict-avoid", "summary": f"Subpar metrics in {sector_name}.", "checks": checks, "score": score}
 
-    if score >= 3:
-        return {
-            "verdict": "Apply",
-            "verdictCls": "verdict-apply",
-            "summary": f"Strong fundamentals outperforming historical benchmarks in {sector_name}.",
-            "checks": checks,
-            "score": score,
-        }
-    return {
-        "verdict": "Avoid",
-        "verdictCls": "verdict-avoid",
-        "summary": f"Subpar valuation or growth metrics compared to peers in {sector_name}.",
-        "checks": checks,
-        "score": score,
-    }
-
-def display_date(value):
-    return value.strftime("%d %B %Y") if value else "TBA"
+def display_date(value): return value.strftime("%d %B %Y") if value else "TBA"
 
 def main():
     now = datetime.now(IST)
     print(f"\nIPO scraper started: {now:%d %b %Y %I:%M %p} IST")
-
     items, errors = scrape(now)
-    previous = load_json(DATA_FILE, {})
-    cache = load_json(CACHE_FILE, {})
-    
+    previous, cache = load_json(DATA_FILE, {}), load_json(CACHE_FILE, {})
     old_items = {key(item.get("name", "")): item for item in previous.get("upcoming", []) if item.get("name")}
     
     output = []
     for item in items:
-        match_old_k = find_matching_key(item["name"], old_items)
-        old = old_items.get(match_old_k, {}) if match_old_k else {}
+        match_old_k, match_cache_k = find_matching_key(item["name"], old_items), find_matching_key(item["name"], cache)
+        old, enrichment = old_items.get(match_old_k, {}) if match_old_k else {}, cache.get(match_cache_k) if match_cache_k else None
 
-        match_cache_k = find_matching_key(item["name"], cache)
-        enrichment = cache.get(match_cache_k) if match_cache_k else None
-
-        if enrichment and enrichment.get("sector"):
-            print(f"  [Cached] Loaded saved fundamentals for: {item['name']}")
+        if enrichment and enrichment.get("sector"): print(f"  [Cached] Loaded fundamentals for: {item['name']}")
         else:
             enrichment = prompt_user_fundamentals(item["name"])
             if enrichment:
@@ -523,17 +378,14 @@ def main():
         price = item.get("price") or old.get("issuePrice")
         lot = item.get("lot") or old.get("lotSize")
         size = item.get("issueSize") or old.get("issueSize") or "TBA"
-
         is_sme = item["category"] == "SME IPO"
-        if not lot and not is_sme and price and price > 0:
-            lot = max(1, int(15000 // price))
-
-        lots_required = 2 if is_sme else 1
-        investment = round(price * lot * lots_required) if price and lot else None
+        
+        if not lot and not is_sme and price and price > 0: lot = max(1, int(15000 // price))
+        investment = round(price * lot * (2 if is_sme else 1)) if price and lot else None
 
         sector_name = enrichment.get("sector", "Pending Entry") if enrichment else "Pending Entry"
         decision = evaluate_decision(enrichment, sector_name)
-        historical_gain = f"{SECTOR_BENCHMARKS[sector_name]['avgListingGain']}% avg listing gain in last 1 yr ({SECTOR_BENCHMARKS[sector_name]['winRate']})" if enrichment else "Fundamental data pending entry for sector benchmarking"
+        historical_gain = f"{SECTOR_BENCHMARKS[sector_name]['avgListingGain']}% avg listing gain in last 1 yr" if enrichment else "Data pending"
 
         output.append({
             "slug": re.sub(r"[^a-z0-9]+", "-", item["name"].lower()).strip("-"),
@@ -558,12 +410,9 @@ def main():
         })
 
     output.sort(key=lambda item: (parse_one_date(item.get("closeDate", ""), now.year) or date.max, item.get("name", "").lower()))
-
-    data = {"upcoming": output, "lastUpdated": now.strftime("%d %b %Y, %I:%M %p"), "scrapeWarnings": errors}
-    save_json(DATA_FILE, data)
-
+    save_json(DATA_FILE, {"upcoming": output, "lastUpdated": now.strftime("%d %b %Y, %I:%M %p"), "scrapeWarnings": errors})
     print(f"\n[OK] {len(output)} currently open IPO(s) written to data.json")
-    for item in output: print(f"{item['name']} | {item['category']} | Price: {item['issuePrice']} | Lot: {item['lotSize']} | Verdict: {item['verdict']}")
+    for item in output: print(f"{item['name']} | Price: {item['issuePrice']} | Verdict: {item['verdict']}")
 
 if __name__ == "__main__":
     main()
