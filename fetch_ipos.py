@@ -3,7 +3,7 @@ fetch_ipos.py — Automated IPO Decision Engine
 - Strict entity deduplication
 - ALL FILTERS REMOVED: Fetches all listed IPOs regardless of date or price
 - CLI BYPASS REMOVED: Prompts for all fetched IPOs
-- FIXED: Restored *2 SME Multiplier and Accurate Math Fallbacks
+- FIXED: Exact Mainboard (15000) and SME (130000 * 2) Math Fallbacks
 """
 
 import json
@@ -227,7 +227,6 @@ def extract_tables(soup, url):
                     size = issue_size(value, "")
                     if size: break
             
-            # Use scraped lot size directly, no calculations during extraction
             lot = None
             for heading, value in mapped.items():
                 if any(t in heading for t in ("lot", "share", "qty", "quantity")):
@@ -283,7 +282,6 @@ def scrape(now):
                     continue
                 old = merged[match_k]
                 for field in ("price", "lot", "issueSize"):
-                    # NEVER overwrite a valid lot with None
                     if old.get(field) is None and item.get(field) is not None:
                         old[field] = item[field]
                 if item.get("open") and (not old.get("open") or item["open"] > old["open"]): old["open"] = item["open"]
@@ -383,7 +381,7 @@ def main():
 
         price = item.get("price") or old.get("issuePrice")
         
-# Prioritize scraped lot size over threshold calculations
+        # EXACT LOGIC FOR SCRIPT OVERRIDE
         scraped_lot = item.get("lot") or old.get("lotSize")
         if scraped_lot and scraped_lot > 0:
             lot = scraped_lot
@@ -391,17 +389,18 @@ def main():
             lot = None
             if price and price > 0:
                 is_sme = item["category"] == "SME IPO"
-                if not is_sme:
-                    # ONLY apply math limit to Mainboard IPOs
+                if is_sme:
+                    lot = max(1, int(130000 // price))
+                else:
                     lot = max(1, int(15000 // price))
 
         is_sme = item["category"] == "SME IPO"
         if price and lot:
             if is_sme:
-                # Multiply SME investment requirement by 2 lots
+                # 2 lot minimum application strictly for SMEs
                 investment = round(price * lot * 2)
             else:
-                # Mainboard requires strictly 1 lot
+                # 1 lot application strictly for Mainboard
                 investment = round(price * lot)
         else:
             investment = None
