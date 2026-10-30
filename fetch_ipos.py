@@ -3,7 +3,7 @@ fetch_ipos.py — Automated IPO Decision Engine
 - Strict entity deduplication
 - ALL FILTERS REMOVED: Fetches all listed IPOs regardless of date or price
 - CLI BYPASS REMOVED: Prompts for all fetched IPOs
-- FIXED: Mainboard Lot Size Calculation
+- FIXED: Strict Prioritization of Scraped Lot Sizes Over Threshold Math
 """
 
 import json
@@ -226,6 +226,8 @@ def extract_tables(soup, url):
                 for value in values:
                     size = issue_size(value, "")
                     if size: break
+            
+            # FIXED LOT EXTRACTION: Safely grab the EXACT number without threshold math interference
             lot = None
             for heading, value in mapped.items():
                 if any(t in heading for t in ("lot", "share", "qty", "quantity")):
@@ -281,6 +283,7 @@ def scrape(now):
                     continue
                 old = merged[match_k]
                 for field in ("price", "lot", "issueSize"):
+                    # NEVER overwrite a valid lot with None
                     if old.get(field) is None and item.get(field) is not None:
                         old[field] = item[field]
                 if item.get("open") and (not old.get("open") or item["open"] > old["open"]): old["open"] = item["open"]
@@ -379,22 +382,33 @@ def main():
                 save_json(CACHE_FILE, cache)
 
         price = item.get("price") or old.get("issuePrice")
-        lot = item.get("lot") or old.get("lotSize")
-        size = item.get("issueSize") or old.get("issueSize") or "TBA"
-        is_sme = item["category"] == "SME IPO"
         
-        # FIXED: Enforce accurate mainboard minimum lot thresholds. 
-        if not lot and price and price > 0:
+        # FIXED: Only use math calculation if the portal explicitly lists TBA or nothing for Lot Size
+        scraped_lot = item.get("lot") or old.get("lotSize")
+        if scraped_lot and scraped_lot > 0:
+            lot = scraped_lot
+        else:
+            lot = None
+            if price and price > 0:
+                is_sme = item["category"] == "SME IPO"
+                if is_sme:
+                    lot = max(1, int(130000 // price))
+                else:
+                    lot = max(1, int(15000 // price))
+                    
+        # Fixed SME vs Mainboard Minimum Lot Threshold Math
+        is_sme = item["category"] == "SME IPO"
+        if price and lot:
             if is_sme:
-                # SMEs use static massive lots (usually ₹1-1.4L each)
-                lot = max(1, int(130000 // price))
+                # SMEs have a massive minimum 1 lot application (~1.3L)
+                investment = round(price * lot) 
             else:
-                # Mainboard lots are exactly bound near ₹15,000 threshold
-                lot = max(1, int(15000 // price))
-                
-        # Mainboards require exactly 1 lot for minimum application; SMEs also require 1 lot
-        investment = round(price * lot) if price and lot else None
+                # Mainboards have a small minimum 1 lot application (~15k)
+                investment = round(price * lot)
+        else:
+            investment = None
 
+        size = item.get("issueSize") or old.get("issueSize") or "TBA"
         sector_name = enrichment.get("sector", "Pending Entry") if enrichment else "Pending Entry"
         decision = evaluate_decision(enrichment, sector_name)
         historical_gain = f"{SECTOR_BENCHMARKS[sector_name]['avgListingGain']}% avg listing gain in last 1 yr" if enrichment else "Data pending"
