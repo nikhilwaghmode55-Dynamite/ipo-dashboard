@@ -226,6 +226,8 @@ def extract_tables(soup, url):
                 for value in values:
                     size = issue_size(value, "")
                     if size: break
+            
+            # Use scraped lot size directly, no calculations during extraction
             lot = None
             for heading, value in mapped.items():
                 if any(t in heading for t in ("lot", "share", "qty", "quantity")):
@@ -281,6 +283,7 @@ def scrape(now):
                     continue
                 old = merged[match_k]
                 for field in ("price", "lot", "issueSize"):
+                    # NEVER overwrite a valid lot with None
                     if old.get(field) is None and item.get(field) is not None:
                         old[field] = item[field]
                 if item.get("open") and (not old.get("open") or item["open"] > old["open"]): old["open"] = item["open"]
@@ -379,14 +382,29 @@ def main():
                 save_json(CACHE_FILE, cache)
 
         price = item.get("price") or old.get("issuePrice")
-        lot = item.get("lot") or old.get("lotSize")
-        is_sme = item["category"] == "SME IPO"
         
-        # FINAL FIX: The Original Mainboard Logic + The Missing SME * 2 Math
-        if not lot and not is_sme and price and price > 0: 
-            lot = max(1, int(15000 // price))
-            
-        investment = round(price * lot * (2 if is_sme else 1)) if price and lot else None
+        # Prioritize scraped lot size over threshold calculations
+        scraped_lot = item.get("lot") or old.get("lotSize")
+        if scraped_lot and scraped_lot > 0:
+            lot = scraped_lot
+        else:
+            lot = None
+            if price and price > 0:
+                is_sme = item["category"] == "SME IPO"
+                if not is_sme:
+                    # ONLY apply math limit to Mainboard IPOs
+                    lot = max(1, int(15000 // price))
+
+        is_sme = item["category"] == "SME IPO"
+        if price and lot:
+            if is_sme:
+                # Multiply SME investment requirement by 2 lots
+                investment = round(price * lot * 2)
+            else:
+                # Mainboard requires strictly 1 lot
+                investment = round(price * lot)
+        else:
+            investment = None
 
         size = item.get("issueSize") or old.get("issueSize") or "TBA"
         sector_name = enrichment.get("sector", "Pending Entry") if enrichment else "Pending Entry"
