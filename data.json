@@ -40,7 +40,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:24 PM"
+      "lastFetched": "30 Oct 2026, 07:39 PM"
     },
     {
       "slug": "carver-roboweld",
@@ -82,7 +82,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:24 PM"
+      "lastFetched": "30 Oct 2026, 07:39 PM"
     },
     {
       "slug": "m-k-sons-fine-jewels",
@@ -94,8 +94,8 @@
       "openDate": "28 October 2026",
       "closeDate": "30 October 2026",
       "issuePrice": 162.0,
-      "lotSize": 4,
-      "minAmount": 648,
+      "lotSize": 91,
+      "minAmount": 14742,
       "issueSize": "₹275.4 Cr",
       "historicalGain": "18.2% avg listing gain in last 1 yr",
       "summary": "Strong fundamentals in Industrials.",
@@ -124,7 +124,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:24 PM"
+      "lastFetched": "30 Oct 2026, 07:39 PM"
     },
     {
       "slug": "antala-industries",
@@ -166,7 +166,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:24 PM"
+      "lastFetched": "30 Oct 2026, 07:39 PM"
     },
     {
       "slug": "bombay-coated-and-special-steels",
@@ -178,8 +178,8 @@
       "openDate": "29 November 2026",
       "closeDate": "02 November 2026",
       "issuePrice": 82.0,
-      "lotSize": 2,
-      "minAmount": 164,
+      "lotSize": 182,
+      "minAmount": 14924,
       "issueSize": "₹183.06 Cr",
       "historicalGain": "17.0% avg listing gain in last 1 yr",
       "summary": "Strong fundamentals in Materials.",
@@ -208,7 +208,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:24 PM"
+      "lastFetched": "30 Oct 2026, 07:39 PM"
     },
     {
       "slug": "hgs",
@@ -250,7 +250,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:24 PM"
+      "lastFetched": "30 Oct 2026, 07:39 PM"
     },
     {
       "slug": "johnsoncab-electricals",
@@ -292,7 +292,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:24 PM"
+      "lastFetched": "30 Oct 2026, 07:39 PM"
     },
     {
       "slug": "maxwell-engineering",
@@ -334,7 +334,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:24 PM"
+      "lastFetched": "30 Oct 2026, 07:39 PM"
     },
     {
       "slug": "vectras-enprocon",
@@ -376,7 +376,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:24 PM"
+      "lastFetched": "30 Oct 2026, 07:39 PM"
     },
     {
       "slug": "vedant-poly-fabs",
@@ -418,9 +418,9 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:24 PM"
+      "lastFetched": "30 Oct 2026, 07:39 PM"
     }
   ],
-  "lastUpdated": "30 Oct 2026, 07:24 PM",
+  "lastUpdated": "30 Oct 2026, 07:39 PM",
   "scrapeWarnings": []
 }

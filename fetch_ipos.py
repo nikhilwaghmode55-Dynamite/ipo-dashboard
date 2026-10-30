@@ -1,9 +1,10 @@
 """
 fetch_ipos.py — Automated IPO Decision Engine
 - Strict entity deduplication
-- ALL FILTERS REMOVED: Fetches all listed IPOs regardless of date or price
-- CLI BYPASS REMOVED: Prompts for all fetched IPOs
-- FIXED: Exact Mainboard (15000) and SME (130000 * 2) Math Fallbacks
+- Fetches Open and Upcoming IPOs
+- Prompts for all fetched IPOs (unless headless)
+- FIXED: Blocks Face Value (₹2, ₹4, ₹10) from being scraped as Lot Size
+- FIXED: Purges corrupt <10 lot sizes cached in old data.json
 """
 
 import json
@@ -208,7 +209,7 @@ def extract_tables(soup, url):
                     end = parse_one_date(close_col, current_year)
             price = None
             for heading, value in mapped.items():
-                if any(t in heading for t in ("price", "band", "range")):
+                if any(t in heading for t in ("price", "band", "range")) and "face" not in heading:
                     price = price_band(value)
                     if price is not None: break
             if price is None:
@@ -219,30 +220,49 @@ def extract_tables(soup, url):
             size = None
             for heading, value in mapped.items():
                 if any(t in heading for t in ("size", "amount", "cr")):
-                    if not any(t in heading for t in ("lot", "share", "price")):
+                    if not any(t in heading for t in ("lot", "share", "price", "face")):
                         size = issue_size(value, heading)
                         if size: break
             if size is None:
                 for value in values:
-                    size = issue_size(value, "")
-                    if size: break
+                    if "cr" in value.lower() or "crore" in value.lower():
+                        size = issue_size(value, "")
+                        if size: break
             
+            # FIXED LOT EXTRACTION: Never match Face Value columns or single-digit numbers (< 11)
             lot = None
             for heading, value in mapped.items():
-                if any(t in heading for t in ("lot", "share", "qty", "quantity")):
+                if any(t in heading for t in ("face", "fv", "price", "size", "amount", "date")):
+                    continue
+                if any(t in heading for t in ("lot", "qty", "quantity", "shares")):
                     if value.lower() in {"tba", "na", "n/a", "-", "—", ""}: continue
                     vals = numbers(value)
-                    if vals and vals[0].is_integer() and 1 <= vals[0] <= 100000 and int(vals[0]) != current_year:
-                        lot = int(vals[0])
-                        break
+                    for v in vals:
+                        if v.is_integer() and 11 <= int(v) <= 100000 and int(v) != current_year:
+                            if price and int(v) == int(price): continue
+                            lot = int(v)
+                            break
+                    if lot: break
+            if lot is None:
+                for value in values:
+                    low_val = value.lower()
+                    if any(w in low_val for w in ("shares", "lot")):
+                        nums = re.findall(r"\b\d{2,5}\b", value.replace(",", ""))
+                        for n in nums:
+                            v = int(n)
+                            if 11 <= v <= 15000 and v != current_year:
+                                if price and v == int(price): continue
+                                lot = v
+                                break
+                        if lot: break
             if lot is None:
                 for value in values:
                     low_val = value.lower()
                     if not any(sym in low_val for sym in ["₹", "rs", "-", "–", "to", "%", "cr", "crore", "."]):
-                        nums = re.findall(r"\b\d{1,5}\b", value.replace(",", ""))
+                        nums = re.findall(r"\b\d{2,5}\b", value.replace(",", ""))
                         for n in nums:
                             v = int(n)
-                            if 1 <= v <= 15000 and v != current_year:
+                            if 11 <= v <= 15000 and v != current_year:
                                 if price and v == int(price): continue
                                 lot = v
                                 break
@@ -380,35 +400,27 @@ def main():
                 save_json(CACHE_FILE, cache)
 
         price = item.get("price") or old.get("issuePrice")
-        
-        # EXACT LOGIC FOR SCRIPT OVERRIDE
-        scraped_lot = item.get("lot") or old.get("lotSize")
-        if scraped_lot and scraped_lot > 0:
-            lot = scraped_lot
-        else:
-            lot = None
-            if price and price > 0:
-                is_sme = item["category"] == "SME IPO"
-                if is_sme:
-                    lot = max(1, int(130000 // price))
-                else:
-                    lot = max(1, int(15000 // price))
-
         is_sme = item["category"] == "SME IPO"
-        if price and lot:
-            if is_sme:
-                # 2 lot minimum application strictly for SMEs
-                investment = round(price * lot * 2)
-            else:
-                # 1 lot application strictly for Mainboard
-                investment = round(price * lot)
-        else:
-            investment = None
+        
+        # FIXED: Ignore old cached lotSize if it was a corrupt Face Value (< 11)
+        old_lot = old.get("lotSize")
+        if old_lot is not None and old_lot < 11:
+            old_lot = None
+            
+        lot = item.get("lot") or old_lot
+        
+        # If portal still didn't give a lot size for Mainboard, calculate it cleanly
+        if not lot and not is_sme and price and price > 0:
+            lot = max(1, int(15000 // price))
+
+        investment = round(price * lot * (2 if is_sme else 1)) if price and lot else None
 
         size = item.get("issueSize") or old.get("issueSize") or "TBA"
         sector_name = enrichment.get("sector", "Pending Entry") if enrichment else "Pending Entry"
         decision = evaluate_decision(enrichment, sector_name)
         historical_gain = f"{SECTOR_BENCHMARKS[sector_name]['avgListingGain']}% avg listing gain in last 1 yr" if enrichment else "Data pending"
+
+        print(f"  -> {item['name']} | {item['category']} | Price: {price} | Lot: {lot} | Inv: {investment}")
 
         output.append({
             "slug": re.sub(r"[^a-z0-9]+", "-", item["name"].lower()).strip("-"),
