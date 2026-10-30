@@ -40,7 +40,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:31 PM"
+      "lastFetched": "30 Oct 2026, 05:36 PM"
     },
     {
       "slug": "carver-roboweld",
@@ -82,7 +82,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:31 PM"
+      "lastFetched": "30 Oct 2026, 05:36 PM"
     },
     {
       "slug": "m-k-sons-fine-jewels",
@@ -124,13 +124,13 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:31 PM"
+      "lastFetched": "30 Oct 2026, 05:36 PM"
     },
     {
       "slug": "antala-industries",
       "name": "Antala Industries",
       "symbol": "",
-      "sector": "Pending Entry (SME IPO)",
+      "sector": "Materials (SME IPO)",
       "category": "SME IPO",
       "status": "Upcoming",
       "openDate": "29 November 2026",
@@ -139,19 +139,34 @@
       "lotSize": 2000,
       "minAmount": 268000,
       "issueSize": "₹23.33 Cr",
-      "historicalGain": "Data pending",
-      "summary": "Awaiting fundamental RHP data entry.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "17.0% avg listing gain in last 1 yr",
+      "summary": "Strong fundamentals in Materials.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "ℹ",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending"
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (1.72x vs Sector Average 2.5x)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Robust growth (94.64% vs Sector Average 13.0%)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "High promoter confidence (71.36% holding)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Major chunk of issue allocated to Working Capital"
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:31 PM"
+      "lastFetched": "30 Oct 2026, 05:36 PM"
     },
     {
       "slug": "bombay-coated-and-special-steels",
@@ -178,13 +193,13 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:31 PM"
+      "lastFetched": "30 Oct 2026, 05:36 PM"
     },
     {
       "slug": "hgs",
       "name": "HGS",
       "symbol": "",
-      "sector": "Pending Entry (SME IPO)",
+      "sector": "Industrials (SME IPO)",
       "category": "SME IPO",
       "status": "Upcoming",
       "openDate": "30 November 2026",
@@ -193,25 +208,40 @@
       "lotSize": 1200,
       "minAmount": 288000,
       "issueSize": "₹34.56 Cr",
-      "historicalGain": "Data pending",
-      "summary": "Awaiting fundamental RHP data entry.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "18.2% avg listing gain in last 1 yr",
+      "summary": "Subpar metrics in Industrials.",
+      "verdict": "Avoid",
+      "verdictCls": "verdict-avoid",
       "checks": [
         {
-          "icon": "ℹ",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending"
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "High P/S valuation (2.89x vs Sector Average 2.8x)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Slow revenue growth (12.82% vs Sector Average 14.0%)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "High promoter confidence (64.33% holding)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Major chunk of issue allocated to Capex and Business Expansion"
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:31 PM"
+      "lastFetched": "30 Oct 2026, 05:36 PM"
     },
     {
       "slug": "johnsoncab-electricals",
       "name": "Johnsoncab Electricals",
       "symbol": "",
-      "sector": "Pending Entry (SME IPO)",
+      "sector": "Industrials (SME IPO)",
       "category": "SME IPO",
       "status": "Upcoming",
       "openDate": "30 November 2026",
@@ -220,25 +250,40 @@
       "lotSize": 600,
       "minAmount": 240000,
       "issueSize": "₹56.02 Cr",
-      "historicalGain": "Data pending",
-      "summary": "Awaiting fundamental RHP data entry.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "18.2% avg listing gain in last 1 yr",
+      "summary": "Strong fundamentals in Industrials.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "ℹ",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending"
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (1.0x vs Sector Average 2.8x)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Robust growth (54.37% vs Sector Average 14.0%)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "High promoter confidence (72.48% holding)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Major chunk of issue allocated to Capex and Business Expansion"
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:31 PM"
+      "lastFetched": "30 Oct 2026, 05:36 PM"
     },
     {
       "slug": "maxwell-engineering",
       "name": "Maxwell Engineering",
       "symbol": "",
-      "sector": "Pending Entry (SME IPO)",
+      "sector": "Industrials (SME IPO)",
       "category": "SME IPO",
       "status": "Upcoming",
       "openDate": "30 November 2026",
@@ -247,25 +292,40 @@
       "lotSize": 800,
       "minAmount": 252800,
       "issueSize": "₹57.64 Cr",
-      "historicalGain": "Data pending",
-      "summary": "Awaiting fundamental RHP data entry.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "18.2% avg listing gain in last 1 yr",
+      "summary": "Strong fundamentals in Industrials.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "ℹ",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending"
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "High P/S valuation (7.35x vs Sector Average 2.8x)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Robust growth (67.13% vs Sector Average 14.0%)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "High promoter confidence (71.36% holding)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Major chunk of issue allocated to Capex and Business Expansion"
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:31 PM"
+      "lastFetched": "30 Oct 2026, 05:36 PM"
     },
     {
       "slug": "vectras-enprocon",
       "name": "Vectras Enprocon",
       "symbol": "",
-      "sector": "Pending Entry (SME IPO)",
+      "sector": "Industrials (SME IPO)",
       "category": "SME IPO",
       "status": "Upcoming",
       "openDate": "30 November 2026",
@@ -274,25 +334,40 @@
       "lotSize": 1200,
       "minAmount": 252000,
       "issueSize": "₹53.05 Cr",
-      "historicalGain": "Data pending",
-      "summary": "Awaiting fundamental RHP data entry.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "18.2% avg listing gain in last 1 yr",
+      "summary": "Strong fundamentals in Industrials.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "ℹ",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending"
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (1.67x vs Sector Average 2.8x)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Robust growth (48.51% vs Sector Average 14.0%)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "High promoter confidence (73.49% holding)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Major chunk of issue allocated to Working Capital"
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:31 PM"
+      "lastFetched": "30 Oct 2026, 05:36 PM"
     },
     {
       "slug": "vedant-poly-fabs",
       "name": "Vedant Poly Fabs",
       "symbol": "",
-      "sector": "Pending Entry (SME IPO)",
+      "sector": "Materials (SME IPO)",
       "category": "SME IPO",
       "status": "Upcoming",
       "openDate": "26 November 2026",
@@ -301,21 +376,36 @@
       "lotSize": 1200,
       "minAmount": 225600,
       "issueSize": "₹56.68 Cr",
-      "historicalGain": "Data pending",
-      "summary": "Awaiting fundamental RHP data entry.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "17.0% avg listing gain in last 1 yr",
+      "summary": "Strong fundamentals in Materials.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "ℹ",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending"
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (1.64x vs Sector Average 2.5x)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Robust growth (41.35% vs Sector Average 13.0%)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "High promoter confidence (73.08% holding)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Major chunk of issue allocated to Working Capital"
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:31 PM"
+      "lastFetched": "30 Oct 2026, 05:36 PM"
     }
   ],
-  "lastUpdated": "30 Oct 2026, 05:31 PM",
+  "lastUpdated": "30 Oct 2026, 05:36 PM",
   "scrapeWarnings": []
 }

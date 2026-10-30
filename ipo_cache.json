@@ -103,5 +103,47 @@
     "cagr3Yr": 11.73,
     "proceedsUse": "Capex and Business Expansion",
     "promoterPct": 65.77
+  },
+  "vedantpolyfabs": {
+    "sector": "Materials",
+    "psRatio": 1.64,
+    "cagr3Yr": 41.35,
+    "proceedsUse": "Working Capital",
+    "promoterPct": 73.08
+  },
+  "johnsoncabelectricals": {
+    "sector": "Industrials",
+    "psRatio": 1.0,
+    "cagr3Yr": 54.37,
+    "proceedsUse": "Capex and Business Expansion",
+    "promoterPct": 72.48
+  },
+  "hgs": {
+    "sector": "Industrials",
+    "psRatio": 2.89,
+    "cagr3Yr": 12.82,
+    "proceedsUse": "Capex and Business Expansion",
+    "promoterPct": 64.33
+  },
+  "maxwell": {
+    "sector": "Industrials",
+    "psRatio": 7.35,
+    "cagr3Yr": 67.13,
+    "proceedsUse": "Capex and Business Expansion",
+    "promoterPct": 71.36
+  },
+  "vectrasenprocon": {
+    "sector": "Industrials",
+    "psRatio": 1.67,
+    "cagr3Yr": 48.51,
+    "proceedsUse": "Working Capital",
+    "promoterPct": 73.49
+  },
+  "antala": {
+    "sector": "Materials",
+    "psRatio": 1.72,
+    "cagr3Yr": 94.64,
+    "proceedsUse": "Working Capital",
+    "promoterPct": 71.36
   }
 }
