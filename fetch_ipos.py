@@ -383,7 +383,7 @@ def main():
 
         price = item.get("price") or old.get("issuePrice")
         
-        # Prioritize scraped lot size over threshold calculations
+# Prioritize scraped lot size over threshold calculations
         scraped_lot = item.get("lot") or old.get("lotSize")
         if scraped_lot and scraped_lot > 0:
             lot = scraped_lot
