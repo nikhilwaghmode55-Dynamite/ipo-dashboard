@@ -1,8 +1,9 @@
 """
 fetch_ipos.py — Automated IPO Decision Engine
 - Strict entity deduplication
-- FUTURE-ONLY FILTER: Fetches all Open and Upcoming IPOs
-- UNRESTRICTED CLI: Prompts for fundamentals for EVERY fetched IPO
+- ALL FILTERS REMOVED: Fetches all listed IPOs regardless of date or price
+- CLI BYPASS REMOVED: Prompts for all fetched IPOs
+- FIXED: Mainboard Lot Size Calculation
 """
 
 import json
@@ -370,9 +371,7 @@ def main():
 
         status = get_status(item.get("open"), item.get("close"), now)
         
-        # PROMPT FOR ALL FETCHED IPOs
-        if enrichment and enrichment.get("sector"): 
-            print(f"  [Cached] Loaded fundamentals for: {item['name']}")
+        if enrichment and enrichment.get("sector"): print(f"  [Cached] Loaded fundamentals for: {item['name']}")
         else:
             enrichment = prompt_user_fundamentals(item["name"])
             if enrichment:
@@ -384,8 +383,17 @@ def main():
         size = item.get("issueSize") or old.get("issueSize") or "TBA"
         is_sme = item["category"] == "SME IPO"
         
-        if not lot and not is_sme and price and price > 0: lot = max(1, int(15000 // price))
-        investment = round(price * lot * (2 if is_sme else 1)) if price and lot else None
+        # FIXED: Enforce accurate mainboard minimum lot thresholds. 
+        if not lot and price and price > 0:
+            if is_sme:
+                # SMEs use static massive lots (usually ₹1-1.4L each)
+                lot = max(1, int(130000 // price))
+            else:
+                # Mainboard lots are exactly bound near ₹15,000 threshold
+                lot = max(1, int(15000 // price))
+                
+        # Mainboards require exactly 1 lot for minimum application; SMEs also require 1 lot
+        investment = round(price * lot) if price and lot else None
 
         sector_name = enrichment.get("sector", "Pending Entry") if enrichment else "Pending Entry"
         decision = evaluate_decision(enrichment, sector_name)
