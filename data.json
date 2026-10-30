@@ -40,7 +40,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:36 PM"
+      "lastFetched": "30 Oct 2026, 05:46 PM"
     },
     {
       "slug": "carver-roboweld",
@@ -82,7 +82,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:36 PM"
+      "lastFetched": "30 Oct 2026, 05:46 PM"
     },
     {
       "slug": "m-k-sons-fine-jewels",
@@ -124,7 +124,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:36 PM"
+      "lastFetched": "30 Oct 2026, 05:46 PM"
     },
     {
       "slug": "antala-industries",
@@ -166,13 +166,13 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:36 PM"
+      "lastFetched": "30 Oct 2026, 05:46 PM"
     },
     {
       "slug": "bombay-coated-and-special-steels",
       "name": "Bombay Coated and Special Steels",
       "symbol": "",
-      "sector": "Pending Entry (Mainboard IPO)",
+      "sector": "Materials (Mainboard IPO)",
       "category": "Mainboard IPO",
       "status": "Upcoming",
       "openDate": "29 November 2026",
@@ -181,19 +181,34 @@
       "lotSize": 2,
       "minAmount": 164,
       "issueSize": "₹183.06 Cr",
-      "historicalGain": "Data pending",
-      "summary": "Awaiting fundamental RHP data entry.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
+      "historicalGain": "17.0% avg listing gain in last 1 yr",
+      "summary": "Strong fundamentals in Materials.",
+      "verdict": "Apply",
+      "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "ℹ",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending"
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Attractive P/S valuation (0.41x vs Sector Average 2.5x)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "Robust growth (29.0% vs Sector Average 13.0%)"
+        },
+        {
+          "icon": "✓",
+          "cls": "check-pass",
+          "text": "High promoter confidence (63.03% holding)"
+        },
+        {
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Major chunk of issue goes to Debt Repayment / OFS"
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:36 PM"
+      "lastFetched": "30 Oct 2026, 05:46 PM"
     },
     {
       "slug": "hgs",
@@ -235,7 +250,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:36 PM"
+      "lastFetched": "30 Oct 2026, 05:46 PM"
     },
     {
       "slug": "johnsoncab-electricals",
@@ -277,7 +292,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:36 PM"
+      "lastFetched": "30 Oct 2026, 05:46 PM"
     },
     {
       "slug": "maxwell-engineering",
@@ -319,7 +334,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:36 PM"
+      "lastFetched": "30 Oct 2026, 05:46 PM"
     },
     {
       "slug": "vectras-enprocon",
@@ -361,7 +376,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:36 PM"
+      "lastFetched": "30 Oct 2026, 05:46 PM"
     },
     {
       "slug": "vedant-poly-fabs",
@@ -403,9 +418,9 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 05:36 PM"
+      "lastFetched": "30 Oct 2026, 05:46 PM"
     }
   ],
-  "lastUpdated": "30 Oct 2026, 05:36 PM",
+  "lastUpdated": "30 Oct 2026, 05:46 PM",
   "scrapeWarnings": []
 }

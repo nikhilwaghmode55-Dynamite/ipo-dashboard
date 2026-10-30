@@ -145,5 +145,12 @@
     "cagr3Yr": 94.64,
     "proceedsUse": "Working Capital",
     "promoterPct": 71.36
+  },
+  "bombaycoatedandspecialsteels": {
+    "sector": "Materials",
+    "psRatio": 0.41,
+    "cagr3Yr": 29.0,
+    "proceedsUse": "Debt Repayment / OFS",
+    "promoterPct": 63.03
   }
 }
