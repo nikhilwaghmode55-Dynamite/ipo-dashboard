@@ -2,7 +2,7 @@
 fetch_ipos.py — Automated IPO Decision Engine
 - Strict entity deduplication
 - FUTURE-ONLY FILTER: Fetches all Open and Upcoming IPOs
-- CLI BYPASS: Only prompts for fundamentals if the IPO is actively Open today
+- UNRESTRICTED CLI: Prompts for fundamentals for EVERY fetched IPO
 """
 
 import json
@@ -126,7 +126,6 @@ def issue_size(value, heading=""):
 
 def parse_one_date(value, year=None):
     if not value or str(value).strip().upper() in ["TBA", "NA", "-", "—", ""]: return None
-    # Aggressively strip commas to prevent parsing failures
     text = clean(value).replace(",", "").replace(".", "").strip()
     text = re.sub(r"(\d+)(st|nd|rd|th)\b", r"\1", text, flags=re.I)
     year = int(year or datetime.now(IST).year)
@@ -197,7 +196,6 @@ def extract_tables(soup, url):
             start = end = None
             for heading, value in mapped.items():
                 if "anchor" in heading.lower(): continue
-                # More fault-tolerant header checking
                 if any(t in heading for t in ("ipo date", "bidding dates", "date", "subscription")):
                     start, end = parse_dates(value)
                     if start and end: break
@@ -291,7 +289,6 @@ def scrape(now):
     
     opened = []
     for item in merged.values():
-        # Keep IPO if it has NOT closed yet (Captures Open + Upcoming)
         close_dt = item.get("close")
         if close_dt and close_dt >= now.date():
             opened.append(item)
@@ -373,17 +370,14 @@ def main():
 
         status = get_status(item.get("open"), item.get("close"), now)
         
-        # ONLY PROMPT FOR CURRENTLY ACTIVE IPOs. SKIP UPCOMING.
-        if status == "Open":
-            if enrichment and enrichment.get("sector"): print(f"  [Cached] Loaded fundamentals for: {item['name']}")
-            else:
-                enrichment = prompt_user_fundamentals(item["name"])
-                if enrichment:
-                    cache[key(item["name"])] = enrichment
-                    save_json(CACHE_FILE, cache)
+        # PROMPT FOR ALL FETCHED IPOs
+        if enrichment and enrichment.get("sector"): 
+            print(f"  [Cached] Loaded fundamentals for: {item['name']}")
         else:
-            enrichment = None
-            print(f"  [{status}] Skipping CLI entry for: {item['name']}")
+            enrichment = prompt_user_fundamentals(item["name"])
+            if enrichment:
+                cache[key(item["name"])] = enrichment
+                save_json(CACHE_FILE, cache)
 
         price = item.get("price") or old.get("issuePrice")
         lot = item.get("lot") or old.get("lotSize")
