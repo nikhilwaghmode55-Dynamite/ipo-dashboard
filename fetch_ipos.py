@@ -1,8 +1,7 @@
 """
 fetch_ipos.py — Automated IPO Decision Engine
-- Fetches ONLY currently OPEN IPOs (strictly excludes Upcoming and Closed)
-- Enforces 5:00 PM IST cutoff on the closing date
-- Smart open-date fallback when a portal only lists the closing date
+- Fixes cross-month date ranges like '30-3 November' -> 30 Oct to 03 Nov
+- Fetches ONLY currently OPEN IPOs (drops Closed after 5:00 PM IST and future Upcoming)
 - Blocks Face Value (Rs 2, Rs 4, Rs 10) from corrupting Mainboard Lot Sizes
 - Applies 2-lot minimum for SME IPOs and 1-lot for Mainboard IPOs
 """
@@ -11,7 +10,7 @@ import json
 import os
 import re
 import sys
-from datetime import datetime, date, time, timedelta
+from datetime import datetime, date, time
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -175,13 +174,24 @@ def parse_dates(value):
         months = {name: i for i, name in enumerate(["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"], 1)}
         month_num = lambda val: next((num for prefix, num in months.items() if val and val.lower().startswith(prefix)), None)
         end_month = month_num(m2)
-        start_month = month_num(m1) or end_month
-        if start_month and end_month:
+        start_month = month_num(m1)
+        if end_month:
             try:
-                y = int(yr or year)
-                if start_month == 12 and end_month == 1:
-                    return date(y - 1, start_month, int(d1)), date(y, end_month, int(d2))
-                return date(y, start_month, int(d1)), date(y, end_month, int(d2))
+                y_end = int(yr or year)
+                y_start = y_end
+                if not start_month:
+                    # e.g. "30-3 November" -> d1=30 > d2=3 means start_month is previous month (October)
+                    if int(d1) > int(d2):
+                        if end_month == 1:
+                            start_month = 12
+                            y_start = y_end - 1
+                        else:
+                            start_month = end_month - 1
+                    else:
+                        start_month = end_month
+                elif start_month == 12 and end_month == 1:
+                    y_start = y_end - 1
+                return date(y_start, start_month, int(d1)), date(y_end, end_month, int(d2))
             except ValueError:
                 pass
     parts = re.split(r"\s*-\s*", text, maxsplit=1)
@@ -189,6 +199,13 @@ def parse_dates(value):
         start = parse_one_date(parts[0], year)
         end = parse_one_date(parts[1], year)
         if start and end:
+            if start > end:
+                m = end.month - 1 or 12
+                y = end.year - 1 if end.month == 1 else end.year
+                try:
+                    start = date(y, m, start.day)
+                except ValueError:
+                    pass
             return start, end
     return None, None
 
@@ -245,6 +262,13 @@ def extract_tables(soup, url):
                     start = parse_one_date(open_col, current_year)
                 if close_col:
                     end = parse_one_date(close_col, current_year)
+                if start and end and start > end:
+                    m = end.month - 1 or 12
+                    y = end.year - 1 if end.month == 1 else end.year
+                    try:
+                        start = date(y, m, start.day)
+                    except ValueError:
+                        pass
             if not start and not end:
                 for value in values[1:]:
                     s, e = parse_dates(value)
@@ -311,10 +335,9 @@ def extract_tables(soup, url):
 
 def is_currently_open(open_dt, close_dt, now):
     """
-    Returns True ONLY if the IPO is currently open for subscription right now.
-    - Drops any IPO whose close_dt is in the past, or is today after 5:00 PM IST.
-    - Drops any Upcoming IPO whose open_dt is strictly in the future (> today).
-    - If open_dt failed to parse on a table but close_dt is today or within 3 days, treats as Open.
+    Strictly returns True ONLY for IPOs currently open for bidding right now:
+    - Excludes Closed IPOs (close_dt < today, or close_dt == today after 17:00 IST)
+    - Excludes Upcoming IPOs (open_dt > today)
     """
     today = now.date()
     if not close_dt or close_dt < today:
@@ -322,9 +345,16 @@ def is_currently_open(open_dt, close_dt, now):
     if close_dt == today and now.time() >= time(17, 0):
         return False
     if open_dt:
+        if open_dt > close_dt:
+            # Safety net if any source inverted cross-month open_dt
+            m = close_dt.month - 1 or 12
+            y = close_dt.year - 1 if close_dt.month == 1 else close_dt.year
+            try:
+                open_dt = date(y, m, open_dt.day)
+            except ValueError:
+                return 0 <= (close_dt - today).days <= 4
         return open_dt <= today <= close_dt
-    # Fallback when open_dt is missing on a portal table: Indian IPOs run 3-4 days
-    return 0 <= (close_dt - today).days <= 3
+    return 0 <= (close_dt - today).days <= 4
 
 
 def scrape(now):
@@ -345,7 +375,7 @@ def scrape(now):
                 for field in ("price", "lot", "issueSize"):
                     if old.get(field) is None and item.get(field) is not None:
                         old[field] = item[field]
-                if item.get("open") and not old.get("open"):
+                if item.get("open") and (not old.get("open") or item["open"] < old["open"]):
                     old["open"] = item["open"]
                 if item.get("close") and (not old.get("close") or item["close"] > old["close"]):
                     old["close"] = item["close"]
@@ -473,7 +503,7 @@ def main():
         decision = evaluate_decision(enrichment, sector_name)
         historical_gain = f"{SECTOR_BENCHMARKS[sector_name]['avgListingGain']}% avg listing gain in last 1 yr" if enrichment and sector_name in SECTOR_BENCHMARKS else "Data pending"
 
-        print(f"  -> {item['name']} | Open | {item['category']} | Price: {price} | Lot: {lot} | Inv: {investment}")
+        print(f"  -> {item['name']} | Open ({display_date(item.get('open'))} to {display_date(item.get('close'))}) | {item['category']} | Price: {price} | Lot: {lot} | Inv: {investment}")
 
         output.append({
             "slug": re.sub(r"[^a-z0-9]+", "-", item["name"].lower()).strip("-"),
