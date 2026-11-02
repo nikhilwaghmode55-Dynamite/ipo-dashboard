@@ -1,216 +1,6 @@
 {
   "upcoming": [
     {
-      "slug": "ajwa-projects",
-      "name": "Ajwa Projects",
-      "symbol": "",
-      "sector": "Industrials (SME IPO)",
-      "category": "SME IPO",
-      "status": "Open",
-      "openDate": "28 October 2026",
-      "closeDate": "30 October 2026",
-      "issuePrice": 203.0,
-      "lotSize": 600,
-      "minAmount": 243600,
-      "issueSize": "₹38.05 Cr",
-      "historicalGain": "18.2% avg listing gain in last 1 yr",
-      "summary": "Strong fundamentals in Industrials.",
-      "verdict": "Apply",
-      "verdictCls": "verdict-apply",
-      "checks": [
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Attractive P/S valuation (2.31x vs Sector Average 2.8x)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Robust growth (18.88% vs Sector Average 14.0%)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "High promoter confidence (72.36% holding)"
-        },
-        {
-          "icon": "✗",
-          "cls": "check-fail",
-          "text": "Major chunk of issue goes to Debt Repayment / OFS"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "30 Oct 2026, 07:39 PM"
-    },
-    {
-      "slug": "carver-roboweld",
-      "name": "Carver Roboweld",
-      "symbol": "",
-      "sector": "Industrials (SME IPO)",
-      "category": "SME IPO",
-      "status": "Open",
-      "openDate": "28 October 2026",
-      "closeDate": "30 October 2026",
-      "issuePrice": 80.0,
-      "lotSize": 1600,
-      "minAmount": 256000,
-      "issueSize": "₹28.29 Cr",
-      "historicalGain": "18.2% avg listing gain in last 1 yr",
-      "summary": "Subpar metrics in Industrials.",
-      "verdict": "Avoid",
-      "verdictCls": "verdict-avoid",
-      "checks": [
-        {
-          "icon": "✗",
-          "cls": "check-fail",
-          "text": "High P/S valuation (3.88x vs Sector Average 2.8x)"
-        },
-        {
-          "icon": "✗",
-          "cls": "check-fail",
-          "text": "Slow revenue growth (11.73% vs Sector Average 14.0%)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "High promoter confidence (65.77% holding)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Major chunk of issue allocated to Capex and Business Expansion"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "30 Oct 2026, 07:39 PM"
-    },
-    {
-      "slug": "m-k-sons-fine-jewels",
-      "name": "M.K.Sons Fine Jewels",
-      "symbol": "",
-      "sector": "Industrials (Mainboard IPO)",
-      "category": "Mainboard IPO",
-      "status": "Open",
-      "openDate": "28 October 2026",
-      "closeDate": "30 October 2026",
-      "issuePrice": 162.0,
-      "lotSize": 91,
-      "minAmount": 14742,
-      "issueSize": "₹275.4 Cr",
-      "historicalGain": "18.2% avg listing gain in last 1 yr",
-      "summary": "Strong fundamentals in Industrials.",
-      "verdict": "Apply",
-      "verdictCls": "verdict-apply",
-      "checks": [
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Attractive P/S valuation (2.31x vs Sector Average 2.8x)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Robust growth (18.88% vs Sector Average 14.0%)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "High promoter confidence (72.36% holding)"
-        },
-        {
-          "icon": "✗",
-          "cls": "check-fail",
-          "text": "Major chunk of issue goes to Debt Repayment / OFS"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "30 Oct 2026, 07:39 PM"
-    },
-    {
-      "slug": "antala-industries",
-      "name": "Antala Industries",
-      "symbol": "",
-      "sector": "Materials (SME IPO)",
-      "category": "SME IPO",
-      "status": "Upcoming",
-      "openDate": "29 November 2026",
-      "closeDate": "02 November 2026",
-      "issuePrice": 67.0,
-      "lotSize": 2000,
-      "minAmount": 268000,
-      "issueSize": "₹23.33 Cr",
-      "historicalGain": "17.0% avg listing gain in last 1 yr",
-      "summary": "Strong fundamentals in Materials.",
-      "verdict": "Apply",
-      "verdictCls": "verdict-apply",
-      "checks": [
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Attractive P/S valuation (1.72x vs Sector Average 2.5x)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Robust growth (94.64% vs Sector Average 13.0%)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "High promoter confidence (71.36% holding)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Major chunk of issue allocated to Working Capital"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "30 Oct 2026, 07:39 PM"
-    },
-    {
-      "slug": "bombay-coated-and-special-steels",
-      "name": "Bombay Coated and Special Steels",
-      "symbol": "",
-      "sector": "Materials (Mainboard IPO)",
-      "category": "Mainboard IPO",
-      "status": "Upcoming",
-      "openDate": "29 November 2026",
-      "closeDate": "02 November 2026",
-      "issuePrice": 82.0,
-      "lotSize": 182,
-      "minAmount": 14924,
-      "issueSize": "₹183.06 Cr",
-      "historicalGain": "17.0% avg listing gain in last 1 yr",
-      "summary": "Strong fundamentals in Materials.",
-      "verdict": "Apply",
-      "verdictCls": "verdict-apply",
-      "checks": [
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Attractive P/S valuation (0.41x vs Sector Average 2.5x)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Robust growth (29.0% vs Sector Average 13.0%)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "High promoter confidence (63.03% holding)"
-        },
-        {
-          "icon": "✗",
-          "cls": "check-fail",
-          "text": "Major chunk of issue goes to Debt Repayment / OFS"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "30 Oct 2026, 07:39 PM"
-    },
-    {
       "slug": "hgs",
       "name": "HGS",
       "symbol": "",
@@ -250,7 +40,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:39 PM"
+      "lastFetched": "02 Nov 2026, 06:20 PM"
     },
     {
       "slug": "johnsoncab-electricals",
@@ -292,7 +82,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:39 PM"
+      "lastFetched": "02 Nov 2026, 06:20 PM"
     },
     {
       "slug": "maxwell-engineering",
@@ -334,7 +124,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:39 PM"
+      "lastFetched": "02 Nov 2026, 06:20 PM"
     },
     {
       "slug": "vectras-enprocon",
@@ -376,7 +166,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:39 PM"
+      "lastFetched": "02 Nov 2026, 06:20 PM"
     },
     {
       "slug": "vedant-poly-fabs",
@@ -418,9 +208,9 @@
         }
       ],
       "score": 1,
-      "lastFetched": "30 Oct 2026, 07:39 PM"
+      "lastFetched": "02 Nov 2026, 06:20 PM"
     }
   ],
-  "lastUpdated": "30 Oct 2026, 07:39 PM",
+  "lastUpdated": "02 Nov 2026, 06:20 PM",
   "scrapeWarnings": []
 }
