@@ -2,15 +2,10 @@ name: Auto-Fetch Live IPOs
 
 on:
   schedule:
-    # Morning Run 1: 04:30 UTC = 10:00 AM IST (Mon-Fri)
-    - cron: '30 4 * * 1-5'
-    # Morning Backup Run 2: 05:00 UTC = 10:30 AM IST (Mon-Fri)
-    - cron: '0 5 * * 1-5'
-    # Evening Cutoff Run 1: 11:35 UTC = 5:05 PM IST (Mon-Fri) — removes IPOs closed at 5 PM
-    - cron: '35 11 * * 1-5'
-    # Evening Backup Run 2: 12:05 UTC = 5:35 PM IST (Mon-Fri)
-    - cron: '5 12 * * 1-5'
-  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+    # Runs at :05 and :35 of every hour from 04:05 UTC (9:35 AM IST) to 13:35 UTC (7:05 PM IST), Mon-Fri.
+    # Running 20 times a day guarantees GitHub Actions cannot skip your morning or 5:00 PM IST cutoff updates.
+    - cron: '5,35 4-13 * * 1-5'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -41,4 +36,4 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add data.json ipo_cache.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-updated open and upcoming IPOs" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-updated open IPOs" && git push)
