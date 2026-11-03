@@ -1,6 +1,7 @@
 """
 fetch_ipos.py — Automated IPO Decision Engine
-- Fixes cross-month date ranges like '30-3 November' -> 30 Oct to 03 Nov
+- Parses both Day-First ('2-5 Nov', '30-3 Nov') and Month-First ('Nov 2-5, 2026') dates
+- Prevents combined 'Open & Close Date' columns from corrupting close_dt
 - Fetches ONLY currently OPEN IPOs (drops Closed after 5:00 PM IST and future Upcoming)
 - Blocks Face Value (Rs 2, Rs 4, Rs 10) from corrupting Mainboard Lot Sizes
 - Applies 2-lot minimum for SME IPOs and 1-lot for Mainboard IPOs
@@ -70,6 +71,21 @@ NOISE_WORDS = {
     "chemicals", "textiles", "exports", "traders", "trading", "polymers",
     "environmental", "alternatives", "jewels", "builders", "developers",
 }
+
+MONTH_MAP = {
+    name: i
+    for i, name in enumerate(
+        ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"],
+        1,
+    )
+}
+
+
+def month_num(val):
+    if not val:
+        return None
+    low = val.strip().lower()
+    return next((num for prefix, num in MONTH_MAP.items() if low.startswith(prefix)), None)
 
 
 def session():
@@ -148,12 +164,15 @@ def parse_one_date(value, year=None):
     text = clean(value).replace(",", "").replace(".", "").strip()
     text = re.sub(r"(\d+)(st|nd|rd|th)\b", r"\1", text, flags=re.I)
     year = int(year or datetime.now(IST).year)
-    for fmt in ("%d %B %Y", "%d %b %Y", "%d-%m-%Y", "%d/%m/%Y", "%d-%b-%Y", "%Y-%m-%d"):
+    for fmt in (
+        "%d %B %Y", "%d %b %Y", "%B %d %Y", "%b %d %Y",
+        "%d-%m-%Y", "%d/%m/%Y", "%d-%b-%Y", "%Y-%m-%d",
+    ):
         try:
             return datetime.strptime(text, fmt).date()
         except ValueError:
             pass
-    for fmt in ("%d %B", "%d %b", "%d-%m", "%d/%m"):
+    for fmt in ("%d %B", "%d %b", "%B %d", "%b %d", "%d-%m", "%d/%m", "%d-%b"):
         try:
             parsed = datetime.strptime(f"{text} {year}", f"{fmt} %Y")
             return date(year, parsed.month, parsed.day)
@@ -162,48 +181,67 @@ def parse_one_date(value, year=None):
     return None
 
 
-def parse_dates(value):
-    text = clean(value).replace(",", "").replace(".", "").strip()
-    text = re.sub(r"(\d+)(st|nd|rd|th)\b", r"\1", text, flags=re.I)
-    text = text.replace(" to ", " - ").replace("–", "-").replace("—", "-")
-    year = datetime.now(IST).year
-    pattern = r"(\d{1,2})\s*([A-Za-z]{3,9})?\s*-\s*(\d{1,2})\s*([A-Za-z]{3,9})\s*(20\d{2})?"
-    match = re.search(pattern, text)
-    if match:
-        d1, m1, d2, m2, yr = match.groups()
-        months = {name: i for i, name in enumerate(["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"], 1)}
-        month_num = lambda val: next((num for prefix, num in months.items() if val and val.lower().startswith(prefix)), None)
-        end_month = month_num(m2)
-        start_month = month_num(m1)
-        if end_month:
-            try:
-                y_end = int(yr or year)
-                y_start = y_end
-                if not start_month:
-                    # e.g. "30-3 November" -> d1=30 > d2=3 means start_month is previous month (October)
-                    if int(d1) > int(d2):
-                        if end_month == 1:
-                            start_month = 12
-                            y_start = y_end - 1
-                        else:
-                            start_month = end_month - 1
-                    else:
-                        start_month = end_month
-                elif start_month == 12 and end_month == 1:
+def build_date_pair(d1, m1, d2, m2, yr, default_year):
+    end_month = month_num(m2) or month_num(m1)
+    start_month = month_num(m1)
+    if not end_month:
+        return None, None
+    try:
+        y_end = int(yr or default_year)
+        y_start = y_end
+        if not start_month:
+            if int(d1) > int(d2):
+                if end_month == 1:
+                    start_month = 12
                     y_start = y_end - 1
-                return date(y_start, start_month, int(d1)), date(y_end, end_month, int(d2))
-            except ValueError:
-                pass
+                else:
+                    start_month = end_month - 1
+            else:
+                start_month = end_month
+        elif start_month == 12 and end_month == 1:
+            y_start = y_end - 1
+        return date(y_start, start_month, int(d1)), date(y_end, end_month, int(d2))
+    except ValueError:
+        return None, None
+
+
+def parse_dates(value):
+    if not value:
+        return None, None
+    text = clean(value).replace(",", " ").replace(".", "").strip()
+    text = re.sub(r"(\d+)(st|nd|rd|th)\b", r"\1", text, flags=re.I)
+    text = re.sub(r"\s+(?:to|till|until)\s+", " - ", text, flags=re.I)
+    text = text.replace("–", "-").replace("—", "-")
+    year = datetime.now(IST).year
+
+    # Pattern 1: Day-First e.g. "2-5 November 2026", "30 Oct - 3 Nov 2026", "30-3 November"
+    p_day_first = r"\b(\d{1,2})\s*([A-Za-z]{3,9})?\s*-\s*(\d{1,2})\s*([A-Za-z]{3,9})\s*(20\d{2})?\b"
+    m = re.search(p_day_first, text)
+    if m:
+        d1, m1, d2, m2, yr = m.groups()
+        s, e = build_date_pair(d1, m1, d2, m2, yr, year)
+        if s and e:
+            return s, e
+
+    # Pattern 2: Month-First e.g. "November 2-5 2026", "Oct 30 - Nov 3 2026"
+    p_month_first = r"\b([A-Za-z]{3,9})\s*(\d{1,2})\s*-\s*([A-Za-z]{3,9})?\s*(\d{1,2})\s*(20\d{2})?\b"
+    m2_match = re.search(p_month_first, text)
+    if m2_match:
+        m1, d1, m2, d2, yr = m2_match.groups()
+        s, e = build_date_pair(d1, m1, d2, m2 or m1, yr, year)
+        if s and e:
+            return s, e
+
     parts = re.split(r"\s*-\s*", text, maxsplit=1)
     if len(parts) == 2:
         start = parse_one_date(parts[0], year)
         end = parse_one_date(parts[1], year)
         if start and end:
             if start > end:
-                m = end.month - 1 or 12
-                y = end.year - 1 if end.month == 1 else end.year
+                m_prev = end.month - 1 or 12
+                y_prev = end.year - 1 if end.month == 1 else end.year
                 try:
-                    start = date(y, m, start.day)
+                    start = date(y_prev, m_prev, start.day)
                 except ValueError:
                     pass
             return start, end
@@ -247,29 +285,41 @@ def extract_tables(soup, url):
                 continue
             row_text = " ".join(values)
 
+            # 1. Try combined range parsing on any date-like column first (including 'Open & Close Date')
             start = end = None
             for heading, value in mapped.items():
                 if "anchor" in heading.lower():
                     continue
-                if any(t in heading for t in ("ipo date", "bidding", "date", "subscription")) and "open" not in heading and "close" not in heading and "closing" not in heading:
-                    start, end = parse_dates(value)
-                    if start and end:
+                if any(t in heading for t in ("date", "bidding", "subscription", "open", "close")):
+                    s, e = parse_dates(value)
+                    if s and e:
+                        start, end = s, e
                         break
+
+            # 2. If not a combined range, check separate Open and Close columns strictly
             if not start or not end:
-                open_col = next((v for h, v in mapped.items() if "open" in h and "anchor" not in h.lower()), None)
-                close_col = next((v for h, v in mapped.items() if ("close" in h or "closing" in h) and "anchor" not in h.lower()), None)
-                if open_col:
+                open_col = next(
+                    (v for h, v in mapped.items() if "open" in h and "close" not in h and "closing" not in h and "anchor" not in h.lower()),
+                    None,
+                )
+                close_col = next(
+                    (v for h, v in mapped.items() if ("close" in h or "closing" in h) and "open" not in h and "anchor" not in h.lower()),
+                    None,
+                )
+                if open_col and not start:
                     start = parse_one_date(open_col, current_year)
-                if close_col:
+                if close_col and not end:
                     end = parse_one_date(close_col, current_year)
                 if start and end and start > end:
-                    m = end.month - 1 or 12
-                    y = end.year - 1 if end.month == 1 else end.year
+                    m_prev = end.month - 1 or 12
+                    y_prev = end.year - 1 if end.month == 1 else end.year
                     try:
-                        start = date(y, m, start.day)
+                        start = date(y_prev, m_prev, start.day)
                     except ValueError:
                         pass
-            if not start and not end:
+
+            # 3. Last-resort scan across all cells in the row for a date range
+            if not start or not end:
                 for value in values[1:]:
                     s, e = parse_dates(value)
                     if s and e:
@@ -346,7 +396,6 @@ def is_currently_open(open_dt, close_dt, now):
         return False
     if open_dt:
         if open_dt > close_dt:
-            # Safety net if any source inverted cross-month open_dt
             m = close_dt.month - 1 or 12
             y = close_dt.year - 1 if close_dt.month == 1 else close_dt.year
             try:
@@ -375,10 +424,16 @@ def scrape(now):
                 for field in ("price", "lot", "issueSize"):
                     if old.get(field) is None and item.get(field) is not None:
                         old[field] = item[field]
-                if item.get("open") and (not old.get("open") or item["open"] < old["open"]):
-                    old["open"] = item["open"]
-                if item.get("close") and (not old.get("close") or item["close"] > old["close"]):
-                    old["close"] = item["close"]
+                # If the new record has a valid (open, close) pair where open < close, prefer it
+                if item.get("open") and item.get("close") and item["open"] <= item["close"]:
+                    if not old.get("open") or not old.get("close") or old["open"] >= old["close"] or item["close"] > old["close"]:
+                        old["open"] = item["open"]
+                        old["close"] = item["close"]
+                else:
+                    if item.get("open") and not old.get("open"):
+                        old["open"] = item["open"]
+                    if item.get("close") and (not old.get("close") or item["close"] > old["close"]):
+                        old["close"] = item["close"]
                 if item["category"] == "SME IPO":
                     old["category"] = "SME IPO"
         except Exception as exc:
