@@ -1,48 +1,6 @@
 {
   "upcoming": [
     {
-      "slug": "vedant-poly-fabs",
-      "name": "Vedant Poly Fabs",
-      "symbol": "",
-      "sector": "Materials (SME IPO)",
-      "category": "SME IPO",
-      "status": "Open",
-      "openDate": "02 November 2026",
-      "closeDate": "04 November 2026",
-      "issuePrice": 94.0,
-      "lotSize": 1200,
-      "minAmount": 225600,
-      "issueSize": "₹56.68 Cr",
-      "historicalGain": "17.0% avg listing gain in last 1 yr",
-      "summary": "Strong fundamentals in Materials.",
-      "verdict": "Apply",
-      "verdictCls": "verdict-apply",
-      "checks": [
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Attractive P/S valuation (1.64x vs Sector Average 2.5x)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Robust growth (41.35% vs Sector Average 13.0%)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "High promoter confidence (73.08% holding)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Major chunk of issue allocated to Working Capital"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "04 Nov 2026, 01:13 AM"
-    },
-    {
       "slug": "antala-industries",
       "name": "Antala Industries",
       "symbol": "",
@@ -82,9 +40,9 @@
         }
       ],
       "score": 1,
-      "lastFetched": "04 Nov 2026, 01:13 AM"
+      "lastFetched": "04 Nov 2026, 05:27 PM"
     }
   ],
-  "lastUpdated": "04 Nov 2026, 01:13 AM",
+  "lastUpdated": "04 Nov 2026, 05:27 PM",
   "scrapeWarnings": []
 }
