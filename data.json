@@ -1,48 +1,5 @@
 {
-  "upcoming": [
-    {
-      "slug": "antala-industries",
-      "name": "Antala Industries",
-      "symbol": "",
-      "sector": "Materials (SME IPO)",
-      "category": "SME IPO",
-      "status": "Open",
-      "openDate": "29 October 2026",
-      "closeDate": "05 November 2026",
-      "issuePrice": 66.0,
-      "lotSize": 2000,
-      "minAmount": 264000,
-      "issueSize": "₹22.98 Cr",
-      "historicalGain": "17.0% avg listing gain in last 1 yr",
-      "summary": "Strong fundamentals in Materials.",
-      "verdict": "Apply",
-      "verdictCls": "verdict-apply",
-      "checks": [
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Attractive P/S valuation (1.72x vs Sector Average 2.5x)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Robust growth (94.64% vs Sector Average 13.0%)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "High promoter confidence (71.36% holding)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Major chunk of issue allocated to Working Capital"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "05 Nov 2026, 01:04 AM"
-    }
-  ],
-  "lastUpdated": "05 Nov 2026, 01:04 AM",
+  "upcoming": [],
+  "lastUpdated": "05 Nov 2026, 05:30 PM",
   "scrapeWarnings": []
 }
