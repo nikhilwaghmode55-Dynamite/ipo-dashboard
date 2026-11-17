@@ -1,5 +1,33 @@
 {
-  "upcoming": [],
-  "lastUpdated": "17 Nov 2026, 06:25 PM",
+  "upcoming": [
+    {
+      "slug": "crystal-crop-protection",
+      "name": "Crystal Crop Protection",
+      "symbol": "",
+      "sector": "Pending Entry (Mainboard IPO)",
+      "category": "Mainboard IPO",
+      "status": "Open",
+      "openDate": "18 November 2026",
+      "closeDate": "20 November 2026",
+      "issuePrice": 272.0,
+      "lotSize": 55,
+      "minAmount": 14960,
+      "issueSize": "TBA",
+      "historicalGain": "Data pending",
+      "summary": "Awaiting fundamental RHP data entry.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "ℹ",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "18 Nov 2026, 03:07 AM"
+    }
+  ],
+  "lastUpdated": "18 Nov 2026, 03:07 AM",
   "scrapeWarnings": []
 }
