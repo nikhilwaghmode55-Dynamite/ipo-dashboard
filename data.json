@@ -25,10 +25,64 @@
         }
       ],
       "score": 1,
-      "lastFetched": "18 Nov 2026, 06:19 PM"
+      "lastFetched": "19 Nov 2026, 02:43 AM"
+    },
+    {
+      "slug": "mahanadi-coalfields",
+      "name": "Mahanadi Coalfields",
+      "symbol": "",
+      "sector": "Pending Entry (Mainboard IPO)",
+      "category": "Mainboard IPO",
+      "status": "Open",
+      "openDate": "19 November 2026",
+      "closeDate": "23 November 2026",
+      "issuePrice": 136.0,
+      "lotSize": 110,
+      "minAmount": 14960,
+      "issueSize": "TBA",
+      "historicalGain": "Data pending",
+      "summary": "Awaiting fundamental RHP data entry.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "ℹ",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "19 Nov 2026, 02:43 AM"
+    },
+    {
+      "slug": "watrana-rentals",
+      "name": "Watrana Rentals",
+      "symbol": "",
+      "sector": "Pending Entry (Mainboard IPO)",
+      "category": "Mainboard IPO",
+      "status": "Open",
+      "openDate": "19 November 2026",
+      "closeDate": "23 November 2026",
+      "issuePrice": 245.0,
+      "lotSize": 61,
+      "minAmount": 14945,
+      "issueSize": "TBA",
+      "historicalGain": "Data pending",
+      "summary": "Awaiting fundamental RHP data entry.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "ℹ",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "19 Nov 2026, 02:43 AM"
     }
   ],
-  "lastUpdated": "18 Nov 2026, 06:19 PM",
+  "lastUpdated": "19 Nov 2026, 02:43 AM",
   "scrapeWarnings": [
     "https://ipowatch.in/mainboard-ipo-2026/: HTTPError: 404 Client Error: Not Found for url: https://ipowatch.in/upcoming-mainboard-ipo-details/"
   ]
