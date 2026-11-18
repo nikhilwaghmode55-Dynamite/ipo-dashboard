@@ -25,9 +25,11 @@
         }
       ],
       "score": 1,
-      "lastFetched": "18 Nov 2026, 03:07 AM"
+      "lastFetched": "18 Nov 2026, 06:19 PM"
     }
   ],
-  "lastUpdated": "18 Nov 2026, 03:07 AM",
-  "scrapeWarnings": []
+  "lastUpdated": "18 Nov 2026, 06:19 PM",
+  "scrapeWarnings": [
+    "https://ipowatch.in/mainboard-ipo-2026/: HTTPError: 404 Client Error: Not Found for url: https://ipowatch.in/upcoming-mainboard-ipo-details/"
+  ]
 }
