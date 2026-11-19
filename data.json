@@ -25,7 +25,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "19 Nov 2026, 02:43 AM"
+      "lastFetched": "19 Nov 2026, 06:10 PM"
     },
     {
       "slug": "mahanadi-coalfields",
@@ -52,7 +52,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "19 Nov 2026, 02:43 AM"
+      "lastFetched": "19 Nov 2026, 06:10 PM"
     },
     {
       "slug": "watrana-rentals",
@@ -79,11 +79,9 @@
         }
       ],
       "score": 1,
-      "lastFetched": "19 Nov 2026, 02:43 AM"
+      "lastFetched": "19 Nov 2026, 06:10 PM"
     }
   ],
-  "lastUpdated": "19 Nov 2026, 02:43 AM",
-  "scrapeWarnings": [
-    "https://ipowatch.in/mainboard-ipo-2026/: HTTPError: 404 Client Error: Not Found for url: https://ipowatch.in/upcoming-mainboard-ipo-details/"
-  ]
+  "lastUpdated": "19 Nov 2026, 06:10 PM",
+  "scrapeWarnings": []
 }
