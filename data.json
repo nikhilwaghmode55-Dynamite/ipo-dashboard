@@ -1,33 +1,6 @@
 {
   "upcoming": [
     {
-      "slug": "crystal-crop-protection",
-      "name": "Crystal Crop Protection",
-      "symbol": "",
-      "sector": "Pending Entry (Mainboard IPO)",
-      "category": "Mainboard IPO",
-      "status": "Open",
-      "openDate": "18 November 2026",
-      "closeDate": "20 November 2026",
-      "issuePrice": 272.0,
-      "lotSize": 55,
-      "minAmount": 14960,
-      "issueSize": "TBA",
-      "historicalGain": "Data pending",
-      "summary": "Awaiting fundamental RHP data entry.",
-      "verdict": "Data will be updated soon",
-      "verdictCls": "verdict-caution",
-      "checks": [
-        {
-          "icon": "ℹ",
-          "cls": "check-warn",
-          "text": "Fundamental metrics pending"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "20 Nov 2026, 02:45 AM"
-    },
-    {
       "slug": "mahanadi-coalfields",
       "name": "Mahanadi Coalfields",
       "symbol": "",
@@ -52,7 +25,7 @@
         }
       ],
       "score": 1,
-      "lastFetched": "20 Nov 2026, 02:45 AM"
+      "lastFetched": "20 Nov 2026, 06:09 PM"
     },
     {
       "slug": "watrana-rentals",
@@ -79,9 +52,9 @@
         }
       ],
       "score": 1,
-      "lastFetched": "20 Nov 2026, 02:45 AM"
+      "lastFetched": "20 Nov 2026, 06:09 PM"
     }
   ],
-  "lastUpdated": "20 Nov 2026, 02:45 AM",
+  "lastUpdated": "20 Nov 2026, 06:09 PM",
   "scrapeWarnings": []
 }
