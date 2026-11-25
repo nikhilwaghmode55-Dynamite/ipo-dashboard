@@ -1,90 +1,48 @@
 {
   "upcoming": [
     {
-      "slug": "vedant-poly-fabs",
-      "name": "Vedant Poly Fabs",
+      "slug": "shree-siddhivinayak-greentech-industries",
+      "name": "Shree Siddhivinayak Greentech Industries",
       "symbol": "",
-      "sector": "Materials (SME IPO)",
-      "category": "SME IPO",
+      "sector": "Consumer Staples (Mainboard IPO)",
+      "category": "Mainboard IPO",
       "status": "Open",
-      "openDate": "02 November 2026",
-      "closeDate": "04 November 2026",
-      "issuePrice": 94.0,
-      "lotSize": 1200,
-      "minAmount": 225600,
-      "issueSize": "₹56.68 Cr",
-      "historicalGain": "17.0% avg listing gain in last 1 yr",
-      "summary": "Strong fundamentals in Materials.",
+      "openDate": "25 November 2026",
+      "closeDate": "27 November 2026",
+      "issuePrice": 142.0,
+      "lotSize": 105,
+      "minAmount": 14910,
+      "issueSize": "TBA",
+      "historicalGain": "12.0% avg listing gain in last 1 yr",
+      "summary": "Strong fundamentals in Consumer Staples.",
       "verdict": "Apply",
       "verdictCls": "verdict-apply",
       "checks": [
         {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Attractive P/S valuation (1.64x vs Sector Average 2.5x)"
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "High P/S valuation (3.56x vs Sector Average 3.5x)"
         },
         {
           "icon": "✓",
           "cls": "check-pass",
-          "text": "Robust growth (41.35% vs Sector Average 13.0%)"
+          "text": "Robust growth (44.04% vs Sector Average 12.0%)"
         },
         {
           "icon": "✓",
           "cls": "check-pass",
-          "text": "High promoter confidence (73.08% holding)"
+          "text": "High promoter confidence (65.0% holding)"
         },
         {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Major chunk of issue allocated to Working Capital"
+          "icon": "✗",
+          "cls": "check-fail",
+          "text": "Major chunk of issue goes to Debt Repayment / OFS"
         }
       ],
       "score": 1,
-      "lastFetched": "03 Nov 2026, 05:45 PM"
-    },
-    {
-      "slug": "antala-industries",
-      "name": "Antala Industries",
-      "symbol": "",
-      "sector": "Materials (SME IPO)",
-      "category": "SME IPO",
-      "status": "Open",
-      "openDate": "29 October 2026",
-      "closeDate": "05 November 2026",
-      "issuePrice": 66.0,
-      "lotSize": 2000,
-      "minAmount": 264000,
-      "issueSize": "₹22.98 Cr",
-      "historicalGain": "17.0% avg listing gain in last 1 yr",
-      "summary": "Strong fundamentals in Materials.",
-      "verdict": "Apply",
-      "verdictCls": "verdict-apply",
-      "checks": [
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Attractive P/S valuation (1.72x vs Sector Average 2.5x)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Robust growth (94.64% vs Sector Average 13.0%)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "High promoter confidence (71.36% holding)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Major chunk of issue allocated to Working Capital"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "03 Nov 2026, 05:45 PM"
+      "lastFetched": "25 Nov 2026, 05:39 PM"
     }
   ],
-  "lastUpdated": "03 Nov 2026, 05:45 PM",
+  "lastUpdated": "25 Nov 2026, 05:39 PM",
   "scrapeWarnings": []
 }
