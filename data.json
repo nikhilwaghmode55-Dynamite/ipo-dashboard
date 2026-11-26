@@ -40,9 +40,36 @@
         }
       ],
       "score": 1,
-      "lastFetched": "25 Nov 2026, 07:31 PM"
+      "lastFetched": "26 Nov 2026, 07:10 PM"
+    },
+    {
+      "slug": "foodlink-f-b-holdings",
+      "name": "Foodlink F&B Holdings",
+      "symbol": "",
+      "sector": "Pending Entry (Mainboard IPO)",
+      "category": "Mainboard IPO",
+      "status": "Open",
+      "openDate": "26 November 2026",
+      "closeDate": "30 November 2026",
+      "issuePrice": 191.0,
+      "lotSize": 78,
+      "minAmount": 14898,
+      "issueSize": "TBA",
+      "historicalGain": "Data pending",
+      "summary": "Awaiting fundamental RHP data entry.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "ℹ",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "26 Nov 2026, 07:10 PM"
     }
   ],
-  "lastUpdated": "25 Nov 2026, 07:31 PM",
+  "lastUpdated": "26 Nov 2026, 07:10 PM",
   "scrapeWarnings": []
 }
