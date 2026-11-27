@@ -1,48 +1,6 @@
 {
   "upcoming": [
     {
-      "slug": "shree-siddhivinayak-greentech-industries",
-      "name": "Shree Siddhivinayak Greentech Industries",
-      "symbol": "",
-      "sector": "Consumer Staples (Mainboard IPO)",
-      "category": "Mainboard IPO",
-      "status": "Open",
-      "openDate": "25 November 2026",
-      "closeDate": "27 November 2026",
-      "issuePrice": 142.0,
-      "lotSize": 105,
-      "minAmount": 14910,
-      "issueSize": "TBA",
-      "historicalGain": "12.0% avg listing gain in last 1 yr",
-      "summary": "Strong fundamentals in Consumer Staples.",
-      "verdict": "Apply",
-      "verdictCls": "verdict-apply",
-      "checks": [
-        {
-          "icon": "✗",
-          "cls": "check-fail",
-          "text": "High P/S valuation (3.56x vs Sector Average 3.5x)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "Robust growth (44.04% vs Sector Average 12.0%)"
-        },
-        {
-          "icon": "✓",
-          "cls": "check-pass",
-          "text": "High promoter confidence (65.0% holding)"
-        },
-        {
-          "icon": "✗",
-          "cls": "check-fail",
-          "text": "Major chunk of issue goes to Debt Repayment / OFS"
-        }
-      ],
-      "score": 1,
-      "lastFetched": "26 Nov 2026, 07:10 PM"
-    },
-    {
       "slug": "foodlink-f-b-holdings",
       "name": "Foodlink F&B Holdings",
       "symbol": "",
@@ -67,9 +25,36 @@
         }
       ],
       "score": 1,
-      "lastFetched": "26 Nov 2026, 07:10 PM"
+      "lastFetched": "27 Nov 2026, 07:07 PM"
+    },
+    {
+      "slug": "airpro-technology-india",
+      "name": "Airpro Technology India",
+      "symbol": "",
+      "sector": "Pending Entry (Mainboard IPO)",
+      "category": "Mainboard IPO",
+      "status": "Open",
+      "openDate": "27 November 2026",
+      "closeDate": "01 December 2026",
+      "issuePrice": 99.0,
+      "lotSize": 151,
+      "minAmount": 14949,
+      "issueSize": "TBA",
+      "historicalGain": "Data pending",
+      "summary": "Awaiting fundamental RHP data entry.",
+      "verdict": "Data will be updated soon",
+      "verdictCls": "verdict-caution",
+      "checks": [
+        {
+          "icon": "ℹ",
+          "cls": "check-warn",
+          "text": "Fundamental metrics pending"
+        }
+      ],
+      "score": 1,
+      "lastFetched": "27 Nov 2026, 07:07 PM"
     }
   ],
-  "lastUpdated": "26 Nov 2026, 07:10 PM",
+  "lastUpdated": "27 Nov 2026, 07:07 PM",
   "scrapeWarnings": []
 }
